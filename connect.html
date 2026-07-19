@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect — MeshTexas</title>
+  <meta name="description" content="Connect your MeshCore device to the MeshTexas broker — setup instructions for MeshCore firmware, meshcoretomqtt, and meshcore-packet-capture.">
+  <meta property="og:title" content="Connect — MeshTexas">
+  <meta property="og:description" content="Connect your MeshCore device to the MeshTexas broker — setup instructions for MeshCore firmware, meshcoretomqtt, and meshcore-packet-capture.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#dde3ea">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    (function() {
+      var t = localStorage.getItem('meshtexas-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <div class="brand">
+        <a href="/" class="brand-name">MeshTexas</a>
+      </div>
+      <nav>
+        <a href="/connect">Connect</a>
+        <details class="nav-dropdown">
+          <summary>About</summary>
+          <menu>
+            <li><a href="/about">About MeshTexas</a></li>
+            <li><a href="/about#coverage">Coverage</a></li>
+            <li><a href="/about#community">Community</a></li>
+            <li><a href="/about#other-regions">Working With Other Regions</a></li>
+          </menu>
+        </details>
+        <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener" class="nav-cta">Live Analyzer ↗</a>
+        <a href="https://livemap.meshtexas.org" target="_blank" rel="noopener" class="nav-cta">Live Map ↗</a>
+      </nav>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">☰</button>
+      <label class="theme-switch" title="Toggle light/dark mode">
+        <input type="checkbox" id="themeToggle" aria-label="Toggle light/dark mode">
+        <span class="switch-track"><span class="switch-thumb"></span></span>
+      </label>
+    </div>
+  </header>
+
+  <div class="mobile-nav" id="mobileNav">
+    <a href="/connect" class="mobile-nav-link">Connect</a>
+    <span class="mobile-nav-label">About</span>
+    <a href="/about" class="mobile-nav-link mobile-nav-sublink">About MeshTexas</a>
+    <a href="/about#coverage" class="mobile-nav-link mobile-nav-sublink">Coverage</a>
+    <a href="/about#community" class="mobile-nav-link mobile-nav-sublink">Community</a>
+    <a href="/about#other-regions" class="mobile-nav-link mobile-nav-sublink">Working With Other Regions</a>
+    <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener" class="mobile-nav-link">Live Analyzer ↗</a>
+    <a href="https://livemap.meshtexas.org" target="_blank" rel="noopener" class="mobile-nav-link">Live Map ↗</a>
+  </div>
+
+  <section class="connect tint">
+    <div class="container">
+      <h1>Connect to the Network</h1>
+      <p class="section-sub">The MeshTexas broker accepts connections from any Texas-area MeshCore observer. Auth uses the same JWT model as MeshMapper and Waev — your device signs its own token from its keypair. No credentials or registration required.</p>
+
+      <div class="broker-info">
+        <div class="broker-detail">
+          <span class="label">Broker</span>
+          <code>mqtt.meshtexas.org</code>
+        </div>
+        <div class="broker-detail">
+          <span class="label">Port</span>
+          <code>443</code>
+        </div>
+        <div class="broker-detail">
+          <span class="label">Transport</span>
+          <code>WebSocket Secure (WSS)</code>
+        </div>
+        <div class="broker-detail">
+          <span class="label">Auth</span>
+          <code>JWT — auto, from device keypair</code>
+        </div>
+      </div>
+
+      <div class="region-note">
+        <div class="region-note-icon">!</div>
+        <div class="region-note-content">
+          <strong>Only listed region codes are accepted</strong>
+          <p>Devices tagged with a region code that isn't in the list below won't be able to connect. Don't see your area? <a href="/about#other-regions">Let us know</a> and we'll add it.</p>
+        </div>
+      </div>
+
+      <h3 class="setup-heading">Setup Instructions</h3>
+      <p class="setup-sub">Select the software your observer is running:</p>
+
+      <div class="device-tabs">
+        <div class="tab-buttons" role="tablist">
+          <button class="tab-btn active" data-tab="firmware" role="tab" aria-selected="true">MeshCore Firmware</button>
+          <button class="tab-btn" data-tab="mctomqtt" role="tab" aria-selected="false">meshcoretomqtt</button>
+          <button class="tab-btn" data-tab="pktcapture" role="tab" aria-selected="false">meshcore-packet-capture</button>
+        </div>
+
+        <div class="tab-pane active" id="tab-firmware" role="tabpanel">
+          <p class="device-compat">For <strong>Heltec V3/V4, T-LoRa, Tracker, and any ESP32-based board</strong> running the <a href="https://github.com/agessaman/MeshCore" target="_blank" rel="noopener">agessaman MeshCore firmware</a> with MQTT bridge support.</p>
+          <ol class="steps">
+            <li>
+              <strong>Open a command line to your device</strong> — expand the method you're using:
+              <div class="iata-choice">
+                <details class="hint-collapsible">
+                  <summary>Via USB Serial</summary>
+                  <div class="hint-body">
+                    <p>Connect via USB serial at <code>115200</code> baud using a terminal (PuTTY, screen, minicom) or the MeshCore serial console.</p>
+                  </div>
+                </details>
+                <details class="hint-collapsible">
+                  <summary>Via Bluetooth Companion App</summary>
+                  <div class="hint-body">
+                    <p>Open the MeshCore companion app, connect to your device over Bluetooth, then navigate to <strong>Remote Management → Command Line</strong> — all commands below are entered there, no USB cable needed.</p>
+                  </div>
+                </details>
+              </div>
+            </li>
+            <li>
+              <strong>Set your region</strong> using the IATA code for the Texas city nearest to you:
+              <div class="iata-grid">
+                <span><code>SAT</code> San Antonio</span>
+                <span><code>AUS</code> Austin</span>
+                <span><code>HOU</code> Houston</span>
+                <span><code>DFW</code> Dallas–Fort Worth</span>
+                <span><code>ELP</code> El Paso</span>
+                <span><code>ABI</code> Abilene</span>
+                <span><code>AMA</code> Amarillo</span>
+                <span><code>MFE</code> McAllen</span>
+                <span><code>SJT</code> San Angelo</span>
+                <span><code>TXK</code> Texarkana</span>
+                <span><code>CRP</code> Corpus Christi</span>
+                <span><code>ACT</code> Waco</span>
+              </div>
+              <pre><code>set mqtt.iata SAT</code></pre>
+            </li>
+            <li>
+              <strong>Pick a free broker slot</strong> (mqtt1–mqtt6). Not sure which are free? Run <code>get mqtt1.preset</code> through <code>get mqtt6.preset</code> and use one that shows <code>none</code>.
+            </li>
+            <li>
+              <strong>Configure the slot</strong> — replace <code>mqtt1</code> with your chosen slot:
+              <pre><code>set mqtt1.preset custom
+set mqtt1.server mqtt.meshtexas.org
+set mqtt1.port 443
+set mqtt1.audience mqtt.meshtexas.org
+save
+reboot</code></pre>
+            </li>
+            <li>
+              <strong>Confirm the connection</strong> after reboot:
+              <pre><code>get mqtt.status</code></pre>
+              You should see <code>mqtt1: connected</code>.
+            </li>
+          </ol>
+        </div>
+
+        <div class="tab-pane" id="tab-mctomqtt" role="tabpanel">
+          <p class="device-compat">For <strong>RAK4631 and any serial-connected MeshCore device</strong> running <a href="https://github.com/Cisien/meshcoretomqtt" target="_blank" rel="noopener">meshcoretomqtt</a>.</p>
+          <ol class="steps">
+            <li>
+              <strong>Find your config directory</strong> — typically <code>/etc/mctomqtt/config.d/</code> on Linux.
+            </li>
+            <li>
+              <strong>Set your IATA region</strong> — replace <code>SAT</code> with the Texas city nearest to you, then expand the option that matches your setup:
+              <div class="iata-grid">
+                <span><code>SAT</code> San Antonio</span>
+                <span><code>AUS</code> Austin</span>
+                <span><code>HOU</code> Houston</span>
+                <span><code>DFW</code> Dallas–Fort Worth</span>
+                <span><code>ELP</code> El Paso</span>
+                <span><code>ABI</code> Abilene</span>
+                <span><code>AMA</code> Amarillo</span>
+                <span><code>MFE</code> McAllen</span>
+                <span><code>SJT</code> San Angelo</span>
+                <span><code>TXK</code> Texarkana</span>
+                <span><code>CRP</code> Corpus Christi</span>
+                <span><code>ACT</code> Waco</span>
+              </div>
+              <div class="iata-choice">
+                <div class="iata-choice-label">Choose your setup</div>
+                <details class="hint-collapsible">
+                  <summary>Connecting to Multiple Region Brokers</summary>
+                  <div class="hint-body">
+                    <p>Sets IATA only for the MeshTexas broker — safe when you're also connected to other regional meshes. Create <code>30-texasmesh.toml</code> in <code>config.d/</code>:</p>
+                    <pre><code>[[broker]]
+name = "meshtexas"
+enabled = true
+server = "mqtt.meshtexas.org"
+port = 443
+transport = "websockets"
+keepalive = 60
+qos = 0
+retain = true
+
+[broker.tls]
+enabled = true
+verify = true
+
+[broker.auth]
+method = "token"
+audience = "mqtt.meshtexas.org"
+
+[broker.topics]
+iata = "SAT"</code></pre>
+                  </div>
+                </details>
+                <details class="hint-collapsible">
+                  <summary>Only Connecting to Texas Brokers</summary>
+                  <div class="hint-body">
+                    <p>Simpler option — sets IATA globally. Create or edit <code>/etc/mctomqtt/config.d/99-user.toml</code>:</p>
+                    <pre><code>[general]
+iata = "SAT"</code></pre>
+                    <p>Then create <code>30-texasmesh.toml</code> in <code>config.d/</code> without a <code>[broker.topics]</code> block:</p>
+                    <pre><code>[[broker]]
+name = "meshtexas"
+enabled = true
+server = "mqtt.meshtexas.org"
+port = 443
+transport = "websockets"
+keepalive = 60
+qos = 0
+retain = true
+
+[broker.tls]
+enabled = true
+verify = true
+
+[broker.auth]
+method = "token"
+audience = "mqtt.meshtexas.org"</code></pre>
+                  </div>
+                </details>
+              </div>
+            </li>
+            <li>
+              <strong>Restart meshcoretomqtt</strong> and watch the logs for a connection confirmation:
+              <pre><code>sudo systemctl restart meshcoretomqtt
+journalctl -u meshcoretomqtt -f</code></pre>
+            </li>
+          </ol>
+          <p class="hint">Run <code>ls /etc/mctomqtt/config.d/</code> to see what files already exist before picking a number.</p>
+        </div>
+
+        <div class="tab-pane" id="tab-pktcapture" role="tabpanel">
+          <p class="device-compat">For any MeshCore observer running <a href="https://github.com/agessaman/meshcore-packet-capture" target="_blank" rel="noopener">meshcore-packet-capture</a>.</p>
+          <ol class="steps">
+            <li>
+              <strong>Find your presets directory</strong> inside your meshcore-packet-capture installation.
+            </li>
+            <li>
+              <strong>Set your IATA region</strong> — replace <code>SAT</code> with the Texas city nearest to you, then expand the option that matches your setup:
+              <div class="iata-grid">
+                <span><code>SAT</code> San Antonio</span>
+                <span><code>AUS</code> Austin</span>
+                <span><code>HOU</code> Houston</span>
+                <span><code>DFW</code> Dallas–Fort Worth</span>
+                <span><code>ELP</code> El Paso</span>
+                <span><code>ABI</code> Abilene</span>
+                <span><code>AMA</code> Amarillo</span>
+                <span><code>MFE</code> McAllen</span>
+                <span><code>SJT</code> San Angelo</span>
+                <span><code>TXK</code> Texarkana</span>
+                <span><code>CRP</code> Corpus Christi</span>
+                <span><code>ACT</code> Waco</span>
+              </div>
+              <div class="iata-choice">
+                <div class="iata-choice-label">Choose your setup</div>
+                <details class="hint-collapsible">
+                  <summary>Connecting to Multiple Region Brokers</summary>
+                  <div class="hint-body">
+                    <p>Sets IATA only for the MeshTexas broker — safe when you're also connected to other regional meshes. Create <code>meshtexas.toml</code> in your presets directory:</p>
+                    <pre><code>[[broker]]
+name = "meshtexas"
+enabled = true
+server = "mqtt.meshtexas.org"
+port = 443
+transport = "websockets"
+keepalive = 60
+qos = 0
+retain = true
+iata = "SAT"
+
+[broker.tls]
+enabled = true
+verify = true
+
+[broker.auth]
+method = "token"
+audience = "mqtt.meshtexas.org"</code></pre>
+                  </div>
+                </details>
+                <details class="hint-collapsible">
+                  <summary>Only Connecting to Texas Brokers</summary>
+                  <div class="hint-body">
+                    <p>Simpler option — sets IATA globally. Create or edit <code>/etc/meshcore-packet-capture/config.d/99-user.toml</code>:</p>
+                    <pre><code>[general]
+iata = "SAT"</code></pre>
+                    <p>Then create <code>meshtexas.toml</code> in your presets directory without an <code>iata</code> line:</p>
+                    <pre><code>[[broker]]
+name = "meshtexas"
+enabled = true
+server = "mqtt.meshtexas.org"
+port = 443
+transport = "websockets"
+keepalive = 60
+qos = 0
+retain = true
+
+[broker.tls]
+enabled = true
+verify = true
+
+[broker.auth]
+method = "token"
+audience = "mqtt.meshtexas.org"</code></pre>
+                  </div>
+                </details>
+              </div>
+            </li>
+            <li>
+              <strong>Restart the service</strong> and check logs for a successful broker connection.
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="verify-section">
+        <div class="verify-icon">✓</div>
+        <div class="verify-content">
+          <strong>Verify your connection</strong>
+          <p>After connecting, search for your node name on the MeshTexas Analyzer. It should appear within a few minutes of your device sending its first advert packet.</p>
+          <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener" class="btn btn-secondary">Open Analyzer ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>MeshTexas is a community project. Not affiliated with MeshCore Ltd.</p>
+      <p><a href="https://meshcore.io" target="_blank" rel="noopener">MeshCore</a> · <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener">Analyzer</a> · <a href="https://livemap.meshtexas.org" target="_blank" rel="noopener">Live Map</a> · <a href="mailto:adamnieto@gmail.com">Contact</a></p>
+    </div>
+  </footer>
+
+  <script>
+    var html = document.documentElement;
+    var toggle = document.getElementById('themeToggle');
+    var hamburger = document.getElementById('hamburger');
+    var mobileNav = document.getElementById('mobileNav');
+
+    hamburger.addEventListener('click', function() {
+      var open = mobileNav.classList.toggle('open');
+      hamburger.setAttribute('aria-expanded', open);
+      hamburger.textContent = open ? '✕' : '☰';
+    });
+
+    document.querySelectorAll('.nav-dropdown').forEach(function(dd) {
+      dd.addEventListener('toggle', function() {
+        if (dd.open) {
+          document.querySelectorAll('.nav-dropdown').forEach(function(other) {
+            if (other !== dd) other.open = false;
+          });
+        }
+      });
+    });
+
+    document.addEventListener('click', function(e) {
+      document.querySelectorAll('.nav-dropdown[open]').forEach(function(dd) {
+        if (!dd.contains(e.target)) dd.open = false;
+      });
+    });
+
+    document.querySelectorAll('.tab-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var tab = btn.getAttribute('data-tab');
+        document.querySelectorAll('.tab-btn').forEach(function(b) {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        document.querySelectorAll('.tab-pane').forEach(function(p) {
+          p.classList.remove('active');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        document.getElementById('tab-' + tab).classList.add('active');
+      });
+    });
+
+    mobileNav.querySelectorAll('a').forEach(function(link) {
+      link.addEventListener('click', function() {
+        mobileNav.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', false);
+        hamburger.textContent = '☰';
+      });
+    });
+
+    toggle.checked = html.getAttribute('data-theme') === 'light';
+
+    toggle.addEventListener('change', function() {
+      var next = toggle.checked ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('meshtexas-theme', next);
+    });
+  </script>
+</body>
+</html>

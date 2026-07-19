@@ -166,6 +166,64 @@ nav a:hover {
   background: var(--accent);
 }
 
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  transition: color 0.15s;
+}
+
+.nav-dropdown summary::-webkit-details-marker { display: none; }
+
+.nav-dropdown summary::after {
+  content: '▾';
+  font-size: 0.7em;
+}
+
+.nav-dropdown:hover summary,
+.nav-dropdown[open] summary {
+  color: var(--text);
+}
+
+.nav-dropdown menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 220px;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+  z-index: 110;
+}
+
+.nav-dropdown menu li a {
+  display: block;
+  padding: 8px 12px;
+  border-radius: calc(var(--radius) - 2px);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.nav-dropdown menu li a:hover {
+  background: var(--bg-3);
+  color: var(--text);
+  text-decoration: none;
+}
+
 .theme-switch {
   display: flex;
   align-items: center;
@@ -261,6 +319,22 @@ nav a:hover {
 }
 
 .hero-sub a { color: var(--accent); }
+
+.eli5 {
+  padding: 48px 0;
+}
+
+.eli5-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.eli5-inner p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
 
 .hero-actions {
   display: flex;
@@ -866,6 +940,20 @@ footer a:hover { color: var(--text); }
 .mobile-nav-link:last-child { border-bottom: none; }
 .mobile-nav-link:hover { background: var(--bg-3); text-decoration: none; }
 
+.mobile-nav-label {
+  padding: 14px 24px 4px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.mobile-nav-sublink {
+  padding-left: 36px;
+  font-size: 0.9rem;
+}
+
 /* About / plain content pages */
 .page-intro {
   padding: 64px 0 48px;
@@ -979,7 +1067,7 @@ footer a:hover { color: var(--text); }
 
 /* Mobile */
 @media (max-width: 640px) {
-  nav a { display: none; }
+  nav a, nav .nav-dropdown { display: none; }
   .hamburger { display: block; }
   .hero { padding: 48px 0; }
   .hero-inner { flex-direction: column-reverse; gap: 32px; }
