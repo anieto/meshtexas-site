@@ -901,6 +901,12 @@ footer a:hover { color: var(--text); }
 
 .prose strong { color: var(--text); }
 
+.prose ul { color: var(--text-muted); line-height: 1.7; padding-left: 20px; }
+
+.prose ul + p, .prose p + ul { margin-top: 16px; }
+
+.prose li + li { margin-top: 8px; }
+
 .request-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
