@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — MeshTexas</title>
+  <meta name="description" content="Why and how MeshTexas runs its Texas MeshCore broker and analyzer, and how other regional mesh communities can get involved.">
+  <meta property="og:title" content="About — MeshTexas">
+  <meta property="og:description" content="Why and how MeshTexas runs its Texas MeshCore broker and analyzer, and how other regional mesh communities can get involved.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#dde3ea">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    (function() {
+      var t = localStorage.getItem('meshtexas-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <div class="brand">
+        <a href="/" class="brand-name">MeshTexas</a>
+      </div>
+      <nav>
+        <a href="/#connect">Connect</a>
+        <a href="/#coverage">Coverage</a>
+        <a href="/#community">Community</a>
+        <a href="/about">About</a>
+        <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener" class="nav-cta">Live Analyzer ↗</a>
+        <a href="https://livemap.meshtexas.org" target="_blank" rel="noopener" class="nav-cta">Live Map ↗</a>
+      </nav>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">☰</button>
+      <label class="theme-switch" title="Toggle light/dark mode">
+        <input type="checkbox" id="themeToggle" aria-label="Toggle light/dark mode">
+        <span class="switch-track"><span class="switch-thumb"></span></span>
+      </label>
+    </div>
+  </header>
+
+  <div class="mobile-nav" id="mobileNav">
+    <a href="/#connect" class="mobile-nav-link">Connect</a>
+    <a href="/#coverage" class="mobile-nav-link">Coverage</a>
+    <a href="/#community" class="mobile-nav-link">Community</a>
+    <a href="/about" class="mobile-nav-link">About</a>
+    <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener" class="mobile-nav-link">Live Analyzer ↗</a>
+    <a href="https://livemap.meshtexas.org" target="_blank" rel="noopener" class="mobile-nav-link">Live Map ↗</a>
+  </div>
+
+  <div class="page-intro">
+    <div class="container-narrow">
+      <h1>About MeshTexas</h1>
+      <p class="hero-sub">MeshTexas started as a way to make sense of a Texas-based <a href="https://meshcore.io" target="_blank" rel="noopener">MeshCore</a> mesh network — one place to see which nodes are active, how packets are moving across the state, and how the network is growing over time. Off-grid, decentralized mesh networking only gets more useful the more people can see it working, so instead of keeping that data to ourselves, we built a public map and opened it up.</p>
+    </div>
+  </div>
+
+  <section class="about-section tint">
+    <div class="container-narrow">
+      <h2>How It Works</h2>
+      <div class="prose">
+        <p>MeshCore <strong>observer nodes</strong> across Texas — devices configured to capture and forward live packet data — report to a self-hosted MQTT broker, which feeds a real-time analyzer and map. Everything runs on infrastructure we manage, is scoped to Texas-region nodes only, and is free for the community to use and watch.</p>
+        <p>Setting one up takes a bit of configuration — not every node needs this, it's a dedicated observer role — but we've written guides for the most common hardware and software combinations. See the <a href="/#connect">Connect</a> section for setup instructions covering MeshCore firmware, <code>meshcoretomqtt</code>, and <code>meshcore-packet-capture</code>.</p>
+        <p>Regions are tagged using IATA airport codes (e.g. <code>SAT</code> for San Antonio, <code>AUS</code> for Austin) — not because they're airport-specific, just a compact, already-familiar convention for naming Texas metro areas without inventing new abbreviations.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-section" id="other-regions">
+    <div class="container-narrow">
+      <h2>Working With Other Regions</h2>
+      <div class="prose">
+        <p>We built this as regional infrastructure, not a one-off personal project — and we'd rather see more of Texas (and neighboring communities) covered than keep it to ourselves. If you're running or organizing a MeshCore community in another region, we're open to giving your nodes access to our broker so you can stand up your own independently-branded map without having to run MQTT infrastructure of your own.</p>
+        <p>You don't need to be organizing a whole community to reach out, either — the broker only accepts devices tagged with a pre-approved region code, so if your city or area isn't in the <a href="/#connect">Connect</a> section's list yet, that's reason enough to get in touch on your own, solo node or not. Adding a region code is a small, quick change on our end.</p>
+        <p>This isn't automatic — we review each request so the network stays healthy and regionally organized — but it's a quick process. Note that this is about observer infrastructure specifically (the piece that forwards packet data to a broker), not a requirement for every node on your mesh — see <a href="/#connect">Connect</a> for what that setup looks like.</p>
+
+        <h3>If you're interested, get in touch and let us know:</h3>
+      </div>
+
+      <div class="request-cards">
+        <div class="request-card">
+          <span class="field-label">Who You Are</span>
+          <p>Your name and group/community name (if any).</p>
+        </div>
+        <div class="request-card">
+          <span class="field-label">Your Community</span>
+          <p>A link to your community's site or social presence.</p>
+        </div>
+        <div class="request-card">
+          <span class="field-label">Contact</span>
+          <p>Email address (or Discord handle).</p>
+        </div>
+        <div class="request-card">
+          <span class="field-label">Coverage</span>
+          <p>What region you cover and roughly how many nodes/operators you have.</p>
+        </div>
+        <div class="request-card">
+          <span class="field-label">Access Type</span>
+          <p>Broker access only (you run your own map), or help setting up a fully independent stack.</p>
+        </div>
+      </div>
+
+      <div class="verify-section">
+        <div class="verify-icon">✓</div>
+        <div class="verify-content">
+          <strong>Get in touch</strong>
+          <p>Send the details above and we'll follow up to get you connected.</p>
+          <a href="mailto:adamnieto@gmail.com" class="btn btn-secondary">Email Us ↗</a>
+        </div>
+      </div>
+
+      <div class="repo-callout">
+        <div class="repo-callout-icon">⚙</div>
+        <div class="repo-callout-content">
+          <strong>Prefer to run your own fully independent stack?</strong>
+          <p>Our deployment is open source and written to work for any region, not just Texas.</p>
+          <a href="https://github.com/anieto/meshcore-broker-stack" target="_blank" rel="noopener" class="btn btn-secondary">View on GitHub ↗</a>
+        </div>
+      </div>
+
+      <p class="hint" style="margin-top: 20px;">MeshTexas is community-run, volunteer infrastructure. We don't guarantee uptime, and access can be adjusted or revoked if needed to keep the network healthy for everyone.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>MeshTexas is a community project. Not affiliated with MeshCore Ltd.</p>
+      <p><a href="https://meshcore.io" target="_blank" rel="noopener">MeshCore</a> · <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener">Analyzer</a> · <a href="https://livemap.meshtexas.org" target="_blank" rel="noopener">Live Map</a> · <a href="mailto:adamnieto@gmail.com">Contact</a></p>
+    </div>
+  </footer>
+
+  <script>
+    var html = document.documentElement;
+    var toggle = document.getElementById('themeToggle');
+    var hamburger = document.getElementById('hamburger');
+    var mobileNav = document.getElementById('mobileNav');
+
+    hamburger.addEventListener('click', function() {
+      var open = mobileNav.classList.toggle('open');
+      hamburger.setAttribute('aria-expanded', open);
+      hamburger.textContent = open ? '✕' : '☰';
+    });
+
+    mobileNav.querySelectorAll('a').forEach(function(link) {
+      link.addEventListener('click', function() {
+        mobileNav.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', false);
+        hamburger.textContent = '☰';
+      });
+    });
+
+    toggle.checked = html.getAttribute('data-theme') === 'light';
+
+    toggle.addEventListener('change', function() {
+      var next = toggle.checked ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('meshtexas-theme', next);
+    });
+  </script>
+</body>
+</html>
