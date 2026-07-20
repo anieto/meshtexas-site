@@ -1,0 +1,24 @@
+---
+import Layout from '../components/Layout.astro';
+---
+<Layout title="Search — MeshTexas" description="Search the MeshTexas site.">
+  <div class="page-intro">
+    <div class="container-narrow">
+      <h1>Search</h1>
+    </div>
+  </div>
+
+  <section class="about-section">
+    <div class="container-narrow">
+      <div id="search"></div>
+    </div>
+  </section>
+
+  <link href="/pagefind/pagefind-ui.css" rel="stylesheet">
+  <script is:inline src="/pagefind/pagefind-ui.js"></script>
+  <script is:inline>
+    window.addEventListener('DOMContentLoaded', function () {
+      new PagefindUI({ element: '#search', showSubResults: true });
+    });
+  </script>
+</Layout>

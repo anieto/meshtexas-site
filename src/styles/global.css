@@ -154,6 +154,11 @@ nav a:hover {
   text-decoration: none;
 }
 
+.nav-search {
+  font-size: 1rem;
+  line-height: 1;
+}
+
 .nav-cta {
   background: var(--accent-dim);
   color: var(--text) !important;
