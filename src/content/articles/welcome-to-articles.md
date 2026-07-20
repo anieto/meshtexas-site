@@ -1,9 +1,11 @@
 ---
 title: Welcome to MeshTexas Articles
-description: Introducing the Articles section — what to expect here and how to get involved with the network.
+description: Introducing the Articles section — what to expect here and how to
+  get involved with the network.
 category: announcement
 author: UsefulTowel
 publishedAt: 2026-07-20
+thumbnail: /images/meshtexas-logo-wide.png
 ---
 
 MeshTexas is a community-run mesh network for Texas, built on MeshCore — long-range radios that let people send text messages without cell service or internet. No towers, no monthly bill, just radios talking to radios.
