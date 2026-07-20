@@ -24,7 +24,7 @@ It extends MeshTexas — a free, open-source community mesh network that lets pe
 
 A small, weatherproof enclosure containing the radio and battery, a lightweight antenna, and usually a solar panel. Compact — roughly the size of a home router, with a longer antenna.
 
-![](/images/repeater2.jpg)
+![](/images/repeater2.jpg "Magnetic Repeater")
 
 **How is it powered?**
 
