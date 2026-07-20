@@ -2,7 +2,7 @@
 import Layout from '../../components/Layout.astro';
 import { getCollection } from 'astro:content';
 
-const pages = await getCollection('host-info');
+const pages = await getCollection('host-a-node');
 ---
 <Layout
   title="Host a Node — MeshTexas"
@@ -22,7 +22,7 @@ const pages = await getCollection('host-info');
       )}
       <div class="article-list">
         {pages.map((page) => (
-          <a href={`/host-info/${page.id}/`} class="article-card">
+          <a href={`/host-a-node/${page.id}/`} class="article-card">
             <h2>{page.data.title}</h2>
             <p>{page.data.description}</p>
           </a>

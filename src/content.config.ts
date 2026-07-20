@@ -19,8 +19,8 @@ const articles = defineCollection({
   }),
 });
 
-const hostInfo = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/host-info' }),
+const hostANode = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/host-a-node' }),
   schema: z.object({
     title: z.string(),
     description: z.string(),
@@ -28,4 +28,4 @@ const hostInfo = defineCollection({
   }),
 });
 
-export const collections = { articles, 'host-info': hostInfo };
+export const collections = { articles, 'host-a-node': hostANode };

@@ -54,10 +54,10 @@ collections:
       - { label: "Thumbnail", name: "thumbnail", widget: "image", required: false }
       - { label: "Body", name: "body", widget: "markdown" }
 
-  - name: "host-info"
-    label: "Host Info"
+  - name: "host-a-node"
+    label: "Host a Node"
     label_singular: "Page"
-    folder: "src/content/host-info"
+    folder: "src/content/host-a-node"
     create: true
     slug: "{{slug}}"
     identifier_field: title

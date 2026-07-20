@@ -3,7 +3,7 @@ import Layout from '../../components/Layout.astro';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
-  const pages = await getCollection('host-info');
+  const pages = await getCollection('host-a-node');
   return pages.map((page) => ({
     params: { slug: page.id },
     props: { page },
