@@ -11,12 +11,13 @@ backend:
   # public_repo scope is enough now that the repo is public — avoids
   # asking contributors' GitHub OAuth consent for full private-repo access.
   auth_scope: public_repo
-
-# Lets any GitHub user submit without being added as a repo collaborator:
-# Decap auto-forks the repo for them, and their submission becomes a PR
-# from their fork into `main`. They only ever see Draft / Ready to Review —
-# no publish button. Requires editorial_workflow (below) to function.
-open_authoring: true
+  # Lets any GitHub user submit without being added as a repo collaborator:
+  # Decap auto-forks the repo for them, and their submission becomes a PR
+  # from their fork into `main`. They only ever see Draft / Ready to Review —
+  # no publish button. Requires editorial_workflow (below) to function.
+  # Must be nested under `backend:` — a top-level open_authoring key is
+  # silently ignored, which is exactly what broke this the first time.
+  open_authoring: true
 
 publish_mode: editorial_workflow
 
