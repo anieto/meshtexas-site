@@ -1,9 +1,6 @@
-# DRAFT — not wired up yet. Not referenced by any page, not deployed.
-# Sketch of Decap CMS's public/admin/config.yml for meshtexas-site,
-# assuming the planned migration to Astro + content collections.
+# Decap CMS config for meshtexas-site.
 #
-# Still needed before this is real:
-#   - Astro migration (src/content/articles/, src/content/host-info/)
+# Still needed before this is fully live:
 #   - OAuth backend (Cloudflare Pages Function at /api/auth, /api/callback)
 #     so GitHub login works — see SubhenduX/decap-cms-cloudflare-pages
 #     or sterlingwes/decap-proxy as reference implementations.
@@ -27,7 +24,7 @@ open_authoring: true
 
 publish_mode: editorial_workflow
 
-media_folder: "src/assets/images"
+media_folder: "public/images"
 public_folder: "/images"
 
 collections:
