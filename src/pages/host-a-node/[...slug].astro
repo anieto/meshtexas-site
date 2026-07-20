@@ -4,6 +4,9 @@ import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
   const pages = await getCollection('host-a-node');
+  // With a single entry, /host-a-node/ renders it directly — skip generating
+  // this page too, so the same content doesn't exist at two URLs.
+  if (pages.length <= 1) return [];
   return pages.map((page) => ({
     params: { slug: page.id },
     props: { page },

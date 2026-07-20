@@ -1,33 +1,56 @@
 ---
 import Layout from '../../components/Layout.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 
 const pages = await getCollection('host-a-node');
----
-<Layout
-  title="Host a Node — MeshTexas"
-  description="Information for property owners and businesses interested in hosting a MeshTexas node."
->
-  <div class="page-intro">
-    <div class="container-narrow">
-      <h1>Host a Node</h1>
-      <p class="hero-sub">Information for property owners, managers, and businesses interested in hosting a MeshTexas node.</p>
-    </div>
-  </div>
 
-  <section class="about-section">
-    <div class="container-narrow">
-      {pages.length === 0 && (
-        <p class="hint">Nothing published yet — check back soon.</p>
-      )}
-      <div class="article-list">
-        {pages.map((page) => (
-          <a href={`/host-a-node/${page.id}/`} class="article-card">
-            <h2>{page.data.title}</h2>
-            <p>{page.data.description}</p>
-          </a>
-        ))}
+// With a single entry, render it directly instead of a listing that just
+// points at itself. Once a second page exists (e.g. a separate flyer for
+// commercial neighborhood nodes), this automatically becomes a real listing.
+const single = pages.length === 1 ? pages[0] : null;
+const { Content } = single ? await render(single) : { Content: null };
+---
+{single ? (
+  <Layout title={`${single.data.title} — MeshTexas`} description={single.data.description}>
+    <div class="page-intro">
+      <div class="container-narrow">
+        <h1>{single.data.title}</h1>
+        <p class="hero-sub">{single.data.description}</p>
       </div>
     </div>
-  </section>
-</Layout>
+
+    <section class="about-section">
+      <div class="container-narrow prose">
+        <Content />
+      </div>
+    </section>
+  </Layout>
+) : (
+  <Layout
+    title="Host a Node — MeshTexas"
+    description="Information for property owners and businesses interested in hosting a MeshTexas node."
+  >
+    <div class="page-intro">
+      <div class="container-narrow">
+        <h1>Host a Node</h1>
+        <p class="hero-sub">Information for property owners, managers, and businesses interested in hosting a MeshTexas node.</p>
+      </div>
+    </div>
+
+    <section class="about-section">
+      <div class="container-narrow">
+        {pages.length === 0 && (
+          <p class="hint">Nothing published yet — check back soon.</p>
+        )}
+        <div class="article-list">
+          {pages.map((page) => (
+            <a href={`/host-a-node/${page.id}/`} class="article-card">
+              <h2>{page.data.title}</h2>
+              <p>{page.data.description}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  </Layout>
+)}
