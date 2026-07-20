@@ -1,6 +1,8 @@
 ---
 title: Host a Node
-description: Information for property owners and businesses interested in hosting a MeshTexas repeater.
+description: Information for property owners and businesses interested in
+  hosting a MeshTexas repeater.
+thumbnail: /images/repeater1a.png
 ---
 
 MeshTexas is looking for property owners willing to host a small radio repeater — the fixed-location devices that extend coverage across the mesh network. Every repeater relays traffic for the whole network, so a well-placed one makes a real difference for everyone nearby.
