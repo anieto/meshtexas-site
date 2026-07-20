@@ -1,0 +1,29 @@
+---
+import Layout from '../../components/Layout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('host-info');
+  return pages.map((page) => ({
+    params: { slug: page.id },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props;
+const { Content } = await render(page);
+---
+<Layout title={`${page.data.title} — MeshTexas`} description={page.data.description}>
+  <div class="page-intro">
+    <div class="container-narrow">
+      <h1>{page.data.title}</h1>
+      <p class="hero-sub">{page.data.description}</p>
+    </div>
+  </div>
+
+  <section class="about-section">
+    <div class="container-narrow prose">
+      <Content />
+    </div>
+  </section>
+</Layout>

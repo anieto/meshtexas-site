@@ -1,0 +1,33 @@
+---
+import Layout from '../../components/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const pages = await getCollection('host-info');
+---
+<Layout
+  title="Host a Node — MeshTexas"
+  description="Information for property owners and businesses interested in hosting a MeshTexas node."
+>
+  <div class="page-intro">
+    <div class="container-narrow">
+      <h1>Host a Node</h1>
+      <p class="hero-sub">Information for property owners, managers, and businesses interested in hosting a MeshTexas node.</p>
+    </div>
+  </div>
+
+  <section class="about-section">
+    <div class="container-narrow">
+      {pages.length === 0 && (
+        <p class="hint">Nothing published yet — check back soon.</p>
+      )}
+      <div class="article-list">
+        {pages.map((page) => (
+          <a href={`/host-info/${page.id}/`} class="article-card">
+            <h2>{page.data.title}</h2>
+            <p>{page.data.description}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>
