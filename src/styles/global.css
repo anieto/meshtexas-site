@@ -52,7 +52,8 @@
   color: #ffffff;
 }
 
-[data-theme="light"] .nav-cta {
+[data-theme="light"] .nav-cta,
+[data-theme="light"] .btn-accent {
   color: #ffffff !important;
 }
 
@@ -370,6 +371,16 @@ nav a:hover {
 
 .btn-secondary:hover {
   background: var(--bg-2);
+  text-decoration: none;
+}
+
+.btn-accent {
+  background: var(--accent-dim);
+  color: var(--text);
+}
+
+.btn-accent:hover {
+  background: var(--accent);
   text-decoration: none;
 }
 
