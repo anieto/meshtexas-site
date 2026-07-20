@@ -973,6 +973,13 @@ pre code {
   display: block;
 }
 
+/* The standard 72px section top-padding (plus .page-intro's own 48px
+   bottom padding) reads as excessive right above a hard-edged image,
+   even though the same gap looks fine leading into flowing text. */
+.about-section:has(.content-thumbnail) {
+  padding-top: 24px;
+}
+
 /* Footer */
 footer {
   border-top: 1px solid var(--border);
