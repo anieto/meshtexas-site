@@ -21,6 +21,9 @@ const { Content } = single ? await render(single) : { Content: null };
 
     <section class="about-section">
       <div class="container-narrow prose">
+        {single.data.thumbnail && (
+          <img src={single.data.thumbnail} alt="" class="content-thumbnail" />
+        )}
         <Content />
       </div>
     </section>
@@ -45,6 +48,9 @@ const { Content } = single ? await render(single) : { Content: null };
         <div class="article-list">
           {pages.map((page) => (
             <a href={`/host-a-node/${page.id}/`} class="article-card">
+              {page.data.thumbnail && (
+                <img src={page.data.thumbnail} alt="" class="article-card-thumbnail" />
+              )}
               <h2>{page.data.title}</h2>
               <p>{page.data.description}</p>
             </a>

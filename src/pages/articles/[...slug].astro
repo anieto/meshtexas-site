@@ -37,6 +37,9 @@ const categoryLabels: Record<string, string> = {
 
   <section class="about-section">
     <div class="container-narrow prose">
+      {article.data.thumbnail && (
+        <img src={article.data.thumbnail} alt="" class="content-thumbnail" />
+      )}
       <Content />
     </div>
   </section>
