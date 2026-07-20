@@ -1,16 +1,12 @@
 # Decap CMS config for meshtexas-site.
-#
-# Still needed before this is fully live:
-#   - OAuth backend (Cloudflare Pages Function at /api/auth, /api/callback)
-#     so GitHub login works — see SubhenduX/decap-cms-cloudflare-pages
-#     or sterlingwes/decap-proxy as reference implementations.
-#   - GitHub branch protection on `main` (require PR review before merge) —
-#     this is what actually enforces "admin must approve," not this config.
 
 backend:
   name: github
   repo: anieto/meshtexas-site
   branch: main
+  # Without base_url, Decap defaults to Netlify's own OAuth proxy host —
+  # since we're not on Netlify, that 404s. Must be set explicitly.
+  base_url: https://meshtexas.org
   auth_endpoint: /api/auth        # served by the Pages Function above
   # public_repo scope is enough now that the repo is public — avoids
   # asking contributors' GitHub OAuth consent for full private-repo access.
