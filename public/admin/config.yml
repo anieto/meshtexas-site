@@ -27,6 +27,7 @@ collections:
   - name: "articles"
     label: "Articles"
     label_singular: "Article"
+    description: "Open to anyone — every submission is reviewed by an admin before it publishes. See the [Contributing Guide](https://meshtexas.org/contribute/) for what the fields below mean."
     folder: "src/content/articles"
     create: true
     slug: "{{slug}}"
@@ -37,6 +38,7 @@ collections:
       - label: "Category"
         name: "category"
         widget: "select"
+        hint: "See the [Contributing Guide](https://meshtexas.org/contribute/#categories) for what each category covers."
         options:
           - { label: "How-To", value: "how-to" }
           - { label: "Buildout / Infrastructure", value: "buildout" }
@@ -47,7 +49,7 @@ collections:
         widget: "select"
         multiple: true
         required: false
-        hint: "Leave blank for statewide content."
+        hint: "The same codes used on the [Connect](https://meshtexas.org/connect) page (e.g. SAT = San Antonio, AUS = Austin). Leave blank for statewide content."
         options: ["AUS", "SAT", "HOU", "DFW", "ELP", "ABI", "AMA", "MFE", "SJT", "TXK", "CRP", "ACT"]
       - { label: "Author", name: "author", widget: "string", required: false }
       - { label: "Published date", name: "publishedAt", widget: "datetime", format: "YYYY-MM-DD" }
@@ -55,8 +57,9 @@ collections:
       - { label: "Body", name: "body", widget: "markdown" }
 
   - name: "host-a-node"
-    label: "Host a Node"
+    label: "Host a Node (Admin Only)"
     label_singular: "Page"
+    description: "Managed directly by MeshTexas admins — please don't submit new entries here. If you have something for this section, email info@meshtexas.org instead."
     folder: "src/content/host-a-node"
     create: true
     slug: "{{slug}}"
