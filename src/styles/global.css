@@ -288,6 +288,7 @@ nav a:hover {
 
 .hero-logo img {
   width: 380px;
+  height: auto;
   max-width: 100%;
   display: block;
 }
