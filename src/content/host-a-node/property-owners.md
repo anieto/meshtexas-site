@@ -14,6 +14,8 @@ MeshTexas is looking for property owners willing to host a small radio repeater 
 * Installation and any maintenance is handled by MeshTexas volunteers, scheduled with you in advance.
 * Access is entirely **revocable** — if you ever want the equipment removed, just let us know and we will.
 
+---
+
 ## Frequently Asked Questions
 
 **What is the node used for?**
