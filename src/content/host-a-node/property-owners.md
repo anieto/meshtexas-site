@@ -4,15 +4,15 @@ description: Information for property owners and businesses interested in
   hosting a MeshTexas repeater.
 thumbnail: /images/repeater1a.png
 ---
-
 MeshTexas is looking for property owners willing to host a small radio repeater — the fixed-location devices that extend coverage across the mesh network. Every repeater relays traffic for the whole network, so a well-placed one makes a real difference for everyone nearby.
 
 **What we're asking for:** space for a small radio and antenna, ideally somewhere elevated — a roof, a tall structure, anywhere with a clear view of the surrounding area helps radio range the most.
 
 **What's involved:**
-- No cost to you, and no offer from us either — this is a simple, no-strings request for space.
-- Installation and any maintenance is handled by MeshTexas volunteers, scheduled with you in advance.
-- Access is entirely **revocable** — if you ever want the equipment removed, just let us know and we will.
+
+* No cost to you, and no offer from us either — this is a simple, no-strings request for space.
+* Installation and any maintenance is handled by MeshTexas volunteers, scheduled with you in advance.
+* Access is entirely **revocable** — if you ever want the equipment removed, just let us know and we will.
 
 ## Frequently Asked Questions
 
@@ -23,6 +23,8 @@ It extends MeshTexas — a free, open-source community mesh network that lets pe
 **What equipment gets installed?**
 
 A small, weatherproof enclosure containing the radio and battery, a lightweight antenna, and usually a solar panel. Compact — roughly the size of a home router, with a longer antenna.
+
+![](/images/repeater2.jpg)
 
 **How is it powered?**
 
