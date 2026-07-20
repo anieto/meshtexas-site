@@ -64,4 +64,4 @@ As long as you'd like. No long-term obligation — you can request removal at an
 
 ## Get in Touch
 
-Interested, or have questions? [Email us](mailto:adamnieto@gmail.com).
+Interested, or have questions? [Email us](mailto:info@meshtexas.org).
