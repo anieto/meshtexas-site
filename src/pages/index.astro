@@ -1,0 +1,92 @@
+---
+import Layout from '../components/Layout.astro';
+import { Image } from 'astro:assets';
+import logo from '../assets/logo.png';
+---
+<Layout
+  title="MeshTexas — Texas MeshCore Mesh Network"
+  description="A community-run MeshCore LoRa mesh network for Texas. Connect your device, join the mesh, and communicate without internet or cell towers."
+>
+  <section class="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-content">
+          <h1>A MeshCore Network, Built by Texans</h1>
+          <p class="hero-sub">A community-run <a href="https://meshcore.io" target="_blank" rel="noopener">MeshCore</a> LoRa radio network spanning Texas — no internet, no cell towers, no infrastructure required. Just radios talking to radios.</p>
+          <div class="hero-actions">
+            <a href="/connect" class="btn btn-primary">Connect Your Device</a>
+            <a href="/about" class="btn btn-secondary">Learn More</a>
+          </div>
+        </div>
+        <div class="hero-logo">
+          <Image src={logo} alt="MeshTexas — Connecting the Lone Star State" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="eli5">
+    <div class="container">
+      <div class="eli5-inner">
+        <p>Cell towers down after a storm? No signal out on a trail? MeshTexas lets people send text messages phone-to-phone using small radios instead of the cell network — no towers, no monthly bill, no internet connection needed. Anyone can join: pick up a compatible radio, pair it with your phone, and you're on the mesh in minutes.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="what tint">
+    <div class="container">
+      <h2>What is MeshCore?</h2>
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">📡</div>
+          <h3>LoRa Radio</h3>
+          <p>MeshCore devices use long-range LoRa radio to send encrypted messages between nodes — covering several miles per hop with affordable hardware.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔁</div>
+          <h3>Self-Healing Mesh</h3>
+          <p>Every node is a relay. Messages automatically find their way through the network, routing around outages without any central server.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔒</div>
+          <h3>Encrypted by Default</h3>
+          <p>All traffic is end-to-end encrypted using public-key cryptography. Each device generates its own identity — no accounts, no registration.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <h3>Off-Grid Ready</h3>
+          <p>Runs on battery or solar. When cell towers and internet go down — storms, disasters, grid failures — the mesh keeps working.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tools">
+    <div class="container">
+      <h2>Network Tools</h2>
+      <div class="tool-cards">
+        <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener" class="tool-card">
+          <div class="tool-header">
+            <span class="tool-name">Analyzer</span>
+            <span class="tool-url">analyzer.meshtexas.org ↗</span>
+          </div>
+          <p>Live packet visualization, node tracking, route analysis, and deep mesh analytics for the Texas network. Powered by CoreScope.</p>
+        </a>
+        <a href="https://livemap.meshtexas.org" target="_blank" rel="noopener" class="tool-card">
+          <div class="tool-header">
+            <span class="tool-name">Live Map</span>
+            <span class="tool-url">livemap.meshtexas.org ↗</span>
+          </div>
+          <p>Real-time map of node positions, message routes, and advert paths across the Texas network, with line-of-sight and RF propagation tools.</p>
+        </a>
+        <a href="https://sat.meshmapper.net" target="_blank" rel="noopener" class="tool-card">
+          <div class="tool-header">
+            <span class="tool-name">MeshMapper — SAT Region</span>
+            <span class="tool-url">sat.meshmapper.net ↗</span>
+          </div>
+          <p>Coverage map for the San Antonio region. Shows confirmed BIDIR, TX, RX, and DISC observations from wardriving and fixed observers.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>

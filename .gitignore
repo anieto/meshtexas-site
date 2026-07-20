@@ -1,2 +1,17 @@
 .DS_Store
 .wrangler/
+
+# Astro build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+
+# environment variables (OAuth secrets for local Pages Functions testing)
+.env
+.env.production
+.dev.vars

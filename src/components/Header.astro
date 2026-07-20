@@ -1,0 +1,84 @@
+---
+---
+<header>
+  <div class="container">
+    <div class="brand">
+      <a href="/" class="brand-name">MeshTexas</a>
+    </div>
+    <nav>
+      <a href="/connect">Connect</a>
+      <details class="nav-dropdown">
+        <summary>About</summary>
+        <menu>
+          <li><a href="/about">About MeshTexas</a></li>
+          <li><a href="/about#coverage">Coverage</a></li>
+          <li><a href="/about#community">Community</a></li>
+          <li><a href="/about#other-regions">Working With Other Regions</a></li>
+        </menu>
+      </details>
+      <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener" class="nav-cta">Live Analyzer ↗</a>
+      <a href="https://livemap.meshtexas.org" target="_blank" rel="noopener" class="nav-cta">Live Map ↗</a>
+    </nav>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">☰</button>
+    <label class="theme-switch" title="Toggle light/dark mode">
+      <input type="checkbox" id="themeToggle" aria-label="Toggle light/dark mode">
+      <span class="switch-track"><span class="switch-thumb"></span></span>
+    </label>
+  </div>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <a href="/connect" class="mobile-nav-link">Connect</a>
+  <span class="mobile-nav-label">About</span>
+  <a href="/about" class="mobile-nav-link mobile-nav-sublink">About MeshTexas</a>
+  <a href="/about#coverage" class="mobile-nav-link mobile-nav-sublink">Coverage</a>
+  <a href="/about#community" class="mobile-nav-link mobile-nav-sublink">Community</a>
+  <a href="/about#other-regions" class="mobile-nav-link mobile-nav-sublink">Working With Other Regions</a>
+  <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener" class="mobile-nav-link">Live Analyzer ↗</a>
+  <a href="https://livemap.meshtexas.org" target="_blank" rel="noopener" class="mobile-nav-link">Live Map ↗</a>
+</div>
+
+<script>
+  var html = document.documentElement;
+  var toggle = document.getElementById('themeToggle');
+  var hamburger = document.getElementById('hamburger');
+  var mobileNav = document.getElementById('mobileNav');
+
+  hamburger.addEventListener('click', function() {
+    var open = mobileNav.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', open);
+    hamburger.textContent = open ? '✕' : '☰';
+  });
+
+  document.querySelectorAll('.nav-dropdown').forEach(function(dd) {
+    dd.addEventListener('toggle', function() {
+      if (dd.open) {
+        document.querySelectorAll('.nav-dropdown').forEach(function(other) {
+          if (other !== dd) other.open = false;
+        });
+      }
+    });
+  });
+
+  document.addEventListener('click', function(e) {
+    document.querySelectorAll('.nav-dropdown[open]').forEach(function(dd) {
+      if (!dd.contains(e.target)) dd.open = false;
+    });
+  });
+
+  mobileNav.querySelectorAll('a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      mobileNav.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', false);
+      hamburger.textContent = '☰';
+    });
+  });
+
+  toggle.checked = html.getAttribute('data-theme') === 'light';
+
+  toggle.addEventListener('change', function() {
+    var next = toggle.checked ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('meshtexas-theme', next);
+  });
+</script>

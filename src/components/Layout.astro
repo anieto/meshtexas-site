@@ -1,0 +1,40 @@
+---
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+  <meta name="description" content={description}>
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content={description}>
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#dde3ea">
+  <script is:inline>
+    (function() {
+      var t = localStorage.getItem('meshtexas-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+
+  <Header />
+
+  <slot />
+
+  <Footer />
+
+</body>
+</html>
