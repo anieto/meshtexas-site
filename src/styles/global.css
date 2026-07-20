@@ -411,6 +411,12 @@ section h2 {
   padding: 24px;
 }
 
+.what-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
 .card-icon {
   font-size: 1.75rem;
   margin-bottom: 12px;
