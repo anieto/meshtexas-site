@@ -909,6 +909,54 @@ pre code {
   margin-top: 4px;
 }
 
+/* Articles */
+.article-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.article-card {
+  display: block;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  color: var(--text);
+  transition: border-color 0.15s;
+}
+
+.article-card:hover {
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+.article-card h2 {
+  font-size: 1.2rem;
+  margin: 8px 0 6px;
+}
+
+.article-card p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.article-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.article-card-category {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: var(--accent);
+}
+
 /* Footer */
 footer {
   border-top: 1px solid var(--border);

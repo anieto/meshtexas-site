@@ -1,0 +1,43 @@
+---
+import Layout from '../../components/Layout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('articles');
+  return articles.map((article) => ({
+    params: { slug: article.id },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props;
+const { Content } = await render(article);
+
+const categoryLabels: Record<string, string> = {
+  'how-to': 'How-To',
+  buildout: 'Buildout / Infrastructure',
+  community: 'Community',
+  announcement: 'Announcement',
+};
+---
+<Layout title={`${article.data.title} — MeshTexas`} description={article.data.description}>
+  <div class="page-intro">
+    <div class="container-narrow">
+      <div class="article-card-meta">
+        <span class="article-card-category">{categoryLabels[article.data.category]}</span>
+        <span class="article-card-date">
+          {article.data.publishedAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
+        </span>
+        {article.data.author && <span class="article-card-author">by {article.data.author}</span>}
+      </div>
+      <h1>{article.data.title}</h1>
+      <p class="hero-sub">{article.data.description}</p>
+    </div>
+  </div>
+
+  <section class="about-section">
+    <div class="container-narrow prose">
+      <Content />
+    </div>
+  </section>
+</Layout>
