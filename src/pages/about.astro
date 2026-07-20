@@ -1,62 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About — MeshTexas</title>
-  <meta name="description" content="Why and how MeshTexas runs its Texas MeshCore broker and analyzer, and how other regional mesh communities can get involved.">
-  <meta property="og:title" content="About — MeshTexas">
-  <meta property="og:description" content="Why and how MeshTexas runs its Texas MeshCore broker and analyzer, and how other regional mesh communities can get involved.">
-  <meta property="og:type" content="website">
-  <meta name="theme-color" content="#dde3ea">
-  <link rel="stylesheet" href="style.css">
-  <script>
-    (function() {
-      var t = localStorage.getItem('meshtexas-theme') || 'light';
-      document.documentElement.setAttribute('data-theme', t);
-    })();
-  </script>
-</head>
-<body>
-
-  <header>
-    <div class="container">
-      <div class="brand">
-        <a href="/" class="brand-name">MeshTexas</a>
-      </div>
-      <nav>
-        <a href="/connect">Connect</a>
-        <details class="nav-dropdown">
-          <summary>About</summary>
-          <menu>
-            <li><a href="/about">About MeshTexas</a></li>
-            <li><a href="/about#coverage">Coverage</a></li>
-            <li><a href="/about#community">Community</a></li>
-            <li><a href="/about#other-regions">Working With Other Regions</a></li>
-          </menu>
-        </details>
-        <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener" class="nav-cta">Live Analyzer ↗</a>
-        <a href="https://livemap.meshtexas.org" target="_blank" rel="noopener" class="nav-cta">Live Map ↗</a>
-      </nav>
-      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">☰</button>
-      <label class="theme-switch" title="Toggle light/dark mode">
-        <input type="checkbox" id="themeToggle" aria-label="Toggle light/dark mode">
-        <span class="switch-track"><span class="switch-thumb"></span></span>
-      </label>
-    </div>
-  </header>
-
-  <div class="mobile-nav" id="mobileNav">
-    <a href="/connect" class="mobile-nav-link">Connect</a>
-    <span class="mobile-nav-label">About</span>
-    <a href="/about" class="mobile-nav-link mobile-nav-sublink">About MeshTexas</a>
-    <a href="/about#coverage" class="mobile-nav-link mobile-nav-sublink">Coverage</a>
-    <a href="/about#community" class="mobile-nav-link mobile-nav-sublink">Community</a>
-    <a href="/about#other-regions" class="mobile-nav-link mobile-nav-sublink">Working With Other Regions</a>
-    <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener" class="mobile-nav-link">Live Analyzer ↗</a>
-    <a href="https://livemap.meshtexas.org" target="_blank" rel="noopener" class="mobile-nav-link">Live Map ↗</a>
-  </div>
-
+---
+import Layout from '../components/Layout.astro';
+import Callout from '../components/Callout.astro';
+---
+<Layout
+  title="About — MeshTexas"
+  description="Why and how MeshTexas runs its Texas MeshCore broker and analyzer, and how other regional mesh communities can get involved."
+>
   <div class="page-intro">
     <div class="container-narrow">
       <h1>About MeshTexas</h1>
@@ -212,23 +161,15 @@
         </div>
       </div>
 
-      <div class="verify-section">
-        <div class="verify-icon">✓</div>
-        <div class="verify-content">
-          <strong>Get in touch</strong>
-          <p>Send the details above and we'll follow up to get you connected.</p>
-          <a href="mailto:adamnieto@gmail.com" class="btn btn-secondary">Email Us ↗</a>
-        </div>
-      </div>
+      <Callout variant="verify" icon="✓" heading="Get in touch">
+        <p>Send the details above and we'll follow up to get you connected.</p>
+        <a href="mailto:adamnieto@gmail.com" class="btn btn-secondary">Email Us ↗</a>
+      </Callout>
 
-      <div class="repo-callout">
-        <div class="repo-callout-icon">⚙</div>
-        <div class="repo-callout-content">
-          <strong>Prefer to run your own fully independent stack?</strong>
-          <p>Our deployment is open source and written to work for any region, not just Texas.</p>
-          <a href="https://github.com/anieto/meshcore-broker-stack" target="_blank" rel="noopener" class="btn btn-secondary">View on GitHub ↗</a>
-        </div>
-      </div>
+      <Callout variant="repo-callout" icon="⚙" heading="Prefer to run your own fully independent stack?">
+        <p>Our deployment is open source and written to work for any region, not just Texas.</p>
+        <a href="https://github.com/anieto/meshcore-broker-stack" target="_blank" rel="noopener" class="btn btn-secondary">View on GitHub ↗</a>
+      </Callout>
 
       <p class="hint" style="margin-top: 20px;">MeshTexas is community-run, volunteer infrastructure. We don't guarantee uptime, and access can be adjusted or revoked if needed to keep the network healthy for everyone.</p>
     </div>
@@ -257,41 +198,4 @@
       </div>
     </div>
   </section>
-
-  <footer>
-    <div class="container">
-      <p>MeshTexas is a community project. Not affiliated with MeshCore Ltd.</p>
-      <p><a href="https://meshcore.io" target="_blank" rel="noopener">MeshCore</a> · <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener">Analyzer</a> · <a href="https://livemap.meshtexas.org" target="_blank" rel="noopener">Live Map</a> · <a href="mailto:adamnieto@gmail.com">Contact</a></p>
-    </div>
-  </footer>
-
-  <script>
-    var html = document.documentElement;
-    var toggle = document.getElementById('themeToggle');
-    var hamburger = document.getElementById('hamburger');
-    var mobileNav = document.getElementById('mobileNav');
-
-    hamburger.addEventListener('click', function() {
-      var open = mobileNav.classList.toggle('open');
-      hamburger.setAttribute('aria-expanded', open);
-      hamburger.textContent = open ? '✕' : '☰';
-    });
-
-    mobileNav.querySelectorAll('a').forEach(function(link) {
-      link.addEventListener('click', function() {
-        mobileNav.classList.remove('open');
-        hamburger.setAttribute('aria-expanded', false);
-        hamburger.textContent = '☰';
-      });
-    });
-
-    toggle.checked = html.getAttribute('data-theme') === 'light';
-
-    toggle.addEventListener('change', function() {
-      var next = toggle.checked ? 'light' : 'dark';
-      html.setAttribute('data-theme', next);
-      localStorage.setItem('meshtexas-theme', next);
-    });
-  </script>
-</body>
-</html>
+</Layout>

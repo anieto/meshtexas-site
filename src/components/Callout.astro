@@ -1,0 +1,26 @@
+---
+// Unifies three visually-identical icon+content callout boxes that only
+// differ by accent color in global.css: .verify-section (green),
+// .region-note (amber), .repo-callout (blue). Same markup/classes as
+// before, just parameterized instead of copy-pasted per instance.
+interface Props {
+  variant: 'verify' | 'region-note' | 'repo-callout';
+  icon: string;
+  heading: string;
+}
+
+const { variant, icon, heading } = Astro.props;
+
+const classes = {
+  verify: { section: 'verify-section', icon: 'verify-icon', content: 'verify-content' },
+  'region-note': { section: 'region-note', icon: 'region-note-icon', content: 'region-note-content' },
+  'repo-callout': { section: 'repo-callout', icon: 'repo-callout-icon', content: 'repo-callout-content' },
+}[variant];
+---
+<div class={classes.section}>
+  <div class={classes.icon}>{icon}</div>
+  <div class={classes.content}>
+    <strong>{heading}</strong>
+    <slot />
+  </div>
+</div>

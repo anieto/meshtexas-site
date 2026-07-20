@@ -1,0 +1,75 @@
+# DRAFT — not wired up yet. Not referenced by any page, not deployed.
+# Sketch of Decap CMS's public/admin/config.yml for meshtexas-site,
+# assuming the planned migration to Astro + content collections.
+#
+# Still needed before this is real:
+#   - Astro migration (src/content/articles/, src/content/host-info/)
+#   - OAuth backend (Cloudflare Pages Function at /api/auth, /api/callback)
+#     so GitHub login works — see SubhenduX/decap-cms-cloudflare-pages
+#     or sterlingwes/decap-proxy as reference implementations.
+#   - GitHub branch protection on `main` (require PR review before merge) —
+#     this is what actually enforces "admin must approve," not this config.
+
+backend:
+  name: github
+  repo: anieto/meshtexas-site
+  branch: main
+  auth_endpoint: /api/auth        # served by the Pages Function above
+  # public_repo scope is enough now that the repo is public — avoids
+  # asking contributors' GitHub OAuth consent for full private-repo access.
+  auth_scope: public_repo
+
+# Lets any GitHub user submit without being added as a repo collaborator:
+# Decap auto-forks the repo for them, and their submission becomes a PR
+# from their fork into `main`. They only ever see Draft / Ready to Review —
+# no publish button. Requires editorial_workflow (below) to function.
+open_authoring: true
+
+publish_mode: editorial_workflow
+
+media_folder: "src/assets/images"
+public_folder: "/images"
+
+collections:
+  - name: "articles"
+    label: "Articles"
+    label_singular: "Article"
+    folder: "src/content/articles"
+    create: true
+    slug: "{{slug}}"
+    identifier_field: title
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Short description", name: "description", widget: "text", hint: "One or two sentences, used on the index/listing page." }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options:
+          - { label: "How-To", value: "how-to" }
+          - { label: "Buildout / Infrastructure", value: "buildout" }
+          - { label: "Community", value: "community" }
+          - { label: "Announcement", value: "announcement" }
+      - label: "Region(s)"
+        name: "region"
+        widget: "select"
+        multiple: true
+        required: false
+        hint: "Leave blank for statewide content."
+        options: ["AUS", "SAT", "HOU", "DFW", "ELP", "ABI", "AMA", "MFE", "SJT", "TXK", "CRP", "ACT"]
+      - { label: "Author", name: "author", widget: "string", required: false }
+      - { label: "Published date", name: "publishedAt", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Thumbnail", name: "thumbnail", widget: "image", required: false }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "host-info"
+    label: "Host Info"
+    label_singular: "Page"
+    folder: "src/content/host-info"
+    create: true
+    slug: "{{slug}}"
+    identifier_field: title
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Short description", name: "description", widget: "text", hint: "One or two sentences, e.g. for a nav/card summary." }
+      - { label: "Thumbnail", name: "thumbnail", widget: "image", required: false }
+      - { label: "Body", name: "body", widget: "markdown" }
