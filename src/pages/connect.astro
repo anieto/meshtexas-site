@@ -49,8 +49,7 @@ import Callout from '../components/Callout.astro';
           <ol class="steps">
             <li>
               <strong>New device, or reflashing?</strong> Already running the agessaman firmware? Skip to the next step.
-              <p>Download the release build for your board from <a href="https://github.com/agessaman/MeshCore/releases/tag/observer-mqtt-latest" target="_blank" rel="noopener">observer-mqtt-latest</a>, then flash it with the <a href="https://meshcore.io/flasher" target="_blank" rel="noopener">MeshCore Web Flasher</a> — runs right in your browser, no tools to install.</p>
-              <p class="hint">First time flashing observer MQTT firmware on this specific board? Use the <code>*-merged.bin</code> file — it writes the bootloader and partition table this firmware needs. After that first flash, regular OTA updates work fine.</p>
+              <p>Flash it automatically using the <a href="https://observer.gessaman.com" target="_blank" rel="noopener">observer.gessaman.com</a> web flasher — pick your board and role (repeater/room server), then flash directly over USB in your browser (Chrome or Edge; uses the Web Serial API). No manual downloads or separate tools needed.</p>
             </li>
             <li>
               <strong>Open a command line to your device</strong> — expand the method you're using:
@@ -109,7 +108,6 @@ reboot</code></pre>
             <li>
               <strong>Configure the slot</strong> — replace <code>mqtt1</code> with your chosen slot:
               <pre><code>set mqtt1.preset meshtexas
-save
 reboot</code></pre>
               <details class="hint-collapsible">
                 <summary>Running an older build without the <code>meshtexas</code> preset?</summary>
@@ -119,7 +117,6 @@ reboot</code></pre>
 set mqtt1.server mqtt.meshtexas.org
 set mqtt1.port 443
 set mqtt1.audience mqtt.meshtexas.org
-save
 reboot</code></pre>
                 </div>
               </details>
