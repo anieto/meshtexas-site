@@ -93,7 +93,7 @@ reboot</code></pre>
               <details class="hint-collapsible">
                 <summary>Running an older build without the <code>meshtexas</code> preset?</summary>
                 <div class="hint-body">
-                  <p>If <code>set mqtt1.preset meshtexas</code> errors, or <code>get mqtt1.preset</code> doesn't show <code>meshtexas</code> after rebooting — replace <code>mqtt1</code> with whichever slot you actually used — your build predates this preset (added July 2026). Reflash from the latest <a href="https://github.com/agessaman/MeshCore/releases/tag/observer-mqtt-latest" target="_blank" rel="noopener">observer-mqtt-latest</a> release, or configure it manually:</p>
+                  <p>If <code>set mqtt1.preset meshtexas</code> errors, or <code>get mqtt1.preset</code> doesn't show <code>meshtexas</code> after rebooting, your build predates this preset (added July 2026). Reflash from the latest <a href="https://github.com/agessaman/MeshCore/releases/tag/observer-mqtt-latest" target="_blank" rel="noopener">observer-mqtt-latest</a> release, or configure it manually:</p>
                   <pre><code>set mqtt1.preset custom
 set mqtt1.server mqtt.meshtexas.org
 set mqtt1.port 443
