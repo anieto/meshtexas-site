@@ -48,6 +48,11 @@ import Callout from '../components/Callout.astro';
           <p class="device-compat">For <strong>Heltec V3/V4, T-LoRa, Tracker, and any ESP32-based board</strong> running the <a href="https://github.com/agessaman/MeshCore" target="_blank" rel="noopener">agessaman MeshCore firmware</a> with MQTT bridge support.</p>
           <ol class="steps">
             <li>
+              <strong>New device, or reflashing?</strong> Already running the agessaman firmware? Skip to the next step.
+              <p>Download the release build for your board from <a href="https://github.com/agessaman/MeshCore/releases/tag/observer-mqtt-latest" target="_blank" rel="noopener">observer-mqtt-latest</a>, then flash it with the <a href="https://meshcore.io/flasher" target="_blank" rel="noopener">MeshCore Web Flasher</a> — runs right in your browser, no tools to install.</p>
+              <p class="hint">First time flashing observer MQTT firmware on this specific board? Use the <code>*-merged.bin</code> file — it writes the bootloader and partition table this firmware needs. After that first flash, regular OTA updates work fine.</p>
+            </li>
+            <li>
               <strong>Open a command line to your device</strong> — expand the method you're using:
               <div class="iata-choice">
                 <details class="hint-collapsible">
@@ -63,6 +68,22 @@ import Callout from '../components/Callout.astro';
                   </div>
                 </details>
               </div>
+            </li>
+            <li>
+              <strong>Back up your device identity</strong> — cheap insurance before you start configuring anything else:
+              <Callout variant="region-note" icon="!" heading="Save your prv.key somewhere safe">
+                <p>Over USB serial (not available via Bluetooth), run <code>get prv.key</code> and save the 64-character key it returns. If a bad setting ever leaves your device stuck in a reboot loop, you can wipe it and start fresh, then restore your exact identity with <code>set prv.key &lt;key&gt;</code> — instead of losing your MeshMapper/analyzer history to a brand-new key.</p>
+              </Callout>
+            </li>
+            <li>
+              <strong>Fresh flash or full erase?</strong> Set your radio parameters, device name, and WiFi before continuing — skip this if you're just adding MQTT to an already-running node:
+              <pre><code>set radio 910.525,62.5,7,5
+set tx 22
+set name YourObserverName
+set wifi.ssid YourWiFiNetwork
+set wifi.pwd YourWiFiPassword
+reboot</code></pre>
+              <p class="hint">The radio line (<code>freq,bw,sf,cr</code>) above is just an example — use the actual settings your local mesh runs, not this value. Ask other operators in your area if you're not sure.</p>
             </li>
             <li>
               <strong>Set your region</strong> using the IATA code for the Texas city nearest to you:
@@ -83,7 +104,7 @@ import Callout from '../components/Callout.astro';
               <pre><code>set mqtt.iata SAT</code></pre>
             </li>
             <li>
-              <strong>Pick a free broker slot</strong> (mqtt1–mqtt6). Not sure which are free? Run <code>get mqtt1.preset</code> through <code>get mqtt6.preset</code> and use one that shows <code>none</code>.
+              <strong>Pick a free broker slot</strong> (mqtt1–mqtt6). Not sure which are free? Run <code>get mqtt.status</code> — it lists each slot already in use (e.g. <code>1: meshmapper (ok)</code>); pick any slot number not shown.
             </li>
             <li>
               <strong>Configure the slot</strong> — replace <code>mqtt1</code> with your chosen slot:
