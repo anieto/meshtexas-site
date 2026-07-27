@@ -1,0 +1,38 @@
+---
+import Layout from '../../components/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const pages = (await getCollection('learn')).sort(
+  (a, b) => (a.data.order ?? 999) - (b.data.order ?? 999)
+);
+---
+<Layout
+  title="Mesh Basics — MeshTexas"
+  description="Getting started with MeshCore, a glossary of common terms, and guidance on antennas and repeaters."
+>
+  <div class="page-intro">
+    <div class="container-narrow">
+      <h1>Mesh Basics</h1>
+      <p class="hero-sub">New to MeshCore, or just want a reference for the terminology and hardware? Start here.</p>
+    </div>
+  </div>
+
+  <section class="about-section">
+    <div class="container-narrow">
+      {pages.length === 0 && (
+        <p class="hint">Nothing published yet — check back soon.</p>
+      )}
+      <div class="article-list">
+        {pages.map((page) => (
+          <a href={`/learn/${page.id}/`} class="article-card">
+            {page.data.thumbnail && (
+              <img src={page.data.thumbnail} alt="" class="article-card-thumbnail" />
+            )}
+            <h2>{page.data.title}</h2>
+            <p>{page.data.description}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>

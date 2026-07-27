@@ -1,0 +1,105 @@
+---
+import Layout from '../../components/Layout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('learn');
+  return pages.map((page) => ({
+    params: { slug: page.id },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props;
+const { Content } = await render(page);
+const isGlossary = page.id === 'glossary';
+---
+<Layout title={`${page.data.title} — MeshTexas`} description={page.data.description}>
+  <div class="page-intro">
+    <div class="container-narrow">
+      <h1>{page.data.title}</h1>
+      <p class="hero-sub">{page.data.description}</p>
+    </div>
+  </div>
+
+  <section class="about-section learn-page">
+    <div class="container-narrow prose">
+      {page.data.thumbnail && (
+        <img src={page.data.thumbnail} alt="" class="content-thumbnail" />
+      )}
+      {page.data.intro && <p>{page.data.intro}</p>}
+      {isGlossary && (
+        <div class="glossary-toolbar" id="glossary-toolbar">
+          <div class="glossary-search">
+            <input type="text" id="glossary-filter" placeholder="Filter terms…" aria-label="Filter glossary terms">
+            <span class="glossary-count" id="glossary-count"></span>
+          </div>
+          <nav class="glossary-az" id="glossary-az" aria-label="Jump to letter"></nav>
+        </div>
+      )}
+      <div id="glossary-content">
+        <Content />
+      </div>
+      {isGlossary && (
+        <p class="hint glossary-empty" id="glossary-empty" style="display: none;">No terms match your filter.</p>
+      )}
+    </div>
+  </section>
+
+  {isGlossary && (
+    <script>
+      (function () {
+        var content = document.getElementById('glossary-content');
+        var input = document.getElementById('glossary-filter') as HTMLInputElement | null;
+        var azNav = document.getElementById('glossary-az');
+        var countEl = document.getElementById('glossary-count');
+        var emptyMsg = document.getElementById('glossary-empty');
+        if (!content || !input || !azNav || !countEl || !emptyMsg) return;
+
+        var terms = Array.from(content.querySelectorAll('h3'));
+
+        // Build the A–Z jump nav from whatever terms actually exist.
+        var seen: Record<string, boolean> = {};
+        terms.forEach(function (h) {
+          var letter = (h.textContent || '').trim().charAt(0).toUpperCase();
+          if (seen[letter]) return;
+          seen[letter] = true;
+          var a = document.createElement('a');
+          a.href = '#' + h.id;
+          a.textContent = letter;
+          azNav.appendChild(a);
+        });
+
+        // Group each heading with the sibling elements that belong to it
+        // (everything up to the next h3), so filtering hides/shows a whole
+        // term entry — not just its heading.
+        function groupFor(h: Element) {
+          var els = [h];
+          var el = h.nextElementSibling;
+          while (el && el.tagName !== 'H3') {
+            els.push(el);
+            el = el.nextElementSibling;
+          }
+          return els;
+        }
+
+        function applyFilter() {
+          var q = (input!.value || '').trim().toLowerCase();
+          var visible = 0;
+          terms.forEach(function (h) {
+            var group = groupFor(h);
+            var text = group.map(function (el) { return el.textContent || ''; }).join(' ').toLowerCase();
+            var match = !q || text.indexOf(q) !== -1;
+            group.forEach(function (el) { (el as HTMLElement).style.display = match ? '' : 'none'; });
+            if (match) visible++;
+          });
+          countEl!.textContent = visible + (visible === 1 ? ' term' : ' terms');
+          emptyMsg!.style.display = visible === 0 ? '' : 'none';
+        }
+
+        input.addEventListener('input', applyFilter);
+        applyFilter();
+      })();
+    </script>
+  )}
+</Layout>

@@ -28,4 +28,18 @@ const hostANode = defineCollection({
   }),
 });
 
-export const collections = { articles, 'host-a-node': hostANode };
+const learn = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/learn' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    order: z.number().optional(),
+    // Short opening line rendered before the toolbar/body — lets a page
+    // (e.g. the glossary) put its filter UI below the intro instead of
+    // having it stuck at the very top, without splitting the markdown body.
+    intro: z.string().optional(),
+    thumbnail: z.string().optional(),
+  }),
+});
+
+export const collections = { articles, 'host-a-node': hostANode, learn };

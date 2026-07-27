@@ -70,3 +70,19 @@ collections:
       - { label: "Short description", name: "description", widget: "text", hint: "One or two sentences, e.g. for a nav/card summary." }
       - { label: "Thumbnail", name: "thumbnail", widget: "image", required: false }
       - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "learn"
+    label: "Learn (Admin Only)"
+    label_singular: "Page"
+    description: "Reference pages for the /learn section — managed directly by MeshTexas admins — please don't submit new entries here. If you have something for this section, email info@meshtexas.org instead."
+    folder: "src/content/learn"
+    create: true
+    slug: "{{slug}}"
+    identifier_field: title
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Short description", name: "description", widget: "text", hint: "One or two sentences, e.g. for a nav/card summary." }
+      - { label: "Order", name: "order", widget: "number", required: false, hint: "Controls sort position on the /learn index (lower shows first)." }
+      - { label: "Intro paragraph", name: "intro", widget: "text", required: false, hint: "Optional opening line rendered before the body — on the glossary, this puts the intro above the filter box instead of the body's first paragraph." }
+      - { label: "Thumbnail", name: "thumbnail", widget: "image", required: false }
+      - { label: "Body", name: "body", widget: "markdown" }
