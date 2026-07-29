@@ -11,7 +11,7 @@ const single = pages.length === 1 ? pages[0] : null;
 const { Content } = single ? await render(single) : { Content: null };
 ---
 {single ? (
-  <Layout title={`${single.data.title} — MeshTexas`} description={single.data.description}>
+  <Layout title={`${single.data.title} — MeshTexas`} description={single.data.description} image={single.data.thumbnail}>
     <div class="page-intro">
       <div class="container-narrow">
         <h1>{single.data.title}</h1>
