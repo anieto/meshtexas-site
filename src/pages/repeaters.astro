@@ -1,0 +1,362 @@
+---
+import Layout from '../components/Layout.astro';
+
+// Canonical Texas region list — kept in sync by hand with about.astro,
+// connect.astro, and src/content.config.ts (this codebase doesn't have a
+// shared constants module; region codes are already duplicated 4x elsewhere).
+const REGIONS = [
+  { code: 'AUS', name: 'Austin' },
+  { code: 'SAT', name: 'San Antonio' },
+  { code: 'HOU', name: 'Houston' },
+  { code: 'DFW', name: 'Dallas–Fort Worth' },
+  { code: 'ELP', name: 'El Paso' },
+  { code: 'ABI', name: 'Abilene' },
+  { code: 'AMA', name: 'Amarillo' },
+  { code: 'MFE', name: 'McAllen' },
+  { code: 'SJT', name: 'San Angelo' },
+  { code: 'TXK', name: 'Texarkana' },
+  { code: 'CRP', name: 'Corpus Christi' },
+  { code: 'ACT', name: 'Waco' },
+];
+---
+<Layout
+  title="Repeater Registry — MeshTexas"
+  description="Public directory of MeshCore repeaters across Texas — search, filter by region, or register your own."
+>
+  <div class="page-intro">
+    <div class="container-narrow">
+      <h1>Repeater Registry</h1>
+      <p class="hero-sub">A community-maintained directory of MeshCore repeaters across Texas. Search or filter by region, or add your own below — new entries appear right away. Please respect other operators' privacy and only submit information for repeaters you control.</p>
+    </div>
+  </div>
+
+  <section class="about-section">
+    <div class="container">
+      <details class="hint-collapsible registry-submit">
+        <summary>Register Your Repeater</summary>
+        <div class="hint-body">
+          <form id="repeater-form">
+            <div class="form-row">
+              <label for="field-name">Repeater Name</label>
+              <input type="text" id="field-name" name="name" required maxlength="100">
+            </div>
+            <div class="form-row">
+              <label for="field-public-key">Repeater ID (Public Key)</label>
+              <input type="text" id="field-public-key" name="publicKey" required maxlength="128">
+            </div>
+            <div class="form-row">
+              <label for="field-region">Region</label>
+              <select id="field-region" name="region" required>
+                <option value="" disabled selected>Choose a region…</option>
+                {REGIONS.map((r) => <option value={r.code}>{r.code} — {r.name}</option>)}
+              </select>
+            </div>
+            <div class="form-row">
+              <label for="field-location">Location</label>
+              <input type="text" id="field-location" name="location" required maxlength="500" placeholder="Address, coordinates, or general description">
+            </div>
+            <div class="form-row">
+              <label for="field-operator-name">Your Name</label>
+              <input type="text" id="field-operator-name" name="operatorName" required maxlength="100">
+            </div>
+            <div class="form-row">
+              <label for="field-contact-info">Contact Info</label>
+              <input type="text" id="field-contact-info" name="contactInfo" required maxlength="200" placeholder="Email, phone, or Discord username/server">
+            </div>
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAAEHiLjg3Bw-BaBIi" data-callback="onTurnstileSuccess"></div>
+            <p class="registry-form-status" id="registry-form-status" role="status"></p>
+            <button type="submit" class="btn btn-primary">Add Repeater</button>
+          </form>
+        </div>
+      </details>
+
+      <div class="registry-toolbar" id="registry-toolbar">
+        <div class="registry-search">
+          <input type="text" id="registry-filter" placeholder="Search by name, operator, or ID…" aria-label="Search repeaters">
+          <span class="registry-count" id="registry-count"></span>
+        </div>
+        <select id="registry-region" aria-label="Filter by region">
+          <option value="">All Regions</option>
+          {REGIONS.map((r) => <option value={r.code}>{r.code} — {r.name}</option>)}
+        </select>
+      </div>
+
+      <div class="registry-table-wrap">
+        <table class="registry-table" id="registry-table">
+          <thead>
+            <tr>
+              <th data-sort="name">Name</th>
+              <th data-sort="region">Region</th>
+              <th data-sort="location">Location</th>
+              <th data-sort="public_key">Repeater ID</th>
+              <th data-sort="operator_name">Operator</th>
+              <th data-sort="contact_info">Contact</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="registry-tbody">
+            <tr><td colspan="7" class="registry-loading">Loading repeaters…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="hint registry-empty" id="registry-empty" style="display: none;">No repeaters match your search.</p>
+
+      <div class="delete-request-panel" id="delete-request-panel" style="display: none;">
+        <h3>Request Deletion</h3>
+        <p class="hint">Requesting removal of <strong id="delete-request-target"></strong>. An admin will review this before it's removed.</p>
+        <form id="delete-request-form">
+          <input type="hidden" id="delete-request-repeater-id" name="repeaterId">
+          <div class="form-row">
+            <label for="field-delete-reason">Reason</label>
+            <textarea id="field-delete-reason" name="reason" required maxlength="500" rows="3" placeholder="Why should this be removed? (e.g. decommissioned, duplicate, incorrect info)"></textarea>
+          </div>
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAAEHiLjg3Bw-BaBIi"></div>
+          <p class="registry-form-status" id="delete-request-status" role="status"></p>
+          <div class="delete-request-actions">
+            <button type="submit" class="btn btn-secondary">Submit Request</button>
+            <button type="button" class="btn btn-secondary" id="delete-request-cancel">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script>
+    (function () {
+      type Repeater = {
+        id: number;
+        name: string;
+        public_key: string;
+        region: string;
+        location: string;
+        operator_name: string;
+        contact_info: string;
+        created_at: string;
+      };
+
+      var tbody = document.getElementById('registry-tbody');
+      var searchInput = document.getElementById('registry-filter') as HTMLInputElement | null;
+      var regionSelect = document.getElementById('registry-region') as HTMLSelectElement | null;
+      var countEl = document.getElementById('registry-count');
+      var emptyMsg = document.getElementById('registry-empty');
+      var table = document.getElementById('registry-table');
+      var form = document.getElementById('repeater-form') as HTMLFormElement | null;
+      var statusEl = document.getElementById('registry-form-status');
+      var deletePanel = document.getElementById('delete-request-panel');
+      var deleteTargetLabel = document.getElementById('delete-request-target');
+      var deleteRepeaterIdInput = document.getElementById('delete-request-repeater-id') as HTMLInputElement | null;
+      var deleteForm = document.getElementById('delete-request-form') as HTMLFormElement | null;
+      var deleteStatusEl = document.getElementById('delete-request-status');
+      var deleteCancelBtn = document.getElementById('delete-request-cancel');
+      if (!tbody || !searchInput || !regionSelect || !countEl || !emptyMsg || !table || !form || !statusEl) return;
+      if (!deletePanel || !deleteTargetLabel || !deleteRepeaterIdInput || !deleteForm || !deleteStatusEl || !deleteCancelBtn) return;
+
+      var allRepeaters: Repeater[] = [];
+      var sortField = 'name';
+      var sortDir = 1;
+
+      function renderRows() {
+        var q = (searchInput!.value || '').trim().toLowerCase();
+        var region = regionSelect!.value;
+
+        var filtered = allRepeaters.filter(function (r) {
+          if (region && r.region !== region) return false;
+          if (!q) return true;
+          var haystack = (r.name + ' ' + r.operator_name + ' ' + r.public_key).toLowerCase();
+          return haystack.indexOf(q) !== -1;
+        });
+
+        filtered.sort(function (a, b) {
+          var av = (a as any)[sortField] || '';
+          var bv = (b as any)[sortField] || '';
+          return av.localeCompare(bv) * sortDir;
+        });
+
+        tbody!.innerHTML = '';
+        filtered.forEach(function (r) {
+          var tr = document.createElement('tr');
+          [
+            ['Name', r.name],
+            ['Region', r.region],
+            ['Location', r.location],
+            ['Repeater ID', r.public_key],
+            ['Operator', r.operator_name],
+            ['Contact', r.contact_info],
+          ].forEach(function (pair) {
+            var td = document.createElement('td');
+            td.setAttribute('data-label', pair[0]);
+            td.textContent = pair[1];
+            tr.appendChild(td);
+          });
+
+          var actionsTd = document.createElement('td');
+          actionsTd.setAttribute('data-label', 'Actions');
+          var deleteBtn = document.createElement('button');
+          deleteBtn.type = 'button';
+          deleteBtn.className = 'link-btn';
+          deleteBtn.textContent = 'Request Deletion';
+          deleteBtn.setAttribute('data-repeater-id', String(r.id));
+          deleteBtn.setAttribute('data-repeater-name', r.name);
+          actionsTd.appendChild(deleteBtn);
+          tr.appendChild(actionsTd);
+
+          tbody!.appendChild(tr);
+        });
+
+        countEl!.textContent = filtered.length + (filtered.length === 1 ? ' repeater' : ' repeaters');
+        emptyMsg!.style.display = filtered.length === 0 ? '' : 'none';
+        table!.style.display = filtered.length === 0 ? 'none' : '';
+      }
+
+      table!.querySelectorAll('th[data-sort]').forEach(function (th) {
+        th.addEventListener('click', function () {
+          var field = th.getAttribute('data-sort') || 'name';
+          if (sortField === field) {
+            sortDir = sortDir * -1;
+          } else {
+            sortField = field;
+            sortDir = 1;
+          }
+          renderRows();
+        });
+      });
+
+      searchInput.addEventListener('input', renderRows);
+      regionSelect.addEventListener('change', renderRows);
+
+      fetch('/api/repeaters')
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          allRepeaters = Array.isArray(data) ? data : [];
+          renderRows();
+        })
+        .catch(function () {
+          tbody!.innerHTML = '<tr><td colspan="7" class="registry-loading">Failed to load repeaters. Try refreshing.</td></tr>';
+        });
+
+      tbody.addEventListener('click', function (e) {
+        var target = e.target as HTMLElement;
+        var btn = target.closest('[data-repeater-id]') as HTMLElement | null;
+        if (!btn) return;
+        var id = btn.getAttribute('data-repeater-id') || '';
+        var name = btn.getAttribute('data-repeater-name') || '';
+        deleteRepeaterIdInput!.value = id;
+        deleteTargetLabel!.textContent = name;
+        deleteStatusEl!.textContent = '';
+        deleteStatusEl!.className = 'registry-form-status';
+        deletePanel!.style.display = '';
+        deletePanel!.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+
+      deleteCancelBtn.addEventListener('click', function () {
+        deletePanel!.style.display = 'none';
+        deleteForm!.reset();
+      });
+
+      deleteForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        deleteStatusEl!.textContent = '';
+        deleteStatusEl!.className = 'registry-form-status';
+
+        var data = new FormData(deleteForm!);
+        var turnstileToken = (deleteForm!.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement | null)?.value || '';
+        var deleteTurnstileWidget = deleteForm!.querySelector('.cf-turnstile');
+
+        var body = {
+          repeaterId: Number(data.get('repeaterId')),
+          reason: String(data.get('reason') || ''),
+          turnstileToken: turnstileToken,
+        };
+
+        if (!body.turnstileToken) {
+          deleteStatusEl!.textContent = 'Please complete the verification widget.';
+          deleteStatusEl!.className = 'registry-form-status error';
+          return;
+        }
+
+        fetch('/api/deletion-requests', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(body),
+        })
+          .then(function (res) {
+            return res.json().then(function (json) { return { ok: res.ok, json: json }; });
+          })
+          .then(function (result) {
+            // @ts-ignore — turnstile global loaded via external script
+            if (window.turnstile && deleteTurnstileWidget) window.turnstile.reset(deleteTurnstileWidget);
+            if (!result.ok) {
+              deleteStatusEl!.textContent = result.json.error || 'Something went wrong.';
+              deleteStatusEl!.className = 'registry-form-status error';
+              return;
+            }
+            deleteStatusEl!.textContent = 'Request submitted — an admin will review it soon.';
+            deleteStatusEl!.className = 'registry-form-status success';
+            deleteForm!.reset();
+          })
+          .catch(function () {
+            // @ts-ignore
+            if (window.turnstile && deleteTurnstileWidget) window.turnstile.reset(deleteTurnstileWidget);
+            deleteStatusEl!.textContent = 'Something went wrong. Try again.';
+            deleteStatusEl!.className = 'registry-form-status error';
+          });
+      });
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        statusEl!.textContent = '';
+        statusEl!.className = 'registry-form-status';
+
+        var data = new FormData(form!);
+        var turnstileToken = (form!.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement | null)?.value || '';
+        var turnstileWidget = form!.querySelector('.cf-turnstile');
+
+        var body = {
+          name: String(data.get('name') || ''),
+          publicKey: String(data.get('publicKey') || ''),
+          region: String(data.get('region') || ''),
+          location: String(data.get('location') || ''),
+          operatorName: String(data.get('operatorName') || ''),
+          contactInfo: String(data.get('contactInfo') || ''),
+          turnstileToken: turnstileToken,
+        };
+
+        if (!body.turnstileToken) {
+          statusEl!.textContent = 'Please complete the verification widget.';
+          statusEl!.className = 'registry-form-status error';
+          return;
+        }
+
+        fetch('/api/repeaters', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(body),
+        })
+          .then(function (res) {
+            return res.json().then(function (json) { return { ok: res.ok, json: json }; });
+          })
+          .then(function (result) {
+            // @ts-ignore — turnstile global loaded via external script
+            if (window.turnstile && turnstileWidget) window.turnstile.reset(turnstileWidget);
+            if (!result.ok) {
+              statusEl!.textContent = result.json.error || 'Something went wrong.';
+              statusEl!.className = 'registry-form-status error';
+              return;
+            }
+            allRepeaters.unshift(result.json);
+            renderRows();
+            form!.reset();
+            statusEl!.textContent = 'Repeater added — thanks!';
+            statusEl!.className = 'registry-form-status success';
+          })
+          .catch(function () {
+            // @ts-ignore
+            if (window.turnstile && turnstileWidget) window.turnstile.reset(turnstileWidget);
+            statusEl!.textContent = 'Something went wrong. Try again.';
+            statusEl!.className = 'registry-form-status error';
+          });
+      });
+    })();
+  </script>
+</Layout>

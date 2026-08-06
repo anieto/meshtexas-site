@@ -1,5 +1,12 @@
 {
   "name": "meshtexas-site",
   "pages_build_output_dir": "./dist",
-  "compatibility_date": "2026-07-20"
+  "compatibility_date": "2026-07-20",
+  "d1_databases": [
+    {
+      "binding": "REPEATERS_DB",
+      "database_name": "meshtexas-repeaters",
+      "database_id": "b60370d5-7d8f-4573-8126-638b6c8d887a"
+    }
+  ]
 }

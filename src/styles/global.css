@@ -1253,6 +1253,234 @@ footer a:hover { color: var(--text); }
 }
 
 /* Mobile */
+/* Repeater registry table + form */
+.registry-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.registry-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 220px;
+}
+
+.registry-search input,
+.registry-toolbar select,
+.registry-submit input,
+.registry-submit select {
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.registry-search input { flex: 1; }
+
+.registry-search input:focus,
+.registry-toolbar select:focus,
+.registry-submit input:focus,
+.registry-submit select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.registry-count {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.registry-table-wrap {
+  overflow-x: auto;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.registry-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.registry-table th,
+.registry-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.registry-table th {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  background: var(--bg-3);
+}
+
+.registry-table th:hover { color: var(--text); }
+
+.registry-table td { color: var(--text); }
+
+.registry-table tbody tr:nth-child(even) { background: var(--bg-3); }
+
+.registry-table tbody tr:last-child td { border-bottom: none; }
+
+.registry-loading {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 24px 12px;
+}
+
+.registry-empty { margin-top: 16px; }
+
+.registry-submit { margin-bottom: 32px; }
+
+.registry-submit form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.registry-submit .form-row,
+.delete-request-panel .form-row,
+.admin-login .form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.registry-submit label,
+.delete-request-panel label,
+.admin-login label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.registry-form-status { min-height: 1.2em; font-size: 0.875rem; }
+.registry-form-status.success { color: var(--green); }
+.registry-form-status.error { color: #f85149; }
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.link-btn:hover { opacity: 0.85; }
+
+.delete-request-panel {
+  margin-top: 20px;
+  padding: 20px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.delete-request-panel h3 { margin-top: 0; }
+
+.delete-request-panel form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.delete-request-panel textarea {
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  resize: vertical;
+}
+
+.delete-request-panel textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.delete-request-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Admin — deletion request review */
+.admin-login {
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-login input {
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.admin-request-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-request-field {
+  display: flex;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.admin-request-field .field-label {
+  flex-shrink: 0;
+  width: 100px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  padding-top: 2px;
+}
+
+.admin-request-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
 @media (max-width: 640px) {
   nav a, nav .nav-dropdown { display: none; }
   .hamburger { display: block; }
@@ -1262,4 +1490,32 @@ footer a:hover { color: var(--text); }
   section { padding: 48px 0; }
   .broker-info { grid-template-columns: 1fr 1fr; }
   .regions { justify-content: center; }
+
+  /* Registry table collapses to stacked cards on mobile */
+  .registry-table thead { display: none; }
+  .registry-table, .registry-table tbody, .registry-table tr, .registry-table td {
+    display: block;
+    width: 100%;
+  }
+  .registry-table tr {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    padding: 8px 12px;
+  }
+  .registry-table td {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: none;
+    padding: 6px 0;
+  }
+  .registry-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
 }
