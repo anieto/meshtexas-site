@@ -346,8 +346,18 @@ const REGIONS = [
             }
             allRepeaters.unshift(result.json);
             renderRows();
+
+            // Keep the operator's own info filled in so adding a second or
+            // third repeater doesn't require retyping it each time — only
+            // the repeater-specific fields reset.
+            var operatorNameValue = (document.getElementById('field-operator-name') as HTMLInputElement).value;
+            var contactInfoValue = (document.getElementById('field-contact-info') as HTMLInputElement).value;
             form!.reset();
-            statusEl!.textContent = 'Repeater added — thanks!';
+            (document.getElementById('field-operator-name') as HTMLInputElement).value = operatorNameValue;
+            (document.getElementById('field-contact-info') as HTMLInputElement).value = contactInfoValue;
+            (document.getElementById('field-name') as HTMLInputElement).focus();
+
+            statusEl!.textContent = 'Repeater added — thanks! Add another below, or close this form when done.';
             statusEl!.className = 'registry-form-status success';
           })
           .catch(function () {
