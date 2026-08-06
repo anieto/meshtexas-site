@@ -15,16 +15,8 @@ import Layout from '../../components/Layout.astro';
 
     <section class="about-section">
       <div class="container-narrow">
-        <div id="admin-login" class="admin-login">
-          <div class="form-row">
-            <label for="admin-password">Admin Password</label>
-            <input type="password" id="admin-password" autocomplete="current-password">
-          </div>
-          <p class="registry-form-status" id="admin-login-status" role="status"></p>
-          <button type="button" class="btn btn-primary" id="admin-unlock">Unlock</button>
-        </div>
-
-        <div id="admin-requests" style="display: none;">
+        <p class="registry-form-status" id="admin-load-status" role="status"></p>
+        <div id="admin-requests">
           <p class="hint" id="admin-requests-count"></p>
           <div id="admin-requests-list"></div>
         </div>
@@ -70,20 +62,10 @@ import Layout from '../../components/Layout.astro';
         | { kind: 'deletion'; requested_at: string; data: DeletionRequest }
         | { kind: 'edit'; requested_at: string; data: EditRequest };
 
-      var STORAGE_KEY = 'meshtexas-admin-password';
-
-      var loginPanel = document.getElementById('admin-login');
-      var passwordInput = document.getElementById('admin-password') as HTMLInputElement | null;
-      var loginStatus = document.getElementById('admin-login-status');
-      var unlockBtn = document.getElementById('admin-unlock');
-      var requestsPanel = document.getElementById('admin-requests');
+      var loadStatus = document.getElementById('admin-load-status');
       var requestsCount = document.getElementById('admin-requests-count');
       var requestsList = document.getElementById('admin-requests-list');
-      if (!loginPanel || !passwordInput || !loginStatus || !unlockBtn || !requestsPanel || !requestsCount || !requestsList) return;
-
-      function getPassword() {
-        return sessionStorage.getItem(STORAGE_KEY) || '';
-      }
+      if (!loadStatus || !requestsCount || !requestsList) return;
 
       function addField(card: HTMLElement, label: string, value: string) {
         var row = document.createElement('div');
@@ -224,10 +206,7 @@ import Layout from '../../components/Layout.astro';
       function resolveRequest(url: string, action: string, card: HTMLElement) {
         fetch(url, {
           method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-            'x-admin-password': getPassword(),
-          },
+          headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ action: action }),
         })
           .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
@@ -246,18 +225,14 @@ import Layout from '../../components/Layout.astro';
       }
 
       function loadRequests() {
-        var password = getPassword();
         Promise.all([
-          fetch('/api/admin/deletion-requests', { headers: { 'x-admin-password': password } }),
-          fetch('/api/admin/edit-requests', { headers: { 'x-admin-password': password } }),
+          fetch('/api/admin/deletion-requests'),
+          fetch('/api/admin/edit-requests'),
         ])
           .then(function (responses) {
             if (responses.some(function (res) { return res.status === 401; })) {
-              sessionStorage.removeItem(STORAGE_KEY);
-              loginPanel!.style.display = '';
-              requestsPanel!.style.display = 'none';
-              loginStatus!.textContent = 'Incorrect password.';
-              loginStatus!.className = 'registry-form-status error';
+              loadStatus!.textContent = 'Not authorized — make sure you\'re logged in via Cloudflare Access.';
+              loadStatus!.className = 'registry-form-status error';
               return null;
             }
             return Promise.all(responses.map(function (res) { return res.json(); }));
@@ -273,32 +248,15 @@ import Layout from '../../components/Layout.astro';
 
             combined.sort(function (a, b) { return a.requested_at.localeCompare(b.requested_at); });
 
-            loginPanel!.style.display = 'none';
-            requestsPanel!.style.display = '';
             renderRequests(combined);
           })
           .catch(function () {
-            loginStatus!.textContent = 'Something went wrong loading requests.';
-            loginStatus!.className = 'registry-form-status error';
+            loadStatus!.textContent = 'Something went wrong loading requests.';
+            loadStatus!.className = 'registry-form-status error';
           });
       }
 
-      unlockBtn.addEventListener('click', function () {
-        var pw = passwordInput!.value || '';
-        if (!pw) return;
-        sessionStorage.setItem(STORAGE_KEY, pw);
-        loginStatus!.textContent = '';
-        loginStatus!.className = 'registry-form-status';
-        loadRequests();
-      });
-
-      passwordInput.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') unlockBtn!.click();
-      });
-
-      if (getPassword()) {
-        loadRequests();
-      }
+      loadRequests();
     })();
   </script>
 </Layout>

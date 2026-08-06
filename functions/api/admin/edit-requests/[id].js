@@ -5,15 +5,17 @@ function jsonResponse(body, status) {
   });
 }
 
-function isAuthorized(request, env) {
-  const header = request.headers.get('x-admin-password') || '';
-  return env.ADMIN_PASSWORD && header === env.ADMIN_PASSWORD;
+function isAuthorized(request) {
+  // Cloudflare Access sets this header after verifying the visitor's
+  // identity, and strips any client-supplied value first — it can't be
+  // spoofed by a request that didn't pass through Access.
+  return Boolean(request.headers.get('Cf-Access-Authenticated-User-Email'));
 }
 
 export async function onRequestPost(context) {
   const { request, env, params } = context;
 
-  if (!isAuthorized(request, env)) {
+  if (!isAuthorized(request)) {
     return jsonResponse({ error: 'Unauthorized' }, 401);
   }
 
