@@ -1338,6 +1338,16 @@ footer a:hover { color: var(--text); }
 
 .registry-table td { color: var(--text); }
 
+.registry-id-cell {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  cursor: help;
+}
+
 .registry-table tbody tr:nth-child(even) { background: var(--bg-3); }
 
 .registry-table tbody tr:last-child td { border-bottom: none; }
@@ -1517,5 +1527,13 @@ footer a:hover { color: var(--text); }
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
+  }
+  .registry-id-cell {
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    text-align: right;
+    word-break: break-all;
   }
 }

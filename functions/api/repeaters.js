@@ -40,7 +40,7 @@ export async function onRequestPost(context) {
   }
 
   const name = typeof body.name === 'string' ? body.name.trim() : '';
-  const publicKey = typeof body.publicKey === 'string' ? body.publicKey.trim() : '';
+  const publicKey = typeof body.publicKey === 'string' ? body.publicKey.trim().toUpperCase() : '';
   const region = typeof body.region === 'string' ? body.region.trim().toUpperCase() : '';
   const location = typeof body.location === 'string' ? body.location.trim() : '';
   const operatorName = typeof body.operatorName === 'string' ? body.operatorName.trim() : '';

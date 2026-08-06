@@ -36,13 +36,14 @@ const REGIONS = [
         <summary>Register Your Repeater</summary>
         <div class="hint-body">
           <form id="repeater-form">
+            <p class="registry-form-status" id="registry-form-status" role="status"></p>
             <div class="form-row">
               <label for="field-name">Repeater Name</label>
               <input type="text" id="field-name" name="name" required maxlength="100">
             </div>
             <div class="form-row">
               <label for="field-public-key">Repeater ID (Public Key)</label>
-              <input type="text" id="field-public-key" name="publicKey" required maxlength="128">
+              <input type="text" id="field-public-key" name="publicKey" required maxlength="128" style="text-transform: uppercase;" autocapitalize="characters">
             </div>
             <div class="form-row">
               <label for="field-region">Region</label>
@@ -64,7 +65,6 @@ const REGIONS = [
               <input type="text" id="field-contact-info" name="contactInfo" required maxlength="200" placeholder="Email, phone, or Discord username/server">
             </div>
             <div class="cf-turnstile" data-sitekey="0x4AAAAAAEHiLjg3Bw-BaBIi" data-callback="onTurnstileSuccess"></div>
-            <p class="registry-form-status" id="registry-form-status" role="status"></p>
             <button type="submit" class="btn btn-primary">Add Repeater</button>
           </form>
         </div>
@@ -187,6 +187,10 @@ const REGIONS = [
             var td = document.createElement('td');
             td.setAttribute('data-label', pair[0]);
             td.textContent = pair[1];
+            if (pair[0] === 'Repeater ID') {
+              td.className = 'registry-id-cell';
+              td.title = pair[1];
+            }
             tr.appendChild(td);
           });
 
