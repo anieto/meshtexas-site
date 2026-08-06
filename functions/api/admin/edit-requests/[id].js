@@ -1,3 +1,5 @@
+import { getAccessEmail } from '../../../_shared/access.js';
+
 function jsonResponse(body, status) {
   return new Response(JSON.stringify(body), {
     status,
@@ -5,17 +7,11 @@ function jsonResponse(body, status) {
   });
 }
 
-function isAuthorized(request) {
-  // Cloudflare Access sets this header after verifying the visitor's
-  // identity, and strips any client-supplied value first — it can't be
-  // spoofed by a request that didn't pass through Access.
-  return Boolean(request.headers.get('Cf-Access-Authenticated-User-Email'));
-}
-
 export async function onRequestPost(context) {
   const { request, env, params } = context;
 
-  if (!isAuthorized(request)) {
+  const email = await getAccessEmail(request, env);
+  if (!email) {
     return jsonResponse({ error: 'Unauthorized' }, 401);
   }
 
@@ -48,10 +44,9 @@ export async function onRequestPost(context) {
       return jsonResponse({ error: 'Edit request not found or already resolved' }, 404);
     }
 
-    const resolvedBy = request.headers.get('Cf-Access-Authenticated-User-Email') || null;
     const resolveStmt = env.REPEATERS_DB.prepare(
       "UPDATE edit_requests SET status = 'resolved', resolved_at = strftime('%Y-%m-%dT%H:%M:%fZ','now'), resolved_by = ? WHERE id = ?"
-    ).bind(resolvedBy, requestId);
+    ).bind(email, requestId);
 
     if (action === 'approve') {
       const updateStmt = env.REPEATERS_DB.prepare(
