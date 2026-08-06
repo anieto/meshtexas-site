@@ -748,6 +748,8 @@ pre code {
 
 .hint code { font-size: 0.8rem; }
 
+.registry-sheet-note { margin-bottom: 16px; }
+
 .iata-choice {
   display: flex;
   flex-direction: column;
@@ -1478,6 +1480,11 @@ footer a:hover { color: var(--text); }
   font-size: 0.9rem;
 }
 
+.admin-request-field > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .admin-request-field .field-label {
   flex-shrink: 0;
   width: 100px;
@@ -1517,7 +1524,17 @@ footer a:hover { color: var(--text); }
   color: var(--accent);
 }
 
-.admin-diff-changed { display: inline; }
+.admin-diff-changed {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.admin-diff-old,
+.admin-diff-new {
+  overflow-wrap: anywhere;
+}
 
 .admin-diff-old {
   color: var(--text-muted);
