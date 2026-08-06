@@ -1276,7 +1276,9 @@ footer a:hover { color: var(--text); }
 .registry-search input,
 .registry-toolbar select,
 .registry-submit input,
-.registry-submit select {
+.registry-submit select,
+.delete-request-panel input,
+.delete-request-panel select {
   padding: 10px 14px;
   font-size: 0.95rem;
   font-family: inherit;
@@ -1291,7 +1293,9 @@ footer a:hover { color: var(--text); }
 .registry-search input:focus,
 .registry-toolbar select:focus,
 .registry-submit input:focus,
-.registry-submit select:focus {
+.registry-submit select:focus,
+.delete-request-panel input:focus,
+.delete-request-panel select:focus {
   outline: none;
   border-color: var(--accent);
 }
@@ -1489,6 +1493,40 @@ footer a:hover { color: var(--text); }
   display: flex;
   gap: 10px;
   margin-top: 8px;
+}
+
+.admin-request-badge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.admin-request-badge-deletion {
+  background: rgba(248, 81, 73, 0.15);
+  color: #f85149;
+}
+
+.admin-request-badge-edit {
+  background: rgba(88, 166, 255, 0.15);
+  color: var(--accent);
+}
+
+.admin-diff-changed { display: inline; }
+
+.admin-diff-old {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.admin-diff-new {
+  color: var(--green);
+  font-weight: 600;
 }
 
 @media (max-width: 640px) {

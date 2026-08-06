@@ -118,6 +118,50 @@ const REGIONS = [
           </div>
         </form>
       </div>
+
+      <div class="delete-request-panel" id="edit-request-panel" style="display: none;">
+        <h3>Request Edit</h3>
+        <p class="hint">Proposing changes to <strong id="edit-request-target"></strong>. An admin will review this before it's applied.</p>
+        <form id="edit-request-form">
+          <input type="hidden" id="edit-request-repeater-id" name="repeaterId">
+          <div class="form-row">
+            <label for="field-edit-name">Repeater Name</label>
+            <input type="text" id="field-edit-name" name="name" required maxlength="100">
+          </div>
+          <div class="form-row">
+            <label for="field-edit-public-key">Repeater ID (Public Key)</label>
+            <input type="text" id="field-edit-public-key" name="publicKey" required maxlength="128" style="text-transform: uppercase;" autocapitalize="characters">
+          </div>
+          <div class="form-row">
+            <label for="field-edit-region">Region</label>
+            <select id="field-edit-region" name="region" required>
+              {REGIONS.map((r) => <option value={r.code}>{r.code} — {r.name}</option>)}
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="field-edit-location">Location</label>
+            <input type="text" id="field-edit-location" name="location" required maxlength="500">
+          </div>
+          <div class="form-row">
+            <label for="field-edit-operator-name">Operator Name</label>
+            <input type="text" id="field-edit-operator-name" name="operatorName" required maxlength="100">
+          </div>
+          <div class="form-row">
+            <label for="field-edit-contact-info">Contact Info</label>
+            <input type="text" id="field-edit-contact-info" name="contactInfo" required maxlength="200">
+          </div>
+          <div class="form-row">
+            <label for="field-edit-note">Note to Admin (optional)</label>
+            <textarea id="field-edit-note" name="note" maxlength="500" rows="2" placeholder="Why this change is needed"></textarea>
+          </div>
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAAEHiLjg3Bw-BaBIi"></div>
+          <p class="registry-form-status" id="edit-request-status" role="status"></p>
+          <div class="delete-request-actions">
+            <button type="submit" class="btn btn-secondary">Submit Edit Request</button>
+            <button type="button" class="btn btn-secondary" id="edit-request-cancel">Cancel</button>
+          </div>
+        </form>
+      </div>
     </div>
   </section>
 
@@ -149,8 +193,15 @@ const REGIONS = [
       var deleteForm = document.getElementById('delete-request-form') as HTMLFormElement | null;
       var deleteStatusEl = document.getElementById('delete-request-status');
       var deleteCancelBtn = document.getElementById('delete-request-cancel');
+      var editPanel = document.getElementById('edit-request-panel');
+      var editTargetLabel = document.getElementById('edit-request-target');
+      var editRepeaterIdInput = document.getElementById('edit-request-repeater-id') as HTMLInputElement | null;
+      var editForm = document.getElementById('edit-request-form') as HTMLFormElement | null;
+      var editStatusEl = document.getElementById('edit-request-status');
+      var editCancelBtn = document.getElementById('edit-request-cancel');
       if (!tbody || !searchInput || !regionSelect || !countEl || !emptyMsg || !table || !form || !statusEl) return;
       if (!deletePanel || !deleteTargetLabel || !deleteRepeaterIdInput || !deleteForm || !deleteStatusEl || !deleteCancelBtn) return;
+      if (!editPanel || !editTargetLabel || !editRepeaterIdInput || !editForm || !editStatusEl || !editCancelBtn) return;
 
       var allRepeaters: Repeater[] = [];
       var sortField = 'name';
@@ -196,6 +247,13 @@ const REGIONS = [
 
           var actionsTd = document.createElement('td');
           actionsTd.setAttribute('data-label', 'Actions');
+          var editBtn = document.createElement('button');
+          editBtn.type = 'button';
+          editBtn.className = 'link-btn';
+          editBtn.textContent = 'Edit';
+          editBtn.setAttribute('data-edit-repeater-id', String(r.id));
+          actionsTd.appendChild(editBtn);
+          actionsTd.appendChild(document.createTextNode(' · '));
           var deleteBtn = document.createElement('button');
           deleteBtn.type = 'button';
           deleteBtn.className = 'link-btn';
@@ -241,6 +299,28 @@ const REGIONS = [
 
       tbody.addEventListener('click', function (e) {
         var target = e.target as HTMLElement;
+
+        var editBtn = target.closest('[data-edit-repeater-id]') as HTMLElement | null;
+        if (editBtn) {
+          var editId = editBtn.getAttribute('data-edit-repeater-id') || '';
+          var repeater = allRepeaters.find(function (r) { return String(r.id) === editId; });
+          if (!repeater) return;
+          editRepeaterIdInput!.value = editId;
+          editTargetLabel!.textContent = repeater.name;
+          (document.getElementById('field-edit-name') as HTMLInputElement).value = repeater.name;
+          (document.getElementById('field-edit-public-key') as HTMLInputElement).value = repeater.public_key;
+          (document.getElementById('field-edit-region') as HTMLSelectElement).value = repeater.region;
+          (document.getElementById('field-edit-location') as HTMLInputElement).value = repeater.location;
+          (document.getElementById('field-edit-operator-name') as HTMLInputElement).value = repeater.operator_name;
+          (document.getElementById('field-edit-contact-info') as HTMLInputElement).value = repeater.contact_info;
+          (document.getElementById('field-edit-note') as HTMLTextAreaElement).value = '';
+          editStatusEl!.textContent = '';
+          editStatusEl!.className = 'registry-form-status';
+          editPanel!.style.display = '';
+          editPanel!.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+
         var btn = target.closest('[data-repeater-id]') as HTMLElement | null;
         if (!btn) return;
         var id = btn.getAttribute('data-repeater-id') || '';
@@ -256,6 +336,66 @@ const REGIONS = [
       deleteCancelBtn.addEventListener('click', function () {
         deletePanel!.style.display = 'none';
         deleteForm!.reset();
+      });
+
+      editCancelBtn.addEventListener('click', function () {
+        editPanel!.style.display = 'none';
+        editForm!.reset();
+      });
+
+      editForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        editStatusEl!.textContent = '';
+        editStatusEl!.className = 'registry-form-status';
+
+        var data = new FormData(editForm!);
+        var turnstileToken = (editForm!.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement | null)?.value || '';
+        var editTurnstileWidget = editForm!.querySelector('.cf-turnstile');
+
+        var body = {
+          repeaterId: Number(data.get('repeaterId')),
+          name: String(data.get('name') || ''),
+          publicKey: String(data.get('publicKey') || ''),
+          region: String(data.get('region') || ''),
+          location: String(data.get('location') || ''),
+          operatorName: String(data.get('operatorName') || ''),
+          contactInfo: String(data.get('contactInfo') || ''),
+          note: String(data.get('note') || ''),
+          turnstileToken: turnstileToken,
+        };
+
+        if (!body.turnstileToken) {
+          editStatusEl!.textContent = 'Please complete the verification widget.';
+          editStatusEl!.className = 'registry-form-status error';
+          return;
+        }
+
+        fetch('/api/edit-requests', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(body),
+        })
+          .then(function (res) {
+            return res.json().then(function (json) { return { ok: res.ok, json: json }; });
+          })
+          .then(function (result) {
+            // @ts-ignore — turnstile global loaded via external script
+            if (window.turnstile && editTurnstileWidget) window.turnstile.reset(editTurnstileWidget);
+            if (!result.ok) {
+              editStatusEl!.textContent = result.json.error || 'Something went wrong.';
+              editStatusEl!.className = 'registry-form-status error';
+              return;
+            }
+            editStatusEl!.textContent = 'Edit request submitted — an admin will review it soon.';
+            editStatusEl!.className = 'registry-form-status success';
+            editForm!.reset();
+          })
+          .catch(function () {
+            // @ts-ignore
+            if (window.turnstile && editTurnstileWidget) window.turnstile.reset(editTurnstileWidget);
+            editStatusEl!.textContent = 'Something went wrong. Try again.';
+            editStatusEl!.className = 'registry-form-status error';
+          });
       });
 
       deleteForm.addEventListener('submit', function (e) {

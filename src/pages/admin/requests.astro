@@ -1,0 +1,304 @@
+---
+import Layout from '../../components/Layout.astro';
+---
+<Layout
+  title="Requests — Admin — MeshTexas"
+  description="Admin review queue for pending repeater deletion and edit requests."
+>
+  <div data-pagefind-ignore="all">
+    <div class="page-intro">
+      <div class="container-narrow">
+        <h1>Requests</h1>
+        <p class="hero-sub">Pending repeater deletion and edit requests, awaiting review.</p>
+      </div>
+    </div>
+
+    <section class="about-section">
+      <div class="container-narrow">
+        <div id="admin-login" class="admin-login">
+          <div class="form-row">
+            <label for="admin-password">Admin Password</label>
+            <input type="password" id="admin-password" autocomplete="current-password">
+          </div>
+          <p class="registry-form-status" id="admin-login-status" role="status"></p>
+          <button type="button" class="btn btn-primary" id="admin-unlock">Unlock</button>
+        </div>
+
+        <div id="admin-requests" style="display: none;">
+          <p class="hint" id="admin-requests-count"></p>
+          <div id="admin-requests-list"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      type DeletionRequest = {
+        request_id: number;
+        reason: string;
+        requested_at: string;
+        repeater_id: number;
+        name: string;
+        public_key: string;
+        region: string;
+        location: string;
+        operator_name: string;
+        contact_info: string;
+      };
+
+      type EditRequest = {
+        request_id: number;
+        note: string | null;
+        requested_at: string;
+        repeater_id: number;
+        new_name: string;
+        new_public_key: string;
+        new_region: string;
+        new_location: string;
+        new_operator_name: string;
+        new_contact_info: string;
+        current_name: string;
+        current_public_key: string;
+        current_region: string;
+        current_location: string;
+        current_operator_name: string;
+        current_contact_info: string;
+      };
+
+      type QueueItem =
+        | { kind: 'deletion'; requested_at: string; data: DeletionRequest }
+        | { kind: 'edit'; requested_at: string; data: EditRequest };
+
+      var STORAGE_KEY = 'meshtexas-admin-password';
+
+      var loginPanel = document.getElementById('admin-login');
+      var passwordInput = document.getElementById('admin-password') as HTMLInputElement | null;
+      var loginStatus = document.getElementById('admin-login-status');
+      var unlockBtn = document.getElementById('admin-unlock');
+      var requestsPanel = document.getElementById('admin-requests');
+      var requestsCount = document.getElementById('admin-requests-count');
+      var requestsList = document.getElementById('admin-requests-list');
+      if (!loginPanel || !passwordInput || !loginStatus || !unlockBtn || !requestsPanel || !requestsCount || !requestsList) return;
+
+      function getPassword() {
+        return sessionStorage.getItem(STORAGE_KEY) || '';
+      }
+
+      function addField(card: HTMLElement, label: string, value: string) {
+        var row = document.createElement('div');
+        row.className = 'admin-request-field';
+        var labelEl = document.createElement('span');
+        labelEl.className = 'field-label';
+        labelEl.textContent = label;
+        var valueEl = document.createElement('span');
+        valueEl.textContent = value;
+        row.appendChild(labelEl);
+        row.appendChild(valueEl);
+        card.appendChild(row);
+      }
+
+      function addDiffField(card: HTMLElement, label: string, current: string, proposed: string) {
+        var row = document.createElement('div');
+        row.className = 'admin-request-field';
+        var labelEl = document.createElement('span');
+        labelEl.className = 'field-label';
+        labelEl.textContent = label;
+        var valueEl = document.createElement('span');
+        if (current === proposed) {
+          valueEl.textContent = current;
+        } else {
+          valueEl.className = 'admin-diff-changed';
+          var oldSpan = document.createElement('span');
+          oldSpan.className = 'admin-diff-old';
+          oldSpan.textContent = current;
+          var arrow = document.createTextNode(' → ');
+          var newSpan = document.createElement('span');
+          newSpan.className = 'admin-diff-new';
+          newSpan.textContent = proposed;
+          valueEl.appendChild(oldSpan);
+          valueEl.appendChild(arrow);
+          valueEl.appendChild(newSpan);
+        }
+        row.appendChild(labelEl);
+        row.appendChild(valueEl);
+        card.appendChild(row);
+      }
+
+      function renderDeletionCard(item: DeletionRequest): HTMLElement {
+        var card = document.createElement('div');
+        card.className = 'admin-request-card';
+
+        var badge = document.createElement('span');
+        badge.className = 'admin-request-badge admin-request-badge-deletion';
+        badge.textContent = 'Deletion Request';
+        card.appendChild(badge);
+
+        addField(card, 'Repeater', item.name);
+        addField(card, 'Region', item.region);
+        addField(card, 'Location', item.location);
+        addField(card, 'Repeater ID', item.public_key);
+        addField(card, 'Operator', item.operator_name);
+        addField(card, 'Contact', item.contact_info);
+        addField(card, 'Reason', item.reason);
+        addField(card, 'Requested', item.requested_at);
+
+        var actions = document.createElement('div');
+        actions.className = 'admin-request-actions';
+
+        var deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'btn btn-primary';
+        deleteBtn.textContent = 'Delete Repeater';
+        deleteBtn.addEventListener('click', function () {
+          resolveRequest('/api/admin/deletion-requests/' + item.request_id, 'delete', card);
+        });
+
+        var dismissBtn = document.createElement('button');
+        dismissBtn.type = 'button';
+        dismissBtn.className = 'btn btn-secondary';
+        dismissBtn.textContent = 'Dismiss Request';
+        dismissBtn.addEventListener('click', function () {
+          resolveRequest('/api/admin/deletion-requests/' + item.request_id, 'dismiss', card);
+        });
+
+        actions.appendChild(deleteBtn);
+        actions.appendChild(dismissBtn);
+        card.appendChild(actions);
+        return card;
+      }
+
+      function renderEditCard(item: EditRequest): HTMLElement {
+        var card = document.createElement('div');
+        card.className = 'admin-request-card';
+
+        var badge = document.createElement('span');
+        badge.className = 'admin-request-badge admin-request-badge-edit';
+        badge.textContent = 'Edit Request';
+        card.appendChild(badge);
+
+        addDiffField(card, 'Name', item.current_name, item.new_name);
+        addDiffField(card, 'Region', item.current_region, item.new_region);
+        addDiffField(card, 'Location', item.current_location, item.new_location);
+        addDiffField(card, 'Repeater ID', item.current_public_key, item.new_public_key);
+        addDiffField(card, 'Operator', item.current_operator_name, item.new_operator_name);
+        addDiffField(card, 'Contact', item.current_contact_info, item.new_contact_info);
+        if (item.note) addField(card, 'Note', item.note);
+        addField(card, 'Requested', item.requested_at);
+
+        var actions = document.createElement('div');
+        actions.className = 'admin-request-actions';
+
+        var approveBtn = document.createElement('button');
+        approveBtn.type = 'button';
+        approveBtn.className = 'btn btn-primary';
+        approveBtn.textContent = 'Approve Changes';
+        approveBtn.addEventListener('click', function () {
+          resolveRequest('/api/admin/edit-requests/' + item.request_id, 'approve', card);
+        });
+
+        var rejectBtn = document.createElement('button');
+        rejectBtn.type = 'button';
+        rejectBtn.className = 'btn btn-secondary';
+        rejectBtn.textContent = 'Reject';
+        rejectBtn.addEventListener('click', function () {
+          resolveRequest('/api/admin/edit-requests/' + item.request_id, 'reject', card);
+        });
+
+        actions.appendChild(approveBtn);
+        actions.appendChild(rejectBtn);
+        card.appendChild(actions);
+        return card;
+      }
+
+      function renderRequests(items: QueueItem[]) {
+        requestsList!.innerHTML = '';
+        requestsCount!.textContent = items.length + (items.length === 1 ? ' pending request' : ' pending requests');
+
+        items.forEach(function (item) {
+          var card = item.kind === 'deletion' ? renderDeletionCard(item.data) : renderEditCard(item.data);
+          requestsList!.appendChild(card);
+        });
+      }
+
+      function resolveRequest(url: string, action: string, card: HTMLElement) {
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            'x-admin-password': getPassword(),
+          },
+          body: JSON.stringify({ action: action }),
+        })
+          .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
+          .then(function (result) {
+            if (!result.ok) {
+              alert(result.json.error || 'Failed to resolve request.');
+              return;
+            }
+            card.remove();
+            var remaining = requestsList!.children.length;
+            requestsCount!.textContent = remaining + (remaining === 1 ? ' pending request' : ' pending requests');
+          })
+          .catch(function () {
+            alert('Something went wrong. Try again.');
+          });
+      }
+
+      function loadRequests() {
+        var password = getPassword();
+        Promise.all([
+          fetch('/api/admin/deletion-requests', { headers: { 'x-admin-password': password } }),
+          fetch('/api/admin/edit-requests', { headers: { 'x-admin-password': password } }),
+        ])
+          .then(function (responses) {
+            if (responses.some(function (res) { return res.status === 401; })) {
+              sessionStorage.removeItem(STORAGE_KEY);
+              loginPanel!.style.display = '';
+              requestsPanel!.style.display = 'none';
+              loginStatus!.textContent = 'Incorrect password.';
+              loginStatus!.className = 'registry-form-status error';
+              return null;
+            }
+            return Promise.all(responses.map(function (res) { return res.json(); }));
+          })
+          .then(function (results) {
+            if (!results) return;
+            var deletions: DeletionRequest[] = Array.isArray(results[0]) ? results[0] : [];
+            var edits: EditRequest[] = Array.isArray(results[1]) ? results[1] : [];
+
+            var combined: QueueItem[] = deletions
+              .map(function (d): QueueItem { return { kind: 'deletion', requested_at: d.requested_at, data: d }; })
+              .concat(edits.map(function (e): QueueItem { return { kind: 'edit', requested_at: e.requested_at, data: e }; }));
+
+            combined.sort(function (a, b) { return a.requested_at.localeCompare(b.requested_at); });
+
+            loginPanel!.style.display = 'none';
+            requestsPanel!.style.display = '';
+            renderRequests(combined);
+          })
+          .catch(function () {
+            loginStatus!.textContent = 'Something went wrong loading requests.';
+            loginStatus!.className = 'registry-form-status error';
+          });
+      }
+
+      unlockBtn.addEventListener('click', function () {
+        var pw = passwordInput!.value || '';
+        if (!pw) return;
+        sessionStorage.setItem(STORAGE_KEY, pw);
+        loginStatus!.textContent = '';
+        loginStatus!.className = 'registry-form-status';
+        loadRequests();
+      });
+
+      passwordInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') unlockBtn!.click();
+      });
+
+      if (getPassword()) {
+        loadRequests();
+      }
+    })();
+  </script>
+</Layout>
