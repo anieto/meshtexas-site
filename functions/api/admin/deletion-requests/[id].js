@@ -45,9 +45,10 @@ export async function onRequestPost(context) {
       return jsonResponse({ error: 'Deletion request not found or already resolved' }, 404);
     }
 
+    const resolvedBy = request.headers.get('Cf-Access-Authenticated-User-Email') || null;
     const resolveStmt = env.REPEATERS_DB.prepare(
-      "UPDATE deletion_requests SET status = 'resolved', resolved_at = strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id = ?"
-    ).bind(requestId);
+      "UPDATE deletion_requests SET status = 'resolved', resolved_at = strftime('%Y-%m-%dT%H:%M:%fZ','now'), resolved_by = ? WHERE id = ?"
+    ).bind(resolvedBy, requestId);
 
     if (action === 'delete') {
       const deleteStmt = env.REPEATERS_DB.prepare('DELETE FROM repeaters WHERE id = ?').bind(

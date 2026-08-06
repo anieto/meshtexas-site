@@ -46,9 +46,10 @@ export async function onRequestPost(context) {
       return jsonResponse({ error: 'Edit request not found or already resolved' }, 404);
     }
 
+    const resolvedBy = request.headers.get('Cf-Access-Authenticated-User-Email') || null;
     const resolveStmt = env.REPEATERS_DB.prepare(
-      "UPDATE edit_requests SET status = 'resolved', resolved_at = strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id = ?"
-    ).bind(requestId);
+      "UPDATE edit_requests SET status = 'resolved', resolved_at = strftime('%Y-%m-%dT%H:%M:%fZ','now'), resolved_by = ? WHERE id = ?"
+    ).bind(resolvedBy, requestId);
 
     if (action === 'approve') {
       const updateStmt = env.REPEATERS_DB.prepare(
