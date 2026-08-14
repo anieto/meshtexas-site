@@ -1280,7 +1280,9 @@ footer a:hover { color: var(--text); }
 .registry-submit input,
 .registry-submit select,
 .delete-request-panel input,
-.delete-request-panel select {
+.delete-request-panel select,
+.host-inquiry-form input,
+.host-inquiry-form textarea {
   padding: 10px 14px;
   font-size: 0.95rem;
   font-family: inherit;
@@ -1290,6 +1292,8 @@ footer a:hover { color: var(--text); }
   border-radius: var(--radius);
 }
 
+.host-inquiry-form textarea { resize: vertical; }
+
 .registry-search input { flex: 1; }
 
 .registry-search input:focus,
@@ -1297,7 +1301,9 @@ footer a:hover { color: var(--text); }
 .registry-submit input:focus,
 .registry-submit select:focus,
 .delete-request-panel input:focus,
-.delete-request-panel select:focus {
+.delete-request-panel select:focus,
+.host-inquiry-form input:focus,
+.host-inquiry-form textarea:focus {
   outline: none;
   border-color: var(--accent);
 }
@@ -1368,7 +1374,8 @@ footer a:hover { color: var(--text); }
 
 .registry-submit { margin-bottom: 32px; }
 
-.registry-submit form {
+.registry-submit form,
+.host-inquiry-form form {
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -1376,7 +1383,8 @@ footer a:hover { color: var(--text); }
 
 .registry-submit .form-row,
 .delete-request-panel .form-row,
-.admin-login .form-row {
+.admin-login .form-row,
+.host-inquiry-form .form-row {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -1384,7 +1392,8 @@ footer a:hover { color: var(--text); }
 
 .registry-submit label,
 .delete-request-panel label,
-.admin-login label {
+.admin-login label,
+.host-inquiry-form label {
   font-size: 0.8rem;
   color: var(--text-muted);
   text-transform: uppercase;

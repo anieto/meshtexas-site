@@ -49,4 +49,4 @@ The property owner typically carries liability, though the likelihood of any inc
 
 ## Get in Touch
 
-Interested, or have questions? [Email us](mailto:info@meshtexas.org) with your building address and approximate roof height.
+Interested, or have questions? Fill out the form below and we'll follow up with an assessment of the support available for your location, or [email us directly](mailto:info@meshtexas.org).

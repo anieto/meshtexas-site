@@ -1,5 +1,6 @@
 ---
 import Layout from '../../components/Layout.astro';
+import HostInquiryForm from '../../components/HostInquiryForm.astro';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -30,6 +31,7 @@ const { Content } = await render(page);
         <img src={page.data.thumbnail} alt="" class="content-thumbnail" />
       )}
       <Content />
+      {page.id === 'commercial' && <HostInquiryForm />}
     </div>
   </section>
 </Layout>

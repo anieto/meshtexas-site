@@ -1,0 +1,89 @@
+---
+// Standalone lead-capture form for commercial host inquiries. Posts to
+// /api/host-inquiries (D1-backed, Turnstile-protected) — see
+// functions/api/host-inquiries.js. Sitekey matches the one used on
+// /repeaters; same Cloudflare Turnstile widget config.
+---
+<div class="host-inquiry-form">
+  <form id="host-inquiry-form">
+    <p class="registry-form-status" id="host-inquiry-status" role="status"></p>
+    <div class="form-row">
+      <label for="field-inquiry-email">Email</label>
+      <input type="email" id="field-inquiry-email" name="email" required maxlength="200">
+    </div>
+    <div class="form-row">
+      <label for="field-inquiry-address">Building Address</label>
+      <input type="text" id="field-inquiry-address" name="address" maxlength="500">
+    </div>
+    <div class="form-row">
+      <label for="field-inquiry-roof-height">Approx. Roof Height</label>
+      <input type="text" id="field-inquiry-roof-height" name="roofHeight" maxlength="100" placeholder="e.g. 40 ft, or number of stories">
+    </div>
+    <div class="form-row">
+      <label for="field-inquiry-message">Message</label>
+      <textarea id="field-inquiry-message" name="message" maxlength="2000" rows="4"></textarea>
+    </div>
+    <div class="cf-turnstile" data-sitekey="0x4AAAAAAEHiLjg3Bw-BaBIi"></div>
+    <button type="submit" class="btn btn-primary">Send Inquiry</button>
+  </form>
+</div>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+  (function () {
+    var form = document.getElementById('host-inquiry-form') as HTMLFormElement | null;
+    var statusEl = document.getElementById('host-inquiry-status');
+    if (!form || !statusEl) return;
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      statusEl!.textContent = '';
+      statusEl!.className = 'registry-form-status';
+
+      var data = new FormData(form!);
+      var turnstileToken = (form!.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement | null)?.value || '';
+      var turnstileWidget = form!.querySelector('.cf-turnstile');
+
+      var body = {
+        email: String(data.get('email') || ''),
+        address: String(data.get('address') || ''),
+        roofHeight: String(data.get('roofHeight') || ''),
+        message: String(data.get('message') || ''),
+        turnstileToken: turnstileToken,
+      };
+
+      if (!body.turnstileToken) {
+        statusEl!.textContent = 'Please complete the verification widget.';
+        statusEl!.className = 'registry-form-status error';
+        return;
+      }
+
+      fetch('/api/host-inquiries', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+        .then(function (res) {
+          return res.json().then(function (json) { return { ok: res.ok, json: json }; });
+        })
+        .then(function (result) {
+          // @ts-ignore — turnstile global loaded via external script
+          if (window.turnstile && turnstileWidget) window.turnstile.reset(turnstileWidget);
+          if (!result.ok) {
+            statusEl!.textContent = result.json.error || 'Something went wrong.';
+            statusEl!.className = 'registry-form-status error';
+            return;
+          }
+          form!.reset();
+          statusEl!.textContent = 'Thanks — we\'ll follow up with a coverage assessment for your location.';
+          statusEl!.className = 'registry-form-status success';
+        })
+        .catch(function () {
+          // @ts-ignore
+          if (window.turnstile && turnstileWidget) window.turnstile.reset(turnstileWidget);
+          statusEl!.textContent = 'Something went wrong. Try again.';
+          statusEl!.className = 'registry-form-status error';
+        });
+    });
+  })();
+</script>
