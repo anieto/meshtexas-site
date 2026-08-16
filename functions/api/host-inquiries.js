@@ -112,24 +112,10 @@ export async function onRequestPost(context) {
   }
 
   try {
-    await env.REPEATERS_DB.prepare(
-      `INSERT INTO host_inquiries (email, address, roof_height, message)
-       VALUES (?, ?, ?, ?)`
-    )
-      .bind(email, address || null, roofHeight || null, message || null)
-      .run();
-  } catch (error) {
-    console.error(error);
-    return jsonResponse({ error: 'Failed to save inquiry' }, 500);
-  }
-
-  try {
     await sendInquiryEmail(env, { email, address, roofHeight, message });
   } catch (error) {
-    // Inquiry is already durably stored in D1, so a notification-email
-    // failure shouldn't fail the visitor's request — just log it for
-    // manual follow-up via `wrangler d1 execute`.
     console.error('Failed to send host inquiry notification email:', error);
+    return jsonResponse({ error: 'Failed to send inquiry' }, 502);
   }
 
   return jsonResponse({ ok: true }, 201);
