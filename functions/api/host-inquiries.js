@@ -14,6 +14,50 @@ function jsonResponse(body, status) {
   });
 }
 
+function escapeHtml(value) {
+  return value.replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }[char]));
+}
+
+async function sendInquiryEmail(env, { email, address, roofHeight, message }) {
+  const rows = [
+    ['Email', email],
+    ['Building address', address || '(not provided)'],
+    ['Approx. roof height', roofHeight || '(not provided)'],
+    ['Message', message || '(none)'],
+  ];
+
+  const html = `<p>New commercial host inquiry from meshtexas.org:</p><ul>${rows
+    .map(([label, value]) => `<li><strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}</li>`)
+    .join('')}</ul>`;
+  const text = rows.map(([label, value]) => `${label}: ${value}`).join('\n');
+
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${env.RESEND_API_KEY}`,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: 'MeshTexas Host Inquiries <hosting@notify.meshtexas.org>',
+      to: 'info@meshtexas.org',
+      reply_to: email,
+      subject: 'New commercial host inquiry',
+      html,
+      text,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Resend API returned ${response.status}: ${await response.text()}`);
+  }
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
 
@@ -74,10 +118,19 @@ export async function onRequestPost(context) {
     )
       .bind(email, address || null, roofHeight || null, message || null)
       .run();
-
-    return jsonResponse({ ok: true }, 201);
   } catch (error) {
     console.error(error);
     return jsonResponse({ error: 'Failed to save inquiry' }, 500);
   }
+
+  try {
+    await sendInquiryEmail(env, { email, address, roofHeight, message });
+  } catch (error) {
+    // Inquiry is already durably stored in D1, so a notification-email
+    // failure shouldn't fail the visitor's request — just log it for
+    // manual follow-up via `wrangler d1 execute`.
+    console.error('Failed to send host inquiry notification email:', error);
+  }
+
+  return jsonResponse({ ok: true }, 201);
 }
