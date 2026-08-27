@@ -940,6 +940,13 @@ pre code {
   text-decoration: none;
 }
 
+/* Image is last in the DOM (renders on the right by default) — flip
+   every other card so the image alternates sides down the list,
+   starting with the image on the left for the first card. */
+.article-card:nth-child(odd) {
+  flex-direction: row-reverse;
+}
+
 .article-card-body {
   flex: 1;
   min-width: 0;
@@ -974,7 +981,7 @@ pre code {
 .article-card-thumbnail {
   width: 220px;
   flex-shrink: 0;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: calc(var(--radius) - 2px);
 }
 
