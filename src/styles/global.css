@@ -978,17 +978,17 @@ pre code {
   border-radius: calc(var(--radius) - 2px);
 }
 
-/* Below this, a 220px side column gets cramped next to the text —
-   stack the image above the text like a traditional card instead. */
+/* Below this, a 220px side column leaves too little room for the text —
+   shrink the image column instead of stacking, so tall/narrow photos
+   still fill the column at any width without cropping vertically. */
 @media (max-width: 640px) {
   .article-card {
-    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
   }
 
   .article-card-thumbnail {
-    width: 100%;
-    height: 160px;
-    order: -1;
+    width: 100px;
   }
 }
 
