@@ -1636,6 +1636,20 @@ footer a:hover { color: var(--text); }
   gap: 8px;
 }
 
+.photo-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 0.85rem;
+}
+
+.photo-picker-row span {
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.photo-picker-row input[type="text"],
 .host-asset-photo-add input[type="text"] {
   padding: 8px 12px;
   font-size: 0.875rem;

@@ -97,7 +97,11 @@ import Layout from '../../components/Layout.astro';
                     <input type="text" id="field-solar-panel" name="solarPanel">
                   </div>
                 </div>
-                <p class="hint">Photos (install, sticker, location) are added from the asset's Details panel after saving.</p>
+                <div class="form-row">
+                  <label for="field-photos">Photos (optional, select multiple)</label>
+                  <input type="file" id="field-photos" name="photos" multiple accept="image/jpeg,image/png,image/webp,image/heic">
+                  <div id="photo-picker-list"></div>
+                </div>
                 <p class="registry-form-status" id="host-form-status" role="status"></p>
                 <div class="form-actions">
                   <button type="submit" class="btn btn-primary" id="host-form-submit">Add Host Asset</button>
@@ -205,8 +209,28 @@ import Layout from '../../components/Layout.astro';
       var formSubmitBtn = document.getElementById('host-form-submit');
       var formCancelBtn = document.getElementById('host-form-cancel');
       var fieldId = document.getElementById('field-id') as HTMLInputElement | null;
+      var fieldPhotos = document.getElementById('field-photos') as HTMLInputElement | null;
+      var photoPickerList = document.getElementById('photo-picker-list');
 
       if (!tbody || !countEl || !emptyEl || !filterInput || !form || !fieldId) return;
+
+      fieldPhotos?.addEventListener('change', function () {
+        photoPickerList!.innerHTML = '';
+        var files = fieldPhotos!.files ? Array.from(fieldPhotos!.files) : [];
+        files.forEach(function (file, i) {
+          var row = document.createElement('div');
+          row.className = 'photo-picker-row';
+          var name = document.createElement('span');
+          name.textContent = file.name;
+          var labelInput = document.createElement('input');
+          labelInput.type = 'text';
+          labelInput.placeholder = 'Label (optional)';
+          labelInput.dataset.photoIndex = String(i);
+          row.appendChild(name);
+          row.appendChild(labelInput);
+          photoPickerList!.appendChild(row);
+        });
+      });
 
       var allAssets: HostAsset[] = [];
       var expandedId: number | null = null;
@@ -225,6 +249,7 @@ import Layout from '../../components/Layout.astro';
       function resetForm() {
         form!.reset();
         fieldId!.value = '';
+        photoPickerList!.innerHTML = '';
         formSubmitBtn!.textContent = 'Add Host Asset';
         formCancelBtn!.style.display = 'none';
         formStatus!.textContent = '';
@@ -237,6 +262,8 @@ import Layout from '../../components/Layout.astro';
           var el = fieldEl(name);
           if (el) el.value = (asset as any)[name] || '';
         });
+        if (fieldPhotos) fieldPhotos.value = '';
+        photoPickerList!.innerHTML = '';
         formSubmitBtn!.textContent = 'Save Changes';
         formCancelBtn!.style.display = '';
         formSummary!.textContent = 'Edit Host Asset #' + asset.assetNumber;
@@ -261,6 +288,25 @@ import Layout from '../../components/Layout.astro';
         row.appendChild(labelEl);
         row.appendChild(valueEl);
         card.appendChild(row);
+      }
+
+      function uploadAndAttachPhoto(hostAssetId: number, file: File, label: string): Promise<void> {
+        var uploadBody = new FormData();
+        uploadBody.append('file', file);
+        return fetch('/api/admin/hosts/upload', { method: 'POST', body: uploadBody })
+          .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
+          .then(function (result) {
+            if (!result.ok) throw new Error(result.json.error || ('Failed to upload ' + file.name));
+            return fetch('/api/admin/hosts/' + hostAssetId + '/photos', {
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({ imageKey: result.json.key, label: label }),
+            });
+          })
+          .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
+          .then(function (result) {
+            if (!result.ok) throw new Error(result.json.error || ('Failed to attach ' + file.name));
+          });
       }
 
       function renderPhotoGallery(container: HTMLElement, asset: HostAsset, photos: HostAssetImage[]) {
@@ -325,7 +371,7 @@ import Layout from '../../components/Layout.astro';
 
         var labelInput = document.createElement('input');
         labelInput.type = 'text';
-        labelInput.placeholder = 'Label — e.g. Install, Sticker, Location';
+        labelInput.placeholder = 'Label (optional)';
 
         var addBtn = document.createElement('button');
         addBtn.type = 'button';
@@ -340,21 +386,8 @@ import Layout from '../../components/Layout.astro';
           addBtn.disabled = true;
           addBtn.textContent = 'Uploading…';
 
-          var uploadBody = new FormData();
-          uploadBody.append('file', file);
-          fetch('/api/admin/hosts/upload', { method: 'POST', body: uploadBody })
-            .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
-            .then(function (result) {
-              if (!result.ok) throw new Error(result.json.error || 'Failed to upload image.');
-              return fetch('/api/admin/hosts/' + asset.id + '/photos', {
-                method: 'POST',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ imageKey: result.json.key, label: labelInput.value }),
-              });
-            })
-            .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
-            .then(function (result) {
-              if (!result.ok) throw new Error(result.json.error || 'Failed to attach photo.');
+          uploadAndAttachPhoto(asset.id, file, labelInput.value)
+            .then(function () {
               asset.photoCount += 1;
               renderFiltered();
               loadPhotosInto(container, asset);
@@ -594,6 +627,12 @@ import Layout from '../../components/Layout.astro';
         var url = id ? '/api/admin/hosts/' + id : '/api/admin/hosts';
         var method = id ? 'PUT' : 'POST';
 
+        var pendingFiles = fieldPhotos?.files ? Array.from(fieldPhotos.files) : [];
+        var pendingLabels = pendingFiles.map(function (_, i) {
+          var input = photoPickerList!.querySelector('input[data-photo-index="' + i + '"]') as HTMLInputElement | null;
+          return input ? input.value : '';
+        });
+
         fetch(url, {
           method: method,
           headers: { 'content-type': 'application/json' },
@@ -604,23 +643,61 @@ import Layout from '../../components/Layout.astro';
             if (!result.ok) {
               formStatus!.textContent = result.json.error || 'Failed to save.';
               formStatus!.className = 'registry-form-status error';
+              return null;
+            }
+            return result.json as HostAsset;
+          })
+          .then(function (saved) {
+            if (!saved) return;
+
+            if (pendingFiles.length === 0) {
+              finishSave(saved);
               return;
             }
-            var wasCreate = !id;
-            resetForm();
-            formSummary!.textContent = 'Add Host Asset';
-            if (formDetails) formDetails.open = false;
-            loadAssets();
-            if (wasCreate) {
-              var created = result.json as HostAsset;
-              expandedId = created.id;
-              renderDetail(created);
-            }
+
+            formStatus!.textContent = 'Saved. Uploading photos (0/' + pendingFiles.length + ')…';
+            var uploaded = 0;
+            var failures: string[] = [];
+
+            pendingFiles
+              .reduce(function (chain, file, i) {
+                return chain
+                  .then(function () { return uploadAndAttachPhoto(saved.id, file, pendingLabels[i]); })
+                  .then(function () {
+                    uploaded++;
+                    formStatus!.textContent = 'Saved. Uploading photos (' + uploaded + '/' + pendingFiles.length + ')…';
+                  })
+                  .catch(function (err) {
+                    failures.push(file.name + ': ' + (err.message || 'failed'));
+                  });
+              }, Promise.resolve())
+              .then(function () {
+                if (failures.length > 0) {
+                  formStatus!.textContent = 'Saved, but some photos failed: ' + failures.join('; ');
+                  formStatus!.className = 'registry-form-status error';
+                }
+                finishSave(saved);
+              });
           })
           .catch(function () {
             formStatus!.textContent = 'Something went wrong. Try again.';
             formStatus!.className = 'registry-form-status error';
           });
+
+        function finishSave(saved: HostAsset) {
+          var hadFailure = formStatus!.className.indexOf('error') !== -1;
+          var failureMessage = formStatus!.textContent;
+          resetForm();
+          if (hadFailure) {
+            formStatus!.textContent = failureMessage;
+            formStatus!.className = 'registry-form-status error';
+          }
+          formSummary!.textContent = 'Add Host Asset';
+          if (formDetails) formDetails.open = false;
+          loadAssets();
+          expandedId = saved.id;
+          renderDetail(saved);
+        }
       });
 
       loadAssets();
