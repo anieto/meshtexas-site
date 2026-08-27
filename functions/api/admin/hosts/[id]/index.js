@@ -1,4 +1,4 @@
-import { getAccessEmail } from '../../../_shared/access.js';
+import { getAccessEmail } from '../../../../_shared/access.js';
 
 function jsonResponse(body, status) {
   return new Response(JSON.stringify(body), {
@@ -27,7 +27,6 @@ const FIELDS = [
   ['batteryType', 'battery_type'],
   ['solarChargeController', 'solar_charge_controller'],
   ['solarPanel', 'solar_panel'],
-  ['imageKey', 'image_key'],
 ];
 
 function rowToJson(row) {
@@ -77,7 +76,7 @@ export async function onRequestPut(context) {
   values.push(id);
 
   try {
-    const existing = await env.REPEATERS_DB.prepare('SELECT id, image_key FROM host_assets WHERE id = ?').bind(id).first();
+    const existing = await env.REPEATERS_DB.prepare('SELECT id FROM host_assets WHERE id = ?').bind(id).first();
     if (!existing) {
       return jsonResponse({ error: 'Host asset not found' }, 404);
     }
@@ -85,11 +84,6 @@ export async function onRequestPut(context) {
     await env.REPEATERS_DB.prepare(`UPDATE host_assets SET ${setClauses.join(', ')} WHERE id = ?`)
       .bind(...values)
       .run();
-
-    const newImageKey = body.imageKey || null;
-    if (existing.image_key && existing.image_key !== newImageKey) {
-      await env.HOST_ASSETS_BUCKET.delete(existing.image_key).catch((err) => console.error('Failed to delete replaced R2 object:', err));
-    }
 
     const row = await env.REPEATERS_DB.prepare('SELECT * FROM host_assets WHERE id = ?').bind(id).first();
     return jsonResponse(rowToJson(row), 200);
@@ -116,16 +110,27 @@ export async function onRequestDelete(context) {
   }
 
   try {
-    const existing = await env.REPEATERS_DB.prepare('SELECT id, image_key FROM host_assets WHERE id = ?').bind(id).first();
+    const existing = await env.REPEATERS_DB.prepare('SELECT id FROM host_assets WHERE id = ?').bind(id).first();
     if (!existing) {
       return jsonResponse({ error: 'Host asset not found' }, 404);
     }
 
-    await env.REPEATERS_DB.prepare('DELETE FROM host_assets WHERE id = ?').bind(id).run();
+    const { results: images } = await env.REPEATERS_DB.prepare(
+      'SELECT image_key FROM host_asset_images WHERE host_asset_id = ?'
+    )
+      .bind(id)
+      .all();
 
-    if (existing.image_key) {
-      await env.HOST_ASSETS_BUCKET.delete(existing.image_key).catch((err) => console.error('Failed to delete R2 object:', err));
-    }
+    await env.REPEATERS_DB.batch([
+      env.REPEATERS_DB.prepare('DELETE FROM host_asset_images WHERE host_asset_id = ?').bind(id),
+      env.REPEATERS_DB.prepare('DELETE FROM host_assets WHERE id = ?').bind(id),
+    ]);
+
+    await Promise.all(
+      images.map((img) =>
+        env.HOST_ASSETS_BUCKET.delete(img.image_key).catch((err) => console.error('Failed to delete R2 object:', err))
+      )
+    );
 
     return jsonResponse({ ok: true }, 200);
   } catch (error) {

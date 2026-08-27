@@ -96,12 +96,8 @@ import Layout from '../../components/Layout.astro';
                     <label for="field-solar-panel">Solar Panel</label>
                     <input type="text" id="field-solar-panel" name="solarPanel">
                   </div>
-                  <div class="form-row">
-                    <label for="field-image">Photo</label>
-                    <input type="file" id="field-image" name="image" accept="image/jpeg,image/png,image/webp,image/heic">
-                    <span class="hint" id="existing-image-hint"></span>
-                  </div>
                 </div>
+                <p class="hint">Photos (install, sticker, location) are added from the asset's Details panel after saving.</p>
                 <p class="registry-form-status" id="host-form-status" role="status"></p>
                 <div class="form-actions">
                   <button type="submit" class="btn btn-primary" id="host-form-submit">Add Host Asset</button>
@@ -138,11 +134,12 @@ import Layout from '../../components/Layout.astro';
                 <th>Antenna</th>
                 <th>Battery</th>
                 <th>Installed</th>
+                <th>Photos</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody id="hosts-tbody">
-              <tr><td colspan="7" class="registry-loading">Loading host assets…</td></tr>
+              <tr><td colspan="8" class="registry-loading">Loading host assets…</td></tr>
             </tbody>
           </table>
         </div>
@@ -174,11 +171,20 @@ import Layout from '../../components/Layout.astro';
       batteryType: string | null;
       solarChargeController: string | null;
       solarPanel: string | null;
-      imageKey: string | null;
+      photoCount: number;
       createdBy: string;
       createdAt: string;
       updatedBy: string | null;
       updatedAt: string | null;
+    };
+
+    type HostAssetImage = {
+      id: number;
+      hostAssetId: number;
+      imageKey: string;
+      label: string | null;
+      uploadedBy: string;
+      uploadedAt: string;
     };
 
     (function () {
@@ -199,13 +205,11 @@ import Layout from '../../components/Layout.astro';
       var formSubmitBtn = document.getElementById('host-form-submit');
       var formCancelBtn = document.getElementById('host-form-cancel');
       var fieldId = document.getElementById('field-id') as HTMLInputElement | null;
-      var existingImageHint = document.getElementById('existing-image-hint');
 
       if (!tbody || !countEl || !emptyEl || !filterInput || !form || !fieldId) return;
 
       var allAssets: HostAsset[] = [];
       var expandedId: number | null = null;
-      var editingImageKey: string | null = null;
 
       var FIELD_IDS = [
         'assetNumber', 'contactName', 'contactPhone', 'businessName', 'buildingAddress',
@@ -221,8 +225,6 @@ import Layout from '../../components/Layout.astro';
       function resetForm() {
         form!.reset();
         fieldId!.value = '';
-        editingImageKey = null;
-        existingImageHint!.textContent = '';
         formSubmitBtn!.textContent = 'Add Host Asset';
         formCancelBtn!.style.display = 'none';
         formStatus!.textContent = '';
@@ -235,8 +237,6 @@ import Layout from '../../components/Layout.astro';
           var el = fieldEl(name);
           if (el) el.value = (asset as any)[name] || '';
         });
-        editingImageKey = asset.imageKey;
-        existingImageHint!.textContent = asset.imageKey ? 'A photo is already on file. Choose a new file only to replace it.' : '';
         formSubmitBtn!.textContent = 'Save Changes';
         formCancelBtn!.style.display = '';
         formSummary!.textContent = 'Edit Host Asset #' + asset.assetNumber;
@@ -261,6 +261,128 @@ import Layout from '../../components/Layout.astro';
         row.appendChild(labelEl);
         row.appendChild(valueEl);
         card.appendChild(row);
+      }
+
+      function renderPhotoGallery(container: HTMLElement, asset: HostAsset, photos: HostAssetImage[]) {
+        container.innerHTML = '';
+
+        var heading = document.createElement('div');
+        heading.className = 'field-label';
+        heading.style.marginTop = '12px';
+        heading.textContent = 'Photos (' + photos.length + ')';
+        container.appendChild(heading);
+
+        if (photos.length > 0) {
+          var gallery = document.createElement('div');
+          gallery.className = 'host-asset-gallery';
+          photos.forEach(function (photo) {
+            var item = document.createElement('div');
+            item.className = 'host-asset-gallery-item';
+
+            var img = document.createElement('img');
+            img.className = 'host-asset-thumb';
+            img.src = '/api/admin/hosts/image/' + photo.imageKey;
+            img.alt = photo.label || 'Photo for asset #' + asset.assetNumber;
+            item.appendChild(img);
+
+            var caption = document.createElement('div');
+            caption.className = 'hint';
+            caption.textContent = photo.label || '(no label)';
+            item.appendChild(caption);
+
+            var removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-danger';
+            removeBtn.textContent = 'Remove';
+            removeBtn.addEventListener('click', function () {
+              if (!confirm('Remove this photo?')) return;
+              fetch('/api/admin/hosts/' + asset.id + '/photos/' + photo.id, { method: 'DELETE' })
+                .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
+                .then(function (result) {
+                  if (!result.ok) {
+                    alert(result.json.error || 'Failed to remove photo.');
+                    return;
+                  }
+                  loadPhotosInto(container, asset);
+                  asset.photoCount = Math.max(0, asset.photoCount - 1);
+                  renderFiltered();
+                })
+                .catch(function () { alert('Something went wrong. Try again.'); });
+            });
+            item.appendChild(removeBtn);
+
+            gallery.appendChild(item);
+          });
+          container.appendChild(gallery);
+        }
+
+        var addForm = document.createElement('div');
+        addForm.className = 'host-asset-photo-add';
+
+        var fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/jpeg,image/png,image/webp,image/heic';
+
+        var labelInput = document.createElement('input');
+        labelInput.type = 'text';
+        labelInput.placeholder = 'Label — e.g. Install, Sticker, Location';
+
+        var addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'btn btn-secondary';
+        addBtn.textContent = 'Add Photo';
+        addBtn.addEventListener('click', function () {
+          var file = fileInput.files && fileInput.files[0];
+          if (!file) {
+            alert('Choose a photo first.');
+            return;
+          }
+          addBtn.disabled = true;
+          addBtn.textContent = 'Uploading…';
+
+          var uploadBody = new FormData();
+          uploadBody.append('file', file);
+          fetch('/api/admin/hosts/upload', { method: 'POST', body: uploadBody })
+            .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
+            .then(function (result) {
+              if (!result.ok) throw new Error(result.json.error || 'Failed to upload image.');
+              return fetch('/api/admin/hosts/' + asset.id + '/photos', {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ imageKey: result.json.key, label: labelInput.value }),
+              });
+            })
+            .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
+            .then(function (result) {
+              if (!result.ok) throw new Error(result.json.error || 'Failed to attach photo.');
+              asset.photoCount += 1;
+              renderFiltered();
+              loadPhotosInto(container, asset);
+            })
+            .catch(function (err) {
+              alert(err.message || 'Something went wrong. Try again.');
+            })
+            .finally(function () {
+              addBtn.disabled = false;
+              addBtn.textContent = 'Add Photo';
+            });
+        });
+
+        addForm.appendChild(fileInput);
+        addForm.appendChild(labelInput);
+        addForm.appendChild(addBtn);
+        container.appendChild(addForm);
+      }
+
+      function loadPhotosInto(container: HTMLElement, asset: HostAsset) {
+        fetch('/api/admin/hosts/' + asset.id + '/photos')
+          .then(function (res) { return res.json(); })
+          .then(function (photos: HostAssetImage[]) {
+            renderPhotoGallery(container, asset, Array.isArray(photos) ? photos : []);
+          })
+          .catch(function () {
+            container.innerHTML = '<p class="hint">Could not load photos.</p>';
+          });
       }
 
       function renderDetail(asset: HostAsset) {
@@ -293,13 +415,9 @@ import Layout from '../../components/Layout.astro';
         addDetailField(card, 'Added By', asset.createdBy + ' on ' + asset.createdAt);
         if (asset.updatedBy) addDetailField(card, 'Last Updated By', asset.updatedBy + ' on ' + asset.updatedAt);
 
-        if (asset.imageKey) {
-          var img = document.createElement('img');
-          img.className = 'host-asset-thumb';
-          img.src = '/api/admin/hosts/image/' + asset.imageKey;
-          img.alt = 'Install photo for asset #' + asset.assetNumber;
-          card.appendChild(img);
-        }
+        var photoSection = document.createElement('div');
+        card.appendChild(photoSection);
+        loadPhotosInto(photoSection, asset);
 
         var actions = document.createElement('div');
         actions.className = 'admin-request-actions';
@@ -409,6 +527,7 @@ import Layout from '../../components/Layout.astro';
           td('Antenna', asset.antennaType || '—');
           td('Battery', asset.batteryType || '—');
           td('Installed', asset.installedDate || '—');
+          td('Photos', String(asset.photoCount));
 
           var actionsTd = document.createElement('td');
           actionsTd.setAttribute('data-label', 'Actions');
@@ -465,65 +584,43 @@ import Layout from '../../components/Layout.astro';
         formStatus!.textContent = 'Saving…';
         formStatus!.className = 'registry-form-status';
 
-        var fileInput = document.getElementById('field-image') as HTMLInputElement;
-        var file = fileInput.files && fileInput.files[0];
+        var payload: Record<string, unknown> = {};
+        FIELD_IDS.forEach(function (name) {
+          var el = fieldEl(name);
+          payload[name] = el ? el.value : '';
+        });
 
-        function submitWithImageKey(imageKey: string | null) {
-          var payload: Record<string, unknown> = { imageKey: imageKey };
-          FIELD_IDS.forEach(function (name) {
-            var el = fieldEl(name);
-            payload[name] = el ? el.value : '';
-          });
+        var id = fieldId!.value;
+        var url = id ? '/api/admin/hosts/' + id : '/api/admin/hosts';
+        var method = id ? 'PUT' : 'POST';
 
-          var id = fieldId!.value;
-          var url = id ? '/api/admin/hosts/' + id : '/api/admin/hosts';
-          var method = id ? 'PUT' : 'POST';
-
-          fetch(url, {
-            method: method,
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify(payload),
+        fetch(url, {
+          method: method,
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+          .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
+          .then(function (result) {
+            if (!result.ok) {
+              formStatus!.textContent = result.json.error || 'Failed to save.';
+              formStatus!.className = 'registry-form-status error';
+              return;
+            }
+            var wasCreate = !id;
+            resetForm();
+            formSummary!.textContent = 'Add Host Asset';
+            if (formDetails) formDetails.open = false;
+            loadAssets();
+            if (wasCreate) {
+              var created = result.json as HostAsset;
+              expandedId = created.id;
+              renderDetail(created);
+            }
           })
-            .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
-            .then(function (result) {
-              if (!result.ok) {
-                formStatus!.textContent = result.json.error || 'Failed to save.';
-                formStatus!.className = 'registry-form-status error';
-                return;
-              }
-              formStatus!.textContent = 'Saved.';
-              formStatus!.className = 'registry-form-status success';
-              resetForm();
-              formSummary!.textContent = 'Add Host Asset';
-              if (formDetails) formDetails.open = false;
-              loadAssets();
-            })
-            .catch(function () {
-              formStatus!.textContent = 'Something went wrong. Try again.';
-              formStatus!.className = 'registry-form-status error';
-            });
-        }
-
-        if (file) {
-          var body = new FormData();
-          body.append('file', file);
-          fetch('/api/admin/hosts/upload', { method: 'POST', body: body })
-            .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
-            .then(function (result) {
-              if (!result.ok) {
-                formStatus!.textContent = result.json.error || 'Failed to upload image.';
-                formStatus!.className = 'registry-form-status error';
-                return;
-              }
-              submitWithImageKey(result.json.key);
-            })
-            .catch(function () {
-              formStatus!.textContent = 'Something went wrong uploading the image.';
-              formStatus!.className = 'registry-form-status error';
-            });
-        } else {
-          submitWithImageKey(editingImageKey);
-        }
+          .catch(function () {
+            formStatus!.textContent = 'Something went wrong. Try again.';
+            formStatus!.className = 'registry-form-status error';
+          });
       });
 
       loadAssets();

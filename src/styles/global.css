@@ -1615,6 +1615,37 @@ footer a:hover { color: var(--text); }
   display: block;
 }
 
+.host-asset-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 8px 0 14px;
+}
+
+.host-asset-gallery-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 160px;
+}
+
+.host-asset-photo-add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.host-asset-photo-add input[type="text"] {
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
 @media (max-width: 640px) {
   nav a, nav .nav-dropdown { display: none; }
   .hamburger { display: block; }

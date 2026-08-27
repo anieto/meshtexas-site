@@ -28,11 +28,17 @@ const FIELDS = [
   ['batteryType', 'battery_type'],
   ['solarChargeController', 'solar_charge_controller'],
   ['solarPanel', 'solar_panel'],
-  ['imageKey', 'image_key'],
 ];
 
 function rowToJson(row) {
-  const out = { id: row.id, createdBy: row.created_by, createdAt: row.created_at, updatedBy: row.updated_by, updatedAt: row.updated_at };
+  const out = {
+    id: row.id,
+    createdBy: row.created_by,
+    createdAt: row.created_at,
+    updatedBy: row.updated_by,
+    updatedAt: row.updated_at,
+    photoCount: row.photo_count ?? 0,
+  };
   for (const [jsKey, dbKey] of FIELDS) out[jsKey] = row[dbKey];
   return out;
 }
@@ -53,7 +59,9 @@ export async function onRequestGet(context) {
 
   try {
     const { results } = await env.REPEATERS_DB.prepare(
-      'SELECT * FROM host_assets ORDER BY asset_number ASC'
+      `SELECT ha.*, (SELECT COUNT(*) FROM host_asset_images hai WHERE hai.host_asset_id = ha.id) AS photo_count
+       FROM host_assets ha
+       ORDER BY ha.asset_number ASC`
     ).all();
     return jsonResponse(results.map(rowToJson), 200);
   } catch (error) {
