@@ -1,0 +1,65 @@
+---
+import Layout from '../../components/Layout.astro';
+---
+<Layout
+  title="Admin Dashboard — MeshTexas"
+  description="Links to MeshTexas admin tools: content, repeater requests, and the commercial host asset database."
+>
+  <div data-pagefind-ignore="all">
+    <div class="page-intro">
+      <div class="container-narrow">
+        <h1>Admin Dashboard</h1>
+        <p class="hero-sub">Tools for managing meshtexas.org. All links require Cloudflare Access.</p>
+      </div>
+    </div>
+
+    <section class="about-section">
+      <div class="container-narrow">
+        <div class="admin-dashboard-grid">
+          <a class="admin-dashboard-card" href="/admin/requests">
+            <h3>Repeater Requests</h3>
+            <p>Review pending edit and deletion requests for the public repeater directory.</p>
+          </a>
+          <a class="admin-dashboard-card" href="/admin/hosts">
+            <h3>Commercial Host Assets</h3>
+            <p>Contact info, roof/mounting details, and equipment on file for each commercial repeater install.</p>
+          </a>
+          <a class="admin-dashboard-card" href="/admin">
+            <h3>Site Content (CMS)</h3>
+            <p>Edit articles and pages.</p>
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .admin-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+  .admin-dashboard-card {
+    display: block;
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-2);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s ease;
+  }
+  .admin-dashboard-card:hover {
+    border-color: var(--accent);
+  }
+  .admin-dashboard-card h3 {
+    margin: 0 0 0.4rem;
+    font-size: 1.05rem;
+  }
+  .admin-dashboard-card p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+</style>

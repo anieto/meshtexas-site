@@ -8,5 +8,11 @@
       "database_name": "meshtexas-repeaters",
       "database_id": "b60370d5-7d8f-4573-8126-638b6c8d887a"
     }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "HOST_ASSETS_BUCKET",
+      "bucket_name": "meshtexas-host-assets"
+    }
   ]
 }

@@ -1,0 +1,532 @@
+---
+import Layout from '../../components/Layout.astro';
+---
+<Layout
+  title="Commercial Host Assets — Admin — MeshTexas"
+  description="Admin record of commercial repeater host sites: contact info, roof/mounting details, and installed equipment, keyed by asset number."
+>
+  <div data-pagefind-ignore="all">
+    <div class="page-intro">
+      <div class="container-narrow">
+        <h1>Commercial Host Assets</h1>
+        <p class="hero-sub">Install records for commercial repeater sites, keyed by the asset number on each box's sticker. Not public — visible only to signed-in admins.</p>
+      </div>
+    </div>
+
+    <section class="about-section">
+      <div class="container-narrow">
+        <p class="registry-form-status" id="hosts-load-status" role="status"></p>
+
+        <details class="hint-collapsible" id="host-form-details">
+          <summary id="host-form-summary">Add Host Asset</summary>
+          <div class="hint-body">
+            <div class="host-asset-form">
+              <form id="host-asset-form">
+                <input type="hidden" id="field-id" name="id">
+                <div class="form-grid">
+                  <div class="form-row">
+                    <label for="field-asset-number">Asset Number</label>
+                    <input type="number" id="field-asset-number" name="assetNumber" required min="1" placeholder="501">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-contact-name">Contact Name</label>
+                    <input type="text" id="field-contact-name" name="contactName">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-contact-phone">Contact Phone</label>
+                    <input type="tel" id="field-contact-phone" name="contactPhone">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-business-name">Business Name</label>
+                    <input type="text" id="field-business-name" name="businessName">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-building-address">Building Address</label>
+                    <input type="text" id="field-building-address" name="buildingAddress">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-roof-height">Roof Height</label>
+                    <input type="text" id="field-roof-height" name="roofHeight" placeholder="e.g. 45 ft">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-parapet-height">Parapet Wall / Obstruction Height</label>
+                    <input type="text" id="field-parapet-height" name="parapetHeight">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-roof-access">Roof Access Method</label>
+                    <input type="text" id="field-roof-access" name="roofAccessMethod">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-installed-date">Installed Date</label>
+                    <input type="date" id="field-installed-date" name="installedDate">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-installer-name">Installer Name</label>
+                    <input type="text" id="field-installer-name" name="installerName">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-installer-phone">Installer Phone</label>
+                    <input type="tel" id="field-installer-phone" name="installerPhone">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-sarc-manager">SARC Manager</label>
+                    <input type="text" id="field-sarc-manager" name="sarcManager">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-node-type">Node Type</label>
+                    <input type="text" id="field-node-type" name="nodeType">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-antenna-type">Antenna Type</label>
+                    <input type="text" id="field-antenna-type" name="antennaType">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-mounting-method">Mounting Method</label>
+                    <input type="text" id="field-mounting-method" name="mountingMethod">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-battery-type">Battery Type</label>
+                    <input type="text" id="field-battery-type" name="batteryType">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-solar-charge-controller">Solar Charge Controller</label>
+                    <input type="text" id="field-solar-charge-controller" name="solarChargeController">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-solar-panel">Solar Panel</label>
+                    <input type="text" id="field-solar-panel" name="solarPanel">
+                  </div>
+                  <div class="form-row">
+                    <label for="field-image">Photo</label>
+                    <input type="file" id="field-image" name="image" accept="image/jpeg,image/png,image/webp,image/heic">
+                    <span class="hint" id="existing-image-hint"></span>
+                  </div>
+                </div>
+                <p class="registry-form-status" id="host-form-status" role="status"></p>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary" id="host-form-submit">Add Host Asset</button>
+                  <button type="button" class="btn btn-secondary" id="host-form-cancel" style="display: none;">Cancel Edit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </details>
+
+        <div class="registry-toolbar" id="hosts-toolbar">
+          <div class="registry-search">
+            <input type="text" id="hosts-filter" placeholder="Search by asset #, business, contact, or address…" aria-label="Search host assets">
+            <span class="registry-count" id="hosts-count"></span>
+          </div>
+          <select id="hosts-node-type-filter" aria-label="Filter by node type">
+            <option value="">All Node Types</option>
+          </select>
+          <select id="hosts-antenna-type-filter" aria-label="Filter by antenna type">
+            <option value="">All Antenna Types</option>
+          </select>
+          <select id="hosts-battery-type-filter" aria-label="Filter by battery type">
+            <option value="">All Battery Types</option>
+          </select>
+        </div>
+
+        <div class="registry-table-wrap">
+          <table class="registry-table" id="hosts-table">
+            <thead>
+              <tr>
+                <th>Asset #</th>
+                <th>Business</th>
+                <th>Node Type</th>
+                <th>Antenna</th>
+                <th>Battery</th>
+                <th>Installed</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="hosts-tbody">
+              <tr><td colspan="7" class="registry-loading">Loading host assets…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="hint registry-empty" id="hosts-empty" style="display: none;">No host assets match your search.</p>
+        <div id="hosts-detail-panel"></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    type HostAsset = {
+      id: number;
+      assetNumber: number;
+      repeaterId: number | null;
+      contactName: string | null;
+      contactPhone: string | null;
+      businessName: string | null;
+      buildingAddress: string | null;
+      roofHeight: string | null;
+      parapetHeight: string | null;
+      roofAccessMethod: string | null;
+      installedDate: string | null;
+      installerName: string | null;
+      installerPhone: string | null;
+      sarcManager: string | null;
+      nodeType: string | null;
+      antennaType: string | null;
+      mountingMethod: string | null;
+      batteryType: string | null;
+      solarChargeController: string | null;
+      solarPanel: string | null;
+      imageKey: string | null;
+      createdBy: string;
+      createdAt: string;
+      updatedBy: string | null;
+      updatedAt: string | null;
+    };
+
+    (function () {
+      var loadStatus = document.getElementById('hosts-load-status');
+      var tbody = document.getElementById('hosts-tbody');
+      var countEl = document.getElementById('hosts-count');
+      var emptyEl = document.getElementById('hosts-empty');
+      var filterInput = document.getElementById('hosts-filter') as HTMLInputElement | null;
+      var nodeTypeFilter = document.getElementById('hosts-node-type-filter') as HTMLSelectElement | null;
+      var antennaTypeFilter = document.getElementById('hosts-antenna-type-filter') as HTMLSelectElement | null;
+      var batteryTypeFilter = document.getElementById('hosts-battery-type-filter') as HTMLSelectElement | null;
+      var detailPanel = document.getElementById('hosts-detail-panel');
+
+      var form = document.getElementById('host-asset-form') as HTMLFormElement | null;
+      var formDetails = document.getElementById('host-form-details') as HTMLDetailsElement | null;
+      var formSummary = document.getElementById('host-form-summary');
+      var formStatus = document.getElementById('host-form-status');
+      var formSubmitBtn = document.getElementById('host-form-submit');
+      var formCancelBtn = document.getElementById('host-form-cancel');
+      var fieldId = document.getElementById('field-id') as HTMLInputElement | null;
+      var existingImageHint = document.getElementById('existing-image-hint');
+
+      if (!tbody || !countEl || !emptyEl || !filterInput || !form || !fieldId) return;
+
+      var allAssets: HostAsset[] = [];
+      var expandedId: number | null = null;
+      var editingImageKey: string | null = null;
+
+      var FIELD_IDS = [
+        'assetNumber', 'contactName', 'contactPhone', 'businessName', 'buildingAddress',
+        'roofHeight', 'parapetHeight', 'roofAccessMethod', 'installedDate',
+        'installerName', 'installerPhone', 'sarcManager', 'nodeType', 'antennaType',
+        'mountingMethod', 'batteryType', 'solarChargeController', 'solarPanel',
+      ];
+
+      function fieldEl(name: string): HTMLInputElement {
+        return document.getElementsByName(name)[0] as HTMLInputElement;
+      }
+
+      function resetForm() {
+        form!.reset();
+        fieldId!.value = '';
+        editingImageKey = null;
+        existingImageHint!.textContent = '';
+        formSubmitBtn!.textContent = 'Add Host Asset';
+        formCancelBtn!.style.display = 'none';
+        formStatus!.textContent = '';
+        formStatus!.className = 'registry-form-status';
+      }
+
+      function startEdit(asset: HostAsset) {
+        fieldId!.value = String(asset.id);
+        FIELD_IDS.forEach(function (name) {
+          var el = fieldEl(name);
+          if (el) el.value = (asset as any)[name] || '';
+        });
+        editingImageKey = asset.imageKey;
+        existingImageHint!.textContent = asset.imageKey ? 'A photo is already on file. Choose a new file only to replace it.' : '';
+        formSubmitBtn!.textContent = 'Save Changes';
+        formCancelBtn!.style.display = '';
+        formSummary!.textContent = 'Edit Host Asset #' + asset.assetNumber;
+        if (formDetails) formDetails.open = true;
+        formDetails?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      formCancelBtn?.addEventListener('click', function () {
+        resetForm();
+        formSummary!.textContent = 'Add Host Asset';
+      });
+
+      function addDetailField(card: HTMLElement, label: string, value: string | null) {
+        if (!value) return;
+        var row = document.createElement('div');
+        row.className = 'admin-request-field';
+        var labelEl = document.createElement('span');
+        labelEl.className = 'field-label';
+        labelEl.textContent = label;
+        var valueEl = document.createElement('span');
+        valueEl.textContent = value;
+        row.appendChild(labelEl);
+        row.appendChild(valueEl);
+        card.appendChild(row);
+      }
+
+      function renderDetail(asset: HostAsset) {
+        detailPanel!.innerHTML = '';
+        var card = document.createElement('div');
+        card.className = 'admin-request-card';
+
+        var badge = document.createElement('span');
+        badge.className = 'admin-request-badge admin-request-badge-edit';
+        badge.textContent = 'Asset #' + asset.assetNumber;
+        card.appendChild(badge);
+
+        addDetailField(card, 'Contact Name', asset.contactName);
+        addDetailField(card, 'Contact Phone', asset.contactPhone);
+        addDetailField(card, 'Business Name', asset.businessName);
+        addDetailField(card, 'Building Address', asset.buildingAddress);
+        addDetailField(card, 'Roof Height', asset.roofHeight);
+        addDetailField(card, 'Parapet/Obstruction Height', asset.parapetHeight);
+        addDetailField(card, 'Roof Access Method', asset.roofAccessMethod);
+        addDetailField(card, 'Installed Date', asset.installedDate);
+        addDetailField(card, 'Installer Name', asset.installerName);
+        addDetailField(card, 'Installer Phone', asset.installerPhone);
+        addDetailField(card, 'SARC Manager', asset.sarcManager);
+        addDetailField(card, 'Node Type', asset.nodeType);
+        addDetailField(card, 'Antenna Type', asset.antennaType);
+        addDetailField(card, 'Mounting Method', asset.mountingMethod);
+        addDetailField(card, 'Battery Type', asset.batteryType);
+        addDetailField(card, 'Solar Charge Controller', asset.solarChargeController);
+        addDetailField(card, 'Solar Panel', asset.solarPanel);
+        addDetailField(card, 'Added By', asset.createdBy + ' on ' + asset.createdAt);
+        if (asset.updatedBy) addDetailField(card, 'Last Updated By', asset.updatedBy + ' on ' + asset.updatedAt);
+
+        if (asset.imageKey) {
+          var img = document.createElement('img');
+          img.className = 'host-asset-thumb';
+          img.src = '/api/admin/hosts/image/' + asset.imageKey;
+          img.alt = 'Install photo for asset #' + asset.assetNumber;
+          card.appendChild(img);
+        }
+
+        var actions = document.createElement('div');
+        actions.className = 'admin-request-actions';
+
+        var editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'btn btn-primary';
+        editBtn.textContent = 'Edit';
+        editBtn.addEventListener('click', function () { startEdit(asset); });
+
+        var deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'btn btn-danger';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.addEventListener('click', function () { deleteAsset(asset); });
+
+        var closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'btn btn-secondary';
+        closeBtn.textContent = 'Close';
+        closeBtn.addEventListener('click', function () {
+          expandedId = null;
+          detailPanel!.innerHTML = '';
+        });
+
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+        actions.appendChild(closeBtn);
+        card.appendChild(actions);
+
+        detailPanel!.appendChild(card);
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      function deleteAsset(asset: HostAsset) {
+        if (!confirm('Delete host asset #' + asset.assetNumber + '? This cannot be undone.')) return;
+        fetch('/api/admin/hosts/' + asset.id, { method: 'DELETE' })
+          .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
+          .then(function (result) {
+            if (!result.ok) {
+              alert(result.json.error || 'Failed to delete.');
+              return;
+            }
+            allAssets = allAssets.filter(function (a) { return a.id !== asset.id; });
+            expandedId = null;
+            detailPanel!.innerHTML = '';
+            populateFilterOptions();
+            renderFiltered();
+          })
+          .catch(function () { alert('Something went wrong. Try again.'); });
+      }
+
+      function populateFilterOptions() {
+        function fillSelect(select: HTMLSelectElement | null, values: (string | null)[]) {
+          if (!select) return;
+          var current = select.value;
+          var unique = Array.from(new Set(values.filter(function (v): v is string { return !!v; }))).sort();
+          select.innerHTML = '<option value="">' + select.options[0].textContent + '</option>';
+          unique.forEach(function (v) {
+            var opt = document.createElement('option');
+            opt.value = v;
+            opt.textContent = v;
+            select!.appendChild(opt);
+          });
+          select.value = unique.includes(current) ? current : '';
+        }
+        fillSelect(nodeTypeFilter, allAssets.map(function (a) { return a.nodeType; }));
+        fillSelect(antennaTypeFilter, allAssets.map(function (a) { return a.antennaType; }));
+        fillSelect(batteryTypeFilter, allAssets.map(function (a) { return a.batteryType; }));
+      }
+
+      function renderFiltered() {
+        var query = filterInput!.value.trim().toLowerCase();
+        var nodeType = nodeTypeFilter?.value || '';
+        var antennaType = antennaTypeFilter?.value || '';
+        var batteryType = batteryTypeFilter?.value || '';
+
+        var filtered = allAssets.filter(function (a) {
+          if (nodeType && a.nodeType !== nodeType) return false;
+          if (antennaType && a.antennaType !== antennaType) return false;
+          if (batteryType && a.batteryType !== batteryType) return false;
+          if (!query) return true;
+          var haystack = [
+            String(a.assetNumber), a.businessName, a.contactName, a.buildingAddress,
+          ].filter(Boolean).join(' ').toLowerCase();
+          return haystack.includes(query);
+        });
+
+        tbody!.innerHTML = '';
+        countEl!.textContent = filtered.length + (filtered.length === 1 ? ' asset' : ' assets');
+        emptyEl!.style.display = filtered.length === 0 ? '' : 'none';
+
+        filtered.forEach(function (asset) {
+          var tr = document.createElement('tr');
+          tr.style.cursor = 'pointer';
+
+          function td(label: string, value: string) {
+            var cell = document.createElement('td');
+            cell.setAttribute('data-label', label);
+            cell.textContent = value;
+            tr.appendChild(cell);
+          }
+
+          td('Asset #', String(asset.assetNumber));
+          td('Business', asset.businessName || '—');
+          td('Node Type', asset.nodeType || '—');
+          td('Antenna', asset.antennaType || '—');
+          td('Battery', asset.batteryType || '—');
+          td('Installed', asset.installedDate || '—');
+
+          var actionsTd = document.createElement('td');
+          actionsTd.setAttribute('data-label', 'Actions');
+          var detailsBtn = document.createElement('button');
+          detailsBtn.type = 'button';
+          detailsBtn.className = 'btn btn-secondary';
+          detailsBtn.textContent = 'Details';
+          detailsBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            expandedId = asset.id;
+            renderDetail(asset);
+          });
+          actionsTd.appendChild(detailsBtn);
+          tr.appendChild(actionsTd);
+
+          tr.addEventListener('click', function () {
+            expandedId = asset.id;
+            renderDetail(asset);
+          });
+
+          tbody!.appendChild(tr);
+        });
+      }
+
+      filterInput.addEventListener('input', renderFiltered);
+      nodeTypeFilter?.addEventListener('change', renderFiltered);
+      antennaTypeFilter?.addEventListener('change', renderFiltered);
+      batteryTypeFilter?.addEventListener('change', renderFiltered);
+
+      function loadAssets() {
+        fetch('/api/admin/hosts')
+          .then(function (res) {
+            if (res.status === 401) {
+              loadStatus!.textContent = "Not authorized — make sure you're logged in via Cloudflare Access.";
+              loadStatus!.className = 'registry-form-status error';
+              return null;
+            }
+            return res.json();
+          })
+          .then(function (data) {
+            if (!data) return;
+            allAssets = Array.isArray(data) ? data : [];
+            populateFilterOptions();
+            renderFiltered();
+          })
+          .catch(function () {
+            loadStatus!.textContent = 'Something went wrong loading host assets.';
+            loadStatus!.className = 'registry-form-status error';
+          });
+      }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        formStatus!.textContent = 'Saving…';
+        formStatus!.className = 'registry-form-status';
+
+        var fileInput = document.getElementById('field-image') as HTMLInputElement;
+        var file = fileInput.files && fileInput.files[0];
+
+        function submitWithImageKey(imageKey: string | null) {
+          var payload: Record<string, unknown> = { imageKey: imageKey };
+          FIELD_IDS.forEach(function (name) {
+            var el = fieldEl(name);
+            payload[name] = el ? el.value : '';
+          });
+
+          var id = fieldId!.value;
+          var url = id ? '/api/admin/hosts/' + id : '/api/admin/hosts';
+          var method = id ? 'PUT' : 'POST';
+
+          fetch(url, {
+            method: method,
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(payload),
+          })
+            .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
+            .then(function (result) {
+              if (!result.ok) {
+                formStatus!.textContent = result.json.error || 'Failed to save.';
+                formStatus!.className = 'registry-form-status error';
+                return;
+              }
+              formStatus!.textContent = 'Saved.';
+              formStatus!.className = 'registry-form-status success';
+              resetForm();
+              formSummary!.textContent = 'Add Host Asset';
+              if (formDetails) formDetails.open = false;
+              loadAssets();
+            })
+            .catch(function () {
+              formStatus!.textContent = 'Something went wrong. Try again.';
+              formStatus!.className = 'registry-form-status error';
+            });
+        }
+
+        if (file) {
+          var body = new FormData();
+          body.append('file', file);
+          fetch('/api/admin/hosts/upload', { method: 'POST', body: body })
+            .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
+            .then(function (result) {
+              if (!result.ok) {
+                formStatus!.textContent = result.json.error || 'Failed to upload image.';
+                formStatus!.className = 'registry-form-status error';
+                return;
+              }
+              submitWithImageKey(result.json.key);
+            })
+            .catch(function () {
+              formStatus!.textContent = 'Something went wrong uploading the image.';
+              formStatus!.className = 'registry-form-status error';
+            });
+        } else {
+          submitWithImageKey(editingImageKey);
+        }
+      });
+
+      loadAssets();
+    })();
+  </script>
+</Layout>
