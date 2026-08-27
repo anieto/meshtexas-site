@@ -32,17 +32,19 @@ const categoryLabels: Record<string, string> = {
       <div class="article-list">
         {articles.map((article) => (
           <a href={`/articles/${article.id}/`} class="article-card">
+            <div class="article-card-body">
+              <div class="article-card-meta">
+                <span class="article-card-category">{categoryLabels[article.data.category]}</span>
+                <span class="article-card-date">
+                  {article.data.publishedAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
+                </span>
+              </div>
+              <h2>{article.data.title}</h2>
+              <p>{article.data.description}</p>
+            </div>
             {article.data.thumbnail && (
               <img src={article.data.thumbnail} alt="" class="article-card-thumbnail" />
             )}
-            <div class="article-card-meta">
-              <span class="article-card-category">{categoryLabels[article.data.category]}</span>
-              <span class="article-card-date">
-                {article.data.publishedAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
-              </span>
-            </div>
-            <h2>{article.data.title}</h2>
-            <p>{article.data.description}</p>
           </a>
         ))}
       </div>

@@ -924,7 +924,9 @@ pre code {
 }
 
 .article-card {
-  display: block;
+  display: flex;
+  align-items: stretch;
+  gap: 20px;
   background: var(--bg-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -936,6 +938,11 @@ pre code {
 .article-card:hover {
   border-color: var(--accent);
   text-decoration: none;
+}
+
+.article-card-body {
+  flex: 1;
+  min-width: 0;
 }
 
 .article-card h2 {
@@ -965,11 +972,24 @@ pre code {
 }
 
 .article-card-thumbnail {
-  width: 100%;
-  height: 160px;
+  width: 220px;
+  flex-shrink: 0;
   object-fit: cover;
   border-radius: calc(var(--radius) - 2px);
-  margin-bottom: 14px;
+}
+
+/* Below this, a 220px side column gets cramped next to the text —
+   stack the image above the text like a traditional card instead. */
+@media (max-width: 640px) {
+  .article-card {
+    flex-direction: column;
+  }
+
+  .article-card-thumbnail {
+    width: 100%;
+    height: 160px;
+    order: -1;
+  }
 }
 
 .content-thumbnail {

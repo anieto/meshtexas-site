@@ -48,11 +48,13 @@ const { Content } = single ? await render(single) : { Content: null };
         <div class="article-list">
           {pages.map((page) => (
             <a href={`/host-a-node/${page.id}/`} class="article-card">
+              <div class="article-card-body">
+                <h2>{page.data.title}</h2>
+                <p>{page.data.description}</p>
+              </div>
               {page.data.thumbnail && (
                 <img src={page.data.thumbnail} alt="" class="article-card-thumbnail" />
               )}
-              <h2>{page.data.title}</h2>
-              <p>{page.data.description}</p>
             </a>
           ))}
         </div>
