@@ -214,22 +214,53 @@ import Layout from '../../components/Layout.astro';
 
       if (!tbody || !countEl || !emptyEl || !filterInput || !form || !fieldId) return;
 
-      fieldPhotos?.addEventListener('change', function () {
+      // Own state for the pending selection, not the raw <input> FileList —
+      // FileList is read-only, so removing a single file needs a JS-side
+      // list rebuilt into the input via DataTransfer to keep it in sync.
+      var pendingPhotos: { file: File; label: string }[] = [];
+
+      function syncFieldPhotosInput() {
+        var dt = new DataTransfer();
+        pendingPhotos.forEach(function (p) { dt.items.add(p.file); });
+        fieldPhotos!.files = dt.files;
+      }
+
+      function renderPhotoPicker() {
         photoPickerList!.innerHTML = '';
-        var files = fieldPhotos!.files ? Array.from(fieldPhotos!.files) : [];
-        files.forEach(function (file, i) {
+        pendingPhotos.forEach(function (pending, i) {
           var row = document.createElement('div');
           row.className = 'photo-picker-row';
+
           var name = document.createElement('span');
-          name.textContent = file.name;
+          name.textContent = pending.file.name;
+
           var labelInput = document.createElement('input');
           labelInput.type = 'text';
           labelInput.placeholder = 'Label (optional)';
-          labelInput.dataset.photoIndex = String(i);
+          labelInput.value = pending.label;
+          labelInput.addEventListener('input', function () { pending.label = labelInput.value; });
+
+          var removeBtn = document.createElement('button');
+          removeBtn.type = 'button';
+          removeBtn.className = 'btn btn-secondary';
+          removeBtn.textContent = 'Remove';
+          removeBtn.addEventListener('click', function () {
+            pendingPhotos.splice(i, 1);
+            syncFieldPhotosInput();
+            renderPhotoPicker();
+          });
+
           row.appendChild(name);
           row.appendChild(labelInput);
+          row.appendChild(removeBtn);
           photoPickerList!.appendChild(row);
         });
+      }
+
+      fieldPhotos?.addEventListener('change', function () {
+        var files = fieldPhotos!.files ? Array.from(fieldPhotos!.files) : [];
+        pendingPhotos = files.map(function (file) { return { file: file, label: '' }; });
+        renderPhotoPicker();
       });
 
       var allAssets: HostAsset[] = [];
@@ -249,6 +280,7 @@ import Layout from '../../components/Layout.astro';
       function resetForm() {
         form!.reset();
         fieldId!.value = '';
+        pendingPhotos = [];
         photoPickerList!.innerHTML = '';
         formSubmitBtn!.textContent = 'Add Host Asset';
         formCancelBtn!.style.display = 'none';
@@ -263,6 +295,7 @@ import Layout from '../../components/Layout.astro';
           if (el) el.value = (asset as any)[name] || '';
         });
         if (fieldPhotos) fieldPhotos.value = '';
+        pendingPhotos = [];
         photoPickerList!.innerHTML = '';
         formSubmitBtn!.textContent = 'Save Changes';
         formCancelBtn!.style.display = '';
@@ -627,11 +660,8 @@ import Layout from '../../components/Layout.astro';
         var url = id ? '/api/admin/hosts/' + id : '/api/admin/hosts';
         var method = id ? 'PUT' : 'POST';
 
-        var pendingFiles = fieldPhotos?.files ? Array.from(fieldPhotos.files) : [];
-        var pendingLabels = pendingFiles.map(function (_, i) {
-          var input = photoPickerList!.querySelector('input[data-photo-index="' + i + '"]') as HTMLInputElement | null;
-          return input ? input.value : '';
-        });
+        var pendingFiles = pendingPhotos.map(function (p) { return p.file; });
+        var pendingLabels = pendingPhotos.map(function (p) { return p.label; });
 
         fetch(url, {
           method: method,
