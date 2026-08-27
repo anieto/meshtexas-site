@@ -2,7 +2,7 @@
 title: Commercial & Business Properties
 description: Information for businesses and property managers interested in
   hosting a subsidized MeshTexas repeater on their rooftop.
-thumbnail: /images/repeater1a.png
+thumbnail: /images/commerical_node_1.png
 ---
 **Keep Texas Connected** is looking for commercial property owners and managers willing to host a small, solar-powered MeshCore repeater. Your rooftop location becomes an important link in a growing, citizen-deployed mesh network that keeps Texas connected when cell service, internet, or the power grid goes down.
 
