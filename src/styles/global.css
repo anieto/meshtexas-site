@@ -1539,8 +1539,11 @@ footer a:hover { color: var(--text); }
 
 .admin-request-field {
   display: flex;
+  align-items: center;
   gap: 8px;
   font-size: 0.9rem;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
 }
 
 .admin-request-field > span:last-child {
@@ -1557,6 +1560,7 @@ footer a:hover { color: var(--text); }
   letter-spacing: 0.04em;
   font-weight: 600;
   padding-top: 2px;
+  overflow-wrap: anywhere;
 }
 
 .admin-request-actions {
