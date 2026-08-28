@@ -507,10 +507,7 @@ import Layout from '../../components/Layout.astro';
         closeBtn.type = 'button';
         closeBtn.className = 'btn btn-secondary';
         closeBtn.textContent = 'Close';
-        closeBtn.addEventListener('click', function () {
-          expandedId = null;
-          detailPanel!.innerHTML = '';
-        });
+        closeBtn.addEventListener('click', closeDetail);
 
         actions.appendChild(editBtn);
         actions.appendChild(deleteBtn);
@@ -519,6 +516,20 @@ import Layout from '../../components/Layout.astro';
 
         detailPanel!.appendChild(card);
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      function closeDetail() {
+        expandedId = null;
+        detailPanel!.innerHTML = '';
+      }
+
+      function toggleDetail(asset: HostAsset) {
+        if (expandedId === asset.id) {
+          closeDetail();
+        } else {
+          expandedId = asset.id;
+          renderDetail(asset);
+        }
       }
 
       function deleteAsset(asset: HostAsset) {
@@ -531,8 +542,7 @@ import Layout from '../../components/Layout.astro';
               return;
             }
             allAssets = allAssets.filter(function (a) { return a.id !== asset.id; });
-            expandedId = null;
-            detailPanel!.innerHTML = '';
+            closeDetail();
             populateFilterOptions();
             renderFiltered();
           })
@@ -606,15 +616,13 @@ import Layout from '../../components/Layout.astro';
           detailsBtn.textContent = 'Details';
           detailsBtn.addEventListener('click', function (e) {
             e.stopPropagation();
-            expandedId = asset.id;
-            renderDetail(asset);
+            toggleDetail(asset);
           });
           actionsTd.appendChild(detailsBtn);
           tr.appendChild(actionsTd);
 
           tr.addEventListener('click', function () {
-            expandedId = asset.id;
-            renderDetail(asset);
+            toggleDetail(asset);
           });
 
           tbody!.appendChild(tr);
