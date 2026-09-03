@@ -154,6 +154,12 @@ import Layout from '../../components/Layout.astro';
         <div id="hosts-detail-panel"></div>
       </div>
     </section>
+
+    <div class="host-asset-lightbox-overlay" id="host-asset-lightbox" hidden>
+      <button type="button" class="host-asset-lightbox-close" id="host-asset-lightbox-close" aria-label="Close">&times;</button>
+      <img class="host-asset-lightbox-img" id="host-asset-lightbox-img" src="" alt="">
+      <div class="host-asset-lightbox-caption" id="host-asset-lightbox-caption"></div>
+    </div>
   </div>
 
   <script>
@@ -214,6 +220,33 @@ import Layout from '../../components/Layout.astro';
       var fieldId = document.getElementById('field-id') as HTMLInputElement | null;
       var fieldPhotos = document.getElementById('field-photos') as HTMLInputElement | null;
       var photoPickerList = document.getElementById('photo-picker-list');
+
+      var lightbox = document.getElementById('host-asset-lightbox');
+      var lightboxImg = document.getElementById('host-asset-lightbox-img') as HTMLImageElement | null;
+      var lightboxCaption = document.getElementById('host-asset-lightbox-caption');
+      var lightboxCloseBtn = document.getElementById('host-asset-lightbox-close');
+
+      function openLightbox(src: string, caption: string) {
+        if (!lightbox || !lightboxImg || !lightboxCaption) return;
+        lightboxImg.src = src;
+        lightboxImg.alt = caption;
+        lightboxCaption.textContent = caption;
+        lightbox.hidden = false;
+      }
+
+      function closeLightbox() {
+        if (!lightbox || !lightboxImg) return;
+        lightbox.hidden = true;
+        lightboxImg.src = '';
+      }
+
+      lightboxCloseBtn?.addEventListener('click', closeLightbox);
+      lightbox?.addEventListener('click', function (e) {
+        if (e.target === lightbox) closeLightbox();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && lightbox && !lightbox.hidden) closeLightbox();
+      });
 
       if (!tbody || !countEl || !emptyEl || !filterInput || !form || !fieldId) return;
 
@@ -365,6 +398,9 @@ import Layout from '../../components/Layout.astro';
             img.className = 'host-asset-thumb';
             img.src = '/api/admin/hosts/image/' + photo.imageKey;
             img.alt = photo.label || 'Photo for asset #' + asset.assetNumber;
+            img.addEventListener('click', function () {
+              openLightbox(img.src, photo.label || 'Photo for asset #' + asset.assetNumber);
+            });
             item.appendChild(img);
 
             var caption = document.createElement('div');
