@@ -1655,8 +1655,10 @@ footer a:hover { color: var(--text); }
 .host-asset-lightbox-overlay[hidden] { display: none; }
 
 .host-asset-lightbox-img {
-  max-width: 100%;
-  max-height: 100%;
+  width: auto;
+  height: auto;
+  max-width: calc(100vw - 80px);
+  max-height: calc(100vh - 80px);
   border-radius: var(--radius);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
