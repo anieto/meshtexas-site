@@ -51,7 +51,7 @@ collections:
         multiple: true
         required: false
         hint: "The same codes used on the [Connect](https://meshtexas.org/connect) page (e.g. SAT = San Antonio, AUS = Austin). Leave blank for statewide content."
-        options: ["AUS", "SAT", "HOU", "DFW", "ELP", "ABI", "AMA", "MFE", "SJT", "TXK", "CRP", "ACT"]
+        options: ["AUS", "SAT", "HOU", "DFW", "ELP", "ABI", "AMA", "MFE", "SJT", "TXK", "GGG", "CRP", "ACT"]
       - { label: "Author", name: "author", widget: "string", required: false }
       - { label: "Published date", name: "publishedAt", widget: "datetime", format: "YYYY-MM-DD" }
       - { label: "Thumbnail", name: "thumbnail", widget: "image", required: false }

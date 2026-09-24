@@ -11,7 +11,7 @@ const articles = defineCollection({
     description: z.string(),
     category: z.enum(['how-to', 'buildout', 'community', 'announcement']),
     region: z
-      .array(z.enum(['AUS', 'SAT', 'HOU', 'DFW', 'ELP', 'ABI', 'AMA', 'MFE', 'SJT', 'TXK', 'CRP', 'ACT']))
+      .array(z.enum(['AUS', 'SAT', 'HOU', 'DFW', 'ELP', 'ABI', 'AMA', 'MFE', 'SJT', 'TXK', 'GGG', 'CRP', 'ACT']))
       .optional(),
     author: z.string().optional(),
     publishedAt: z.coerce.date(),
