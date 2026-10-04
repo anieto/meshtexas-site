@@ -2,16 +2,25 @@
   "generated_at": "2026-10-03",
   "license": "CC BY-SA 4.0",
   "countryNames": {
-    "tx": "All of Texas",
+    "all": "All regions",
     "sat": "San Antonio"
   },
   "countries": {
-    "tx": [
-      { "channel": "#meshtexas", "description": "Statewide MeshTexas chat: network news, questions and meeting other Texas mesh users" }
+    "all": [
+      {
+        "channel": "#meshtexas",
+        "description": "Statewide MeshTexas chat: network news, questions and meeting other Texas mesh users"
+      }
     ],
     "sat": [
-      { "channel": "#satx", "description": "San Antonio area chat for local mesh users" },
-      { "channel": "#sabot", "description": "San Antonio bot channel: try MeshTexasBot commands like ping here instead of Public" }
+      {
+        "channel": "#satx",
+        "description": "San Antonio area chat for local mesh users"
+      },
+      {
+        "channel": "#sabot",
+        "description": "San Antonio bot channel: try MeshTexasBot commands like !ping here instead of Public"
+      }
     ]
   }
 }
