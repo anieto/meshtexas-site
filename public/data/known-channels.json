@@ -19,7 +19,7 @@
       },
       {
         "channel": "#sabot",
-        "description": "San Antonio bot channel: try MeshTexasBot commands like !ping here instead of Public"
+        "description": "San Antonio bot channel: try MeshTexasBot commands like !ping or !help here instead of Public"
       }
     ]
   }
