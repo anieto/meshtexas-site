@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03",
+  "generated_at": "2026-10-04",
   "license": "CC BY-SA 4.0",
   "countryNames": {
     "all": "All regions",
@@ -14,8 +14,12 @@
     ],
     "sat": [
       {
-        "channel": "#satx",
-        "description": "San Antonio area chat for local mesh users"
+        "channel": "#satmesh",
+        "description": "San Antonio region chat covering the city and surrounding towns, the same area as the SAT region here"
+      },
+      {
+        "channel": "#sanantonio",
+        "description": "San Antonio city chat for local mesh users"
       },
       {
         "channel": "#sabot",
