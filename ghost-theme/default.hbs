@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="{{@site.locale}}">
+<head>
+  {{!-- The /articles Pages Function replaces each mt: comment with the
+        matching piece of the Astro site's layout (see partials/chrome.astro
+        in the site repo), so the header, footer, scripts and stylesheet are
+        always the live site's. Viewed directly on the Ghost host, the page
+        renders unstyled. --}}
+  <!--mt:head-->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{#is "home"}}Articles — MeshTexas{{else is "post, page"}}{{meta_title}} — MeshTexas{{else}}{{meta_title}}{{/is}}</title>
+  <link rel="stylesheet" href="{{asset "css/ghost.css"}}">
+  {{ghost_head}}
+</head>
+<body class="{{body_class}}">
+  <!--mt:header-->
+
+  {{{body}}}
+
+  <!--mt:footer-->
+  {{ghost_foot}}
+</body>
+</html>

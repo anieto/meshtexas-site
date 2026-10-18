@@ -1,0 +1,13 @@
+<a href="{{url}}" class="article-card">
+  <div class="article-card-body">
+    <div class="article-card-meta">
+      {{> "category"}}
+      <span class="article-card-date"><time datetime="{{date format="YYYY-MM-DD"}}">{{date format="MMMM D, YYYY"}}</time></span>
+    </div>
+    <h2>{{title}}</h2>
+    <p>{{excerpt}}</p>
+  </div>
+  {{#if feature_image}}
+    <img src="{{img_url feature_image size="m"}}" alt="{{feature_image_alt}}" class="article-card-thumbnail" loading="lazy">
+  {{/if}}
+</a>

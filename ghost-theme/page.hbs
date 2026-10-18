@@ -1,0 +1,17 @@
+{{!< default}}
+{{#post}}
+{{#if @page.show_title_and_feature_image}}
+<div class="page-intro">
+  <div class="container-narrow">
+    <h1>{{title}}</h1>
+    {{#if custom_excerpt}}<p class="hero-sub">{{custom_excerpt}}</p>{{/if}}
+  </div>
+</div>
+{{/if}}
+
+<section class="about-section">
+  <div class="container-narrow prose gh-content">
+    {{content}}
+  </div>
+</section>
+{{/post}}

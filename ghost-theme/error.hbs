@@ -1,0 +1,13 @@
+{{!< default}}
+<div class="page-intro">
+  <div class="container-narrow">
+    <h1>{{statusCode}}</h1>
+    <p class="hero-sub">{{#match statusCode 404}}That article doesn't exist, or it has moved.{{else}}{{message}}{{/match}}</p>
+  </div>
+</div>
+
+<section class="about-section">
+  <div class="container-narrow">
+    <p><a href="{{@site.url}}/">All articles</a></p>
+  </div>
+</section>

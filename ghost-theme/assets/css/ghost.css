@@ -1,0 +1,173 @@
+/* Ghost-only additions. Everything else (colors, header, cards, .prose)
+   comes from the site's own stylesheet, injected by the /articles Pages
+   Function. Only use the site's variables here, so light/dark mode and any
+   palette change carry over. */
+
+/* Editor output the site's .prose rules don't cover */
+.gh-content h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin-top: 48px;
+  margin-bottom: 8px;
+}
+
+.gh-content h3 + p,
+.gh-content h2 + p { margin-top: 0; }
+
+.gh-content h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 32px;
+  margin-bottom: 4px;
+}
+
+.gh-content ol { color: var(--text-muted); line-height: 1.7; padding-left: 22px; }
+
+.gh-content ol + p,
+.gh-content p + ol,
+.gh-content ol + ul,
+.gh-content ul + ol,
+.gh-content ul + ul,
+.gh-content p + pre,
+.gh-content pre + p { margin-top: 16px; }
+
+.gh-content li > ul,
+.gh-content li > ol { margin-top: 8px; }
+
+.gh-content blockquote:not(.kg-blockquote-alt) {
+  border-left: 3px solid var(--accent);
+  padding: 4px 0 4px 18px;
+  margin: 24px 0;
+}
+
+.gh-content blockquote p { color: var(--text); }
+
+.gh-content blockquote.kg-blockquote-alt {
+  margin: 32px 0;
+  text-align: center;
+  font-size: 1.25rem;
+  font-style: italic;
+}
+
+.gh-content blockquote.kg-blockquote-alt p { color: var(--text); }
+
+.gh-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.gh-content th,
+.gh-content td {
+  border-bottom: 1px solid var(--border);
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.gh-content th { color: var(--text); }
+
+/* Figures and captions. The site gives bare .prose img a 24px margin; inside
+   a figure the figure carries the spacing instead. */
+.gh-content figure { margin: 28px 0; }
+
+.gh-content figure img,
+.gh-content .kg-gallery-image img {
+  margin: 0 !important;
+}
+
+.gh-content figcaption,
+.feature-caption {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.feature-caption { margin: -12px 0 24px; text-align: left; }
+
+/* Wide and full-width images and galleries break out of the 760px column. */
+.gh-content .kg-width-wide,
+.gh-content .kg-width-full {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.gh-content .kg-width-wide { width: min(1052px, calc(100vw - 48px)); }
+
+.gh-content .kg-width-full { width: 100vw; }
+
+.gh-content .kg-width-full img { border-radius: 0 !important; }
+
+.gh-content .kg-width-full figcaption { padding: 0 24px; }
+
+.gh-content .kg-gallery-image img { border-radius: calc(var(--radius) - 2px); }
+
+/* Ghost's cards ship their own light-themed colors; pull the common ones
+   onto the site palette. */
+.gh-content .kg-callout-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.gh-content .kg-callout-card-grey,
+.gh-content .kg-callout-card-white { background: var(--bg-2); }
+
+.gh-content .kg-callout-text { color: var(--text); }
+
+.gh-content .kg-bookmark-container {
+  background: var(--bg-2);
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius);
+  color: var(--text) !important;
+}
+
+.gh-content .kg-bookmark-title { color: var(--text); }
+
+.gh-content .kg-bookmark-description,
+.gh-content .kg-bookmark-metadata { color: var(--text-muted); }
+
+.gh-content .kg-bookmark-thumbnail img,
+.gh-content .kg-bookmark-icon { margin: 0 !important; }
+
+.gh-content .kg-toggle-card {
+  background: var(--bg-2) !important;
+  border: 1px solid var(--border);
+  box-shadow: none !important;
+}
+
+.gh-content .kg-toggle-heading-text { color: var(--text); }
+
+.gh-content .kg-btn-accent,
+.gh-content .kg-header-card-button { background: var(--accent-dim); }
+
+.gh-content .kg-code-card pre,
+.gh-content > pre { margin: 24px 0; }
+
+.gh-content hr { margin: 40px 0; }
+
+.article-comments {
+  margin-top: 56px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+
+/* {{pagination}} */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 32px;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.pagination .newer-posts,
+.pagination .older-posts { font-weight: 600; }

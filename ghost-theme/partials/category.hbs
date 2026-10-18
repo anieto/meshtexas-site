@@ -1,0 +1,3 @@
+{{!-- Categories are the tags how-to, buildout, community and announcement
+      (the old Decap "Category" field); region codes are ordinary tags. --}}
+{{#foreach tags}}{{#match slug "how-to"}}{{> "category-label"}}{{else match slug "buildout"}}{{> "category-label"}}{{else match slug "community"}}{{> "category-label"}}{{else match slug "announcement"}}{{> "category-label"}}{{/match}}{{/foreach}}

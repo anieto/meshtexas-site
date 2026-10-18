@@ -1,0 +1,25 @@
+{
+  "name": "meshtexas",
+  "description": "MeshTexas articles theme. Renders only the article content: the site's header, footer and stylesheet are injected by the /articles Pages Function (functions/articles/[[path]].js).",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": {
+    "name": "MeshTexas",
+    "email": "admin@meshtexas.org",
+    "url": "https://meshtexas.org"
+  },
+  "keywords": ["ghost-theme"],
+  "engines": {
+    "ghost": ">=6.0.0"
+  },
+  "config": {
+    "posts_per_page": 12,
+    "card_assets": true,
+    "image_sizes": {
+      "s": { "width": 320 },
+      "m": { "width": 640 },
+      "l": { "width": 1200 },
+      "xl": { "width": 2000 }
+    }
+  }
+}

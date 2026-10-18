@@ -1,0 +1,12 @@
+{{!< default}}
+{{#tag}}
+<div class="page-intro">
+  <div class="container-narrow">
+    <p class="article-card-meta"><a href="{{@site.url}}/">Articles</a></p>
+    <h1>{{name}}</h1>
+    {{#if description}}<p class="hero-sub">{{description}}</p>{{/if}}
+  </div>
+</div>
+{{/tag}}
+
+{{> "post-list"}}

@@ -4,21 +4,6 @@ import { glob } from 'astro/loaders';
 // Field schema mirrors admin-config-sketch.yml's Decap CMS config exactly —
 // this is the source of truth for both, don't let them drift apart.
 
-const articles = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/articles' }),
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    category: z.enum(['how-to', 'buildout', 'community', 'announcement']),
-    region: z
-      .array(z.enum(['AUS', 'SAT', 'HOU', 'DFW', 'ELP', 'ABI', 'AMA', 'MFE', 'SJT', 'TXK', 'TYR', 'CRP', 'ACT']))
-      .optional(),
-    author: z.string().optional(),
-    publishedAt: z.coerce.date(),
-    thumbnail: z.string().optional(),
-  }),
-});
-
 const hostANode = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/host-a-node' }),
   schema: z.object({
@@ -42,4 +27,4 @@ const learn = defineCollection({
   }),
 });
 
-export const collections = { articles, 'host-a-node': hostANode, learn };
+export const collections = { 'host-a-node': hostANode, learn };

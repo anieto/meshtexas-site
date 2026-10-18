@@ -1,0 +1,30 @@
+{{!< default}}
+{{#post}}
+<div class="page-intro">
+  <div class="container-narrow">
+    <div class="article-card-meta">
+      {{> "category"}}
+      <span class="article-card-date"><time datetime="{{date format="YYYY-MM-DD"}}">{{date format="MMMM D, YYYY"}}</time></span>
+      {{#primary_author}}<span class="article-card-author">by <a href="{{url}}">{{name}}</a></span>{{/primary_author}}
+    </div>
+    <h1>{{title}}</h1>
+    {{#if custom_excerpt}}<p class="hero-sub">{{custom_excerpt}}</p>{{/if}}
+  </div>
+</div>
+
+<section class="about-section">
+  <div class="container-narrow prose gh-content">
+    {{#if feature_image}}
+      <img src="{{img_url feature_image size="l"}}" alt="{{feature_image_alt}}" class="content-thumbnail">
+      {{#if feature_image_caption}}<p class="feature-caption">{{feature_image_caption}}</p>{{/if}}
+    {{/if}}
+    {{content}}
+
+    {{#if comments}}
+      <div class="article-comments">
+        {{comments title="Comments" count=true}}
+      </div>
+    {{/if}}
+  </div>
+</section>
+{{/post}}

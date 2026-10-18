@@ -1,0 +1,9 @@
+---
+// The site's layout around an empty slot. The /articles Pages Function
+// (functions/articles/[[path]].js) reads this page from the static assets
+// and wraps every Ghost page in its <head> contents, header and footer, so
+// articles always match the current site. Not public: functions/partials
+// answers 404 for it.
+import Layout from '../../components/Layout.astro';
+---
+<Layout title="MeshTexas" description=""><div id="mt-ghost-slot"></div></Layout>
