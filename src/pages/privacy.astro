@@ -1,0 +1,91 @@
+---
+import Layout from '../components/Layout.astro';
+---
+<Layout
+  title="Privacy & Data Retention — MeshTexas"
+  description="What MeshTexas collects from the mesh and from this site, how long we keep it, and how to have it deleted."
+>
+  <div class="page-intro">
+    <div class="container-narrow">
+      <h1>Privacy &amp; Data Retention</h1>
+      <p class="hero-sub">What we collect, how long we keep it, who can see it, and how to get it deleted. Last updated October 18, 2026.</p>
+    </div>
+  </div>
+
+  <section class="about-section">
+    <div class="container-narrow prose privacy">
+      <h2>The short version</h2>
+      <ul>
+        <li>Mesh packets, including public channel messages, are deleted after <strong>7 days</strong>.</li>
+        <li>Backups are deleted after <strong>3 days</strong>, and they stay on our own hardware.</li>
+        <li>We don't have IP addresses or real identities for people using radios on the mesh.</li>
+        <li>Direct messages and private channels are stored encrypted, and we don't have the keys.</li>
+        <li>Accounts, article comments, and repeater host details stay until you ask us to delete them.</li>
+        <li>No ads, no trackers, no selling data.</li>
+      </ul>
+
+      <h2>Mesh data</h2>
+      <p>Our observers listen to the same radio traffic any MeshCore radio can hear and send it to the <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener">analyzer</a> and <a href="https://livemap.meshtexas.org" target="_blank" rel="noopener">live map</a>. From each packet we record:</p>
+      <ul>
+        <li>what a node announces about itself: its name, public key, type, and location if the owner chose to broadcast one;</li>
+        <li>the path the packet took (which repeaters relayed it), which observer heard it, and the signal strength;</li>
+        <li>messages on public and hashtag channels (such as <code>#meshtexas</code>), in plain text, with the sending node's name;</li>
+        <li>direct messages and private channel messages, but only in their encrypted form.</li>
+      </ul>
+      <p><strong>Packets are deleted after 7 days.</strong> A node that hasn't been heard for 7 days is marked inactive. Its basic listing (name, key, last location) stays until it's heard again or removed.</p>
+      <p>The <code>MeshTexasBot</code> bot keeps its own records on the same schedule: messages, paths, and advert statistics are deleted after 7 days.</p>
+      <p>This data is public by nature: anyone with a radio in range can receive it, and other sites archive it too. Deleting our copy doesn't make it private. <strong>Treat public channels as public.</strong></p>
+
+      <h2>Observers</h2>
+      <p>If you run an observer, it connects to our MQTT broker. The broker's logs include your observer's IP address and are overwritten within hours. The broker also keeps a small trust record for each observer's public key, used to block misbehaving clients, which doesn't include IP addresses. Observers also appear on the analyzer with their name and region.</p>
+
+      <h2>Accounts and forms</h2>
+      <ul>
+        <li><strong>Analyzer accounts:</strong> your email address, login sessions, and any radios you've linked to your account.</li>
+        <li><strong>Article members and comments:</strong> your email address, name, comments, and newsletter preferences. Our article software (Ghost) also records an approximate location (city or region) from your IP address when you sign up, and when you were last active. Commenter avatars come from <a href="https://gravatar.com" target="_blank" rel="noopener">Gravatar</a>, which receives a scrambled (hashed) form of your email address to look up your picture.</li>
+        <li><strong>Repeater registry and hosting inquiries:</strong> whatever you enter in the form, such as your name, email, address, and notes. Requests to add or edit a repeater are kept with the repeater's details.</li>
+      </ul>
+      <p>These are kept until you ask us to delete them (see below).</p>
+
+      <h2>This website</h2>
+      <p>We don't use analytics, ads, or tracking scripts. The site is served through Cloudflare, which processes visitors' IP addresses to deliver pages and block abuse, under <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare's privacy policy</a>. Our forms use Cloudflare Turnstile to filter out bots.</p>
+
+      <h2>Backups</h2>
+      <p>Our databases are backed up nightly to a second machine we own. Backups, including the live map's own snapshots, are deleted after <strong>3 days</strong>. Nothing is copied to a third-party cloud.</p>
+
+      <h2>Who can see it</h2>
+      <p>The mesh data shown on the analyzer and live map is public by design. Everything else (account details, emails, host addresses, logs, and backups) is only accessible to MeshTexas administrators. We don't sell or share it.</p>
+
+      <h2>Requests for data</h2>
+      <p>We can only provide what we still have, and our retention limits run automatically every day. This page describes everything we keep.</p>
+
+      <h2>Deleting your data</h2>
+      <p>Email <a href="mailto:info@meshtexas.org">info@meshtexas.org</a> and we'll delete your analyzer account, article comments, or host details.</p>
+      <p>Nodes are different. We can't delete a node in any lasting way, because it reappears the next time it's heard. What you can do:</p>
+      <ul>
+        <li><strong>Stop sharing your location.</strong> Turn off location in your node's advert settings. This protects you on every map, not just ours.</li>
+        <li><strong>Hide your node yourself.</strong> Start its name with 🚫 and send an advert. Our analyzer and live map, and many other MeshCore maps, will stop showing it.</li>
+        <li><strong>Ask us to hide it.</strong> Email us its name or public key and we'll hide it from the analyzer. This stays in place even when it's heard again.</li>
+      </ul>
+      <p>Hiding a node only removes it from our displays. Its packets are still received, stored, and deleted after 7 days like everything else, and other people's maps and observers can still hear it.</p>
+
+      <h2>Changes</h2>
+      <p>If we change what we collect or how long we keep it, we'll update this page and post about it in <a href="https://meshtexas.org/articles/">Articles</a>.</p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .privacy h2 {
+    margin-top: 48px;
+    padding-top: 40px;
+    margin-bottom: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .privacy h2:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+</style>
