@@ -76,6 +76,14 @@ export async function onRequest(context) {
     return response || new Response('Articles are temporarily unavailable.', { status: 503 });
   }
 
+  // Ghost resolves links typed as "/about" against its own url, so they
+  // land on /articles/about. If Ghost has nothing there and the first
+  // segment is a section the site links to, send the reader to the real page.
+  if (response.status === 404 && isRead) {
+    const target = await siteSectionFor(env, url);
+    if (target) return Response.redirect(target, 301);
+  }
+
   const out = new Headers(response.headers);
   rewriteLocation(out, origin, url);
   // Any noindex meant for the Ghost host doesn't apply to meshtexas.org.
@@ -138,6 +146,28 @@ async function loadChrome(env, url) {
     header: html.slice(bodyStart, slot),
     footer: html.slice(slot + SLOT.length, bodyEnd),
   };
+}
+
+// /articles/<section>/rest → /<section>/rest, when <section> is the first
+// path segment of a link in the site's header or footer (about, connect,
+// learn, host-a-node, ...). Read from the live chrome, so new nav entries
+// are covered without touching this list.
+async function siteSectionFor(env, url) {
+  const rest = url.pathname.slice('/articles/'.length);
+  const section = rest.split('/')[0];
+  if (!section) return null;
+  let chrome;
+  try {
+    chrome = await loadChrome(env, url);
+  } catch (err) {
+    return null;
+  }
+  const sections = new Set();
+  for (const m of (chrome.header + chrome.footer).matchAll(/href="\/([a-z0-9-]+)/g)) {
+    if (m[1] !== 'articles') sections.add(m[1]);
+  }
+  if (!sections.has(section)) return null;
+  return new URL(`/${rest}${url.search}`, url).toString();
 }
 
 async function wrap(html, env, url) {
