@@ -125,7 +125,7 @@ reboot</code></pre>
                 <span><code>CRP</code> Corpus Christi</span>
                 <span><code>ACT</code> Waco</span>
               </div>
-              <pre><code>set mqtt.iata SAT</code></pre>
+              <pre><code>set mqtt.iata AUS</code></pre>
             </li>
             <li>
               <strong>Pick a free broker slot</strong> (mqtt1–mqtt6). Not sure which are free? Run <code>get mqtt.status</code> — it lists each slot already in use (e.g. <code>1: meshmapper (ok)</code>); pick any slot number not shown.
@@ -161,7 +161,7 @@ reboot</code></pre>
               <strong>Find your config directory</strong> — typically <code>/etc/mctomqtt/config.d/</code> on Linux.
             </li>
             <li>
-              <strong>Set your IATA region</strong> — replace <code>SAT</code> with the Texas city nearest to you, then expand the option that matches your setup:
+              <strong>Set your IATA region</strong> — replace <code>AUS</code> with the Texas city nearest to you, then expand the option that matches your setup:
               <div class="iata-grid">
                 <span><code>SAT</code> San Antonio</span>
                 <span><code>AUS</code> Austin</span>
@@ -202,7 +202,7 @@ method = "token"
 audience = "mqtt.meshtexas.org"
 
 [broker.topics]
-iata = "SAT"</code></pre>
+iata = "AUS"</code></pre>
                   </div>
                 </details>
                 <details class="hint-collapsible">
@@ -210,7 +210,7 @@ iata = "SAT"</code></pre>
                   <div class="hint-body">
                     <p>Simpler option — sets IATA globally. Create or edit <code>/etc/mctomqtt/config.d/99-user.toml</code>:</p>
                     <pre><code>[general]
-iata = "SAT"</code></pre>
+iata = "AUS"</code></pre>
                     <p>Then create <code>30-texasmesh.toml</code> in <code>config.d/</code> without a <code>[broker.topics]</code> block:</p>
                     <pre><code>[[broker]]
 name = "meshtexas"
@@ -249,7 +249,7 @@ journalctl -u meshcoretomqtt -f</code></pre>
               <strong>Find your presets directory</strong> inside your meshcore-packet-capture installation.
             </li>
             <li>
-              <strong>Set your IATA region</strong> — replace <code>SAT</code> with the Texas city nearest to you, then expand the option that matches your setup:
+              <strong>Set your IATA region</strong> — replace <code>AUS</code> with the Texas city nearest to you, then expand the option that matches your setup:
               <div class="iata-grid">
                 <span><code>SAT</code> San Antonio</span>
                 <span><code>AUS</code> Austin</span>
@@ -280,7 +280,7 @@ transport = "websockets"
 keepalive = 60
 qos = 0
 retain = true
-iata = "SAT"
+iata = "AUS"
 
 [broker.tls]
 enabled = true
@@ -296,7 +296,7 @@ audience = "mqtt.meshtexas.org"</code></pre>
                   <div class="hint-body">
                     <p>Simpler option — sets IATA globally. Create or edit <code>/etc/meshcore-packet-capture/config.d/99-user.toml</code>:</p>
                     <pre><code>[general]
-iata = "SAT"</code></pre>
+iata = "AUS"</code></pre>
                     <p>Then create <code>meshtexas.toml</code> in your presets directory without an <code>iata</code> line:</p>
                     <pre><code>[[broker]]
 name = "meshtexas"
