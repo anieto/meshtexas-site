@@ -9,6 +9,30 @@ import Callout from '../components/Callout.astro';
   <section class="connect tint">
     <div class="container">
       <h1>Connect to the Network</h1>
+      <p class="section-sub">Pick the one that fits where you're starting from.</p>
+
+      <div class="cards path-cards">
+        <a class="card" href="/learn/getting-started">
+          <div class="card-icon">📻</div>
+          <h3>New to MeshCore?</h3>
+          <p>Get your first radio, flash it, and send your first message.</p>
+          <span class="path-link">Getting Started →</span>
+        </a>
+        <a class="card" href="/join">
+          <div class="card-icon">🤝</div>
+          <h3>Already have a mesh in your area?</h3>
+          <p>Put your town on the MeshTexas map with its own region. It takes one observer.</p>
+          <span class="path-link">Bring Your Area →</span>
+        </a>
+        <a class="card" href="#observer">
+          <div class="card-icon">📡</div>
+          <h3>Ready to set up an observer?</h3>
+          <p>Broker details and step-by-step setup for each kind of observer.</p>
+          <span class="path-link">Observer Setup ↓</span>
+        </a>
+      </div>
+
+      <h2 id="observer" class="observer-heading">Observer Setup</h2>
       <p class="section-sub">The MeshTexas broker accepts connections from any Texas-area MeshCore observer. Auth uses the same JWT model as MeshMapper and Waev — your device signs its own token from its keypair. No credentials or registration required.</p>
 
       <div class="broker-info">
@@ -31,7 +55,7 @@ import Callout from '../components/Callout.astro';
       </div>
 
       <Callout variant="region-note" icon="!" heading="Only listed region codes are accepted">
-        <p>Devices tagged with a region code that isn't in the list below won't be able to connect. Don't see your area? <a href="/about#other-regions">Let us know</a> and we'll add it.</p>
+        <p>Devices tagged with a region code that isn't in the list below won't be able to connect. Don't see your area? <a href="/join">Let us know</a> and we'll add it.</p>
       </Callout>
 
       <h3 class="setup-heading">Setup Instructions</h3>
@@ -327,3 +351,32 @@ audience = "mqtt.meshtexas.org"</code></pre>
     });
   });
 </script>
+
+<style>
+  .path-cards { margin-top: 0; margin-bottom: 56px; }
+
+  .path-cards .card {
+    display: flex;
+    flex-direction: column;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.15s;
+  }
+
+  .path-cards .card:hover { border-color: var(--accent); }
+
+  .path-cards .card p { flex: 1; }
+
+  .path-link {
+    margin-top: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .observer-heading {
+    scroll-margin-top: 80px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+</style>

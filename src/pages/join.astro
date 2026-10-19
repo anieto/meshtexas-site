@@ -1,0 +1,101 @@
+---
+import Layout from '../components/Layout.astro';
+import Callout from '../components/Callout.astro';
+---
+<Layout
+  title="Bring Your Area to MeshTexas"
+  description="Already running MeshCore in your town? One observer puts your area's nodes on the MeshTexas analyzer and live map, with its own region. No accounts, no servers to run."
+>
+  <div class="page-intro">
+    <div class="container-narrow">
+      <h1>Bring Your Area to MeshTexas</h1>
+      <p class="hero-sub">Already running MeshCore where you live? One small observer puts your area's nodes on our analyzer and live map, next to the rest of Texas. You don't need an account or a server, and it's free.</p>
+    </div>
+  </div>
+
+  <section class="about-section">
+    <div class="container-narrow prose join">
+      <h2>What your area gets</h2>
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">🗺️</div>
+          <h3>Your nodes on the map</h3>
+          <p>Repeaters, companions, and room servers your observer hears show up on the <a href="https://livemap.meshtexas.org" target="_blank" rel="noopener">live map</a> and <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener">analyzer</a>.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📍</div>
+          <h3>Your own region</h3>
+          <p>Your city gets its own region code, so anyone can filter the map and analyzer down to just your area.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔍</div>
+          <h3>Tools for your mesh</h3>
+          <p>See which paths packets take, how strong signals are, and which repeaters are carrying the load. Handy when you're deciding where the next repeater goes.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🧰</div>
+          <h3>Nothing to run</h3>
+          <p>We host the broker, analyzer, and map. Your observer connects with its own keys, so there are no logins to set up.</p>
+        </div>
+      </div>
+
+      <h2>What it takes</h2>
+      <ul>
+        <li><strong>One observer.</strong> A MeshCore radio running observer firmware, such as a Heltec V3 (about $20), or an existing repeater reflashed with it.</li>
+        <li><strong>Wi-Fi where it sits.</strong> It sends what it hears to our broker over the internet.</li>
+        <li><strong>A spot with a good view of your mesh.</strong> The more of your area it hears, the more of your nodes show up. Rooftops and tall buildings work well.</li>
+        <li><strong>About 15 minutes</strong> to flash it and enter a few settings.</li>
+      </ul>
+      <p>Your mesh doesn't change. The observer is one more node listening on your local settings, and nobody else on your mesh has to do anything.</p>
+
+      <h2>How to join</h2>
+      <ol>
+        <li><strong>Check for your region code.</strong> The <a href="/connect#observer">Connect</a> page lists the codes we accept. If your area is there, go straight to step 3.</li>
+        <li><strong>Not listed? Email us.</strong> Send your city to <a href="mailto:info@meshtexas.org">info@meshtexas.org</a> and we'll add its code, usually the airport code of the nearest city (Lubbock is <code>LBB</code>, for example). It's a quick change on our end.</li>
+        <li><strong>Set up your observer</strong> with the step-by-step instructions on <a href="/connect#observer">Connect</a>. Your nodes start appearing as soon as it's online.</li>
+        <li><strong>Tell your local group.</strong> Share the live map link with your mesh so everyone can see it.</li>
+      </ol>
+
+      <Callout variant="verify" icon="✓" heading="Want help getting started?">
+        <p>Organizing a group, or not sure where an observer should go? Email us and we'll help you plan it.</p>
+        <a href="mailto:info@meshtexas.org" class="btn btn-secondary">Email Us ↗</a>
+      </Callout>
+
+      <h2>Common questions</h2>
+      <h3>Is it really free?</h3>
+      <p>Yes. MeshTexas is run by volunteers, and connecting to the network is free for individuals and community groups. See <a href="/about#commitments">Our Commitments</a>.</p>
+      <h3>What do you collect, and how long do you keep it?</h3>
+      <p>The same packets any radio in range can hear, kept for 7 days. Direct messages and private channels stay encrypted. The <a href="/privacy">Privacy</a> page has the details.</p>
+      <h3>We already run our own map. Can we still connect?</h3>
+      <p>Yes. Your observers can send to more than one broker at a time, and we can also give your group access to ours for your own map. See <a href="/about#other-regions">Working With Other Regions</a>.</p>
+      <h3>New to MeshCore altogether?</h3>
+      <p>Start with <a href="/learn/getting-started">Getting Started</a> to get your first radio on the air.</p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .join h2 {
+    margin-top: 48px;
+    padding-top: 40px;
+    margin-bottom: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .join h2:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .join .cards {
+    margin-top: 20px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    .join .cards { grid-template-columns: 1fr; }
+  }
+
+  .join .card h3 { margin-top: 0; }
+</style>

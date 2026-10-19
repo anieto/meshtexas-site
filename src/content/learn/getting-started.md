@@ -24,7 +24,7 @@ Join a public channel and say hello. You'll see direct messages, channel traffic
 
 ## 5. Join the Texas network
 
-The steps above get any MeshCore radio talking to the mesh in general. To see your device's traffic on MeshTexas's own live map and analyzer — or to set one up as a dedicated **observer node** that feeds our regional broker — head to [Connect](/connect) for the specific configuration.
+The steps above get any MeshCore radio talking to the mesh in general. To see your device's traffic on MeshTexas's own live map and analyzer — or to set one up as a dedicated **observer node** that feeds our regional broker — head to [Connect](/connect#observer) for the specific configuration. If your town already has a MeshCore group, see [Bring Your Area to MeshTexas](/join).
 
 ---
 
