@@ -58,6 +58,10 @@ import Callout from '../components/Callout.astro';
         <p>Devices tagged with a region code that isn't in the list below won't be able to connect. Don't see your area? <a href="/join">Let us know</a> and we'll add it.</p>
       </Callout>
 
+      <Callout variant="region-note" icon="i" heading="Also sending to MeshMapper?">
+        <p>Observers running the MeshCore firmware use one region code for every broker they send to, so pick a code that exists on both networks. <code>CRP</code>, <code>ACT</code>, and <code>MFE</code> are MeshTexas-only regions; MeshMapper doesn't have them. If you also feed MeshMapper, use its nearest region instead. meshcoretomqtt and meshcore-packet-capture can set a different code per broker (see their tabs below).</p>
+      </Callout>
+
       <h3 class="setup-heading">Setup Instructions</h3>
       <p class="setup-sub">Select the software your observer is running:</p>
 
@@ -124,6 +128,8 @@ reboot</code></pre>
                 <span><code>TYR</code> Tyler–Longview</span>
                 <span><code>CRP</code> Corpus Christi</span>
                 <span><code>ACT</code> Waco</span>
+                <span><code>LBB</code> Lubbock</span>
+                <span><code>MAF</code> Midland–Odessa</span>
               </div>
               <pre><code>set mqtt.iata AUS</code></pre>
             </li>
@@ -176,6 +182,8 @@ reboot</code></pre>
                 <span><code>TYR</code> Tyler–Longview</span>
                 <span><code>CRP</code> Corpus Christi</span>
                 <span><code>ACT</code> Waco</span>
+                <span><code>LBB</code> Lubbock</span>
+                <span><code>MAF</code> Midland–Odessa</span>
               </div>
               <div class="iata-choice">
                 <div class="iata-choice-label">Choose your setup</div>
@@ -264,6 +272,8 @@ journalctl -u meshcoretomqtt -f</code></pre>
                 <span><code>TYR</code> Tyler–Longview</span>
                 <span><code>CRP</code> Corpus Christi</span>
                 <span><code>ACT</code> Waco</span>
+                <span><code>LBB</code> Lubbock</span>
+                <span><code>MAF</code> Midland–Odessa</span>
               </div>
               <div class="iata-choice">
                 <div class="iata-choice-label">Choose your setup</div>
