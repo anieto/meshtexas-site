@@ -1,0 +1,308 @@
+---
+import Layout from '../components/Layout.astro';
+import Callout from '../components/Callout.astro';
+
+const ANALYZER = 'https://analyzer.meshtexas.org/#/packets?region=';
+
+// Links were checked by hand on the review date below. Discord invites expire,
+// so recheck them (and drop dead ones) whenever this list is updated.
+const regions = [
+  {
+    code: 'SAT', name: 'San Antonio',
+    groups: [
+      {
+        name: 'MeshTexas Community',
+        desc: 'San Antonio\'s local mesh community. The former STX Mesh and South Texas Mesh groups now meet here, for both MeshCore and Meshtastic.',
+        area: 'San Antonio and South Texas',
+        multiTech: true,
+        links: [{ label: 'Discord', href: 'https://discord.gg/MCEbb56CPa' }],
+      },
+    ],
+  },
+  {
+    code: 'AUS', name: 'Austin',
+    groups: [
+      {
+        name: 'Austin Mesh',
+        desc: 'A large, active community building out mesh coverage across the Austin metro.',
+        area: 'Austin, Cedar Park, Leander, and beyond',
+        multiTech: true,
+        links: [
+          { label: 'Website', href: 'https://www.austinmesh.org/' },
+          { label: 'Discord', href: 'https://discord.gg/6a5Sv2s9bG' },
+        ],
+      },
+    ],
+  },
+  {
+    code: 'HOU', name: 'Houston',
+    groups: [
+      {
+        name: 'Houston Mesh',
+        desc: 'Volunteers building a resilient network across greater Houston.',
+        area: 'Houston metro',
+        multiTech: true,
+        links: [{ label: 'Discord', href: 'https://discord.gg/QmxBtkmct7' }],
+      },
+    ],
+  },
+  {
+    code: 'DFW', name: 'Dallas–Fort Worth',
+    groups: [
+      {
+        name: 'NTXMesh',
+        desc: 'North Texas\'s regional MeshCore group. Its observers also feed DFW coverage on our map.',
+        area: 'Dallas–Fort Worth and North Texas',
+        links: [
+          { label: 'Website', href: 'https://ntxmesh.com/' },
+          { label: 'Discord', href: 'https://discord.gg/nGeQ8cbSM3' },
+        ],
+      },
+    ],
+  },
+  {
+    code: 'ACT', name: 'Waco',
+    groups: [
+      {
+        name: 'Central Texas MeshCore',
+        desc: 'MeshCore operators in and around Waco.',
+        area: 'Waco area',
+        links: [{ label: 'Discord', href: 'https://discord.gg/rcq3MDDZHN' }],
+      },
+    ],
+  },
+  {
+    code: 'SJT', name: 'San Angelo',
+    groups: [
+      {
+        name: 'Angelo Mesh',
+        desc: 'San Angelo\'s local mesh community.',
+        area: 'San Angelo area',
+        links: [
+          { label: 'Website', href: 'https://angelomesh.com/' },
+          { label: 'Discord', href: 'https://discord.gg/Kw53pzwyuQ' },
+        ],
+      },
+    ],
+  },
+  {
+    code: 'ELP', name: 'El Paso',
+    groups: [
+      {
+        name: 'El Paso Mesh Radio Community',
+        desc: 'Mesh radio operators building out coverage across El Paso and the Borderland.',
+        area: 'El Paso area',
+        multiTech: true,
+        links: [{ label: 'Discord', href: 'https://discord.gg/62EeV343tg' }],
+      },
+    ],
+  },
+  {
+    code: 'TYR', name: 'Tyler–Longview',
+    groups: [
+      {
+        name: 'Rusk County Mesh',
+        desc: 'A community-built MeshCore network that started in Henderson and is growing across Rusk County.',
+        area: 'Henderson and Rusk County',
+        links: [{ label: 'Website', href: 'https://ruskcountymesh.com/' }],
+      },
+      {
+        name: 'ETX Mesh',
+        desc: 'An East Texas mesh group based around Henderson.',
+        area: 'Henderson area',
+        links: [{ label: 'Facebook', href: 'https://www.facebook.com/groups/1218766212926298' }],
+      },
+    ],
+  },
+  {
+    code: 'TXK', name: 'Texarkana',
+    groups: [
+      {
+        name: 'Four States Mesh Radio',
+        desc: 'Mesh radio in the Four States area around Texarkana.',
+        area: 'Bowie and Cass Counties',
+        links: [{ label: 'Facebook', href: 'https://www.facebook.com/FourStatesMeshRadio/' }],
+      },
+    ],
+  },
+];
+
+const statewide = [
+  {
+    name: 'Comchan',
+    desc: 'A volunteer group building out MeshCore across Central Texas. It runs its own analyzer and a broker that brings Texas mesh data together.',
+    links: [{ label: 'Website', href: 'https://comchan.net/' }],
+  },
+  {
+    name: 'MeshCore Texas',
+    desc: 'A statewide group for MeshCore users across Texas.',
+    links: [{ label: 'Facebook', href: 'https://www.facebook.com/groups/1675466243142688/' }],
+  },
+  {
+    name: 'Texas MeshCore Network',
+    desc: 'A statewide group for MeshCore users across Texas.',
+    links: [{ label: 'Facebook', href: 'https://www.facebook.com/groups/1204906347939737' }],
+  },
+];
+
+// Everything renders alphabetically (region by city name, groups by name) so
+// no community, including ours, gets top billing.
+const byName = (a, b) => a.name.localeCompare(b.name);
+regions.sort(byName);
+regions.forEach((r) => r.groups.sort(byName));
+statewide.sort(byName);
+
+const unlisted = [
+  { code: 'ABI', name: 'Abilene' },
+  { code: 'AMA', name: 'Amarillo' },
+  { code: 'CRP', name: 'Corpus Christi' },
+  { code: 'LBB', name: 'Lubbock' },
+  { code: 'MAF', name: 'Midland–Odessa' },
+  { code: 'MFE', name: 'McAllen' },
+].sort(byName);
+---
+<Layout
+  title="Texas Mesh Communities — MeshTexas"
+  description="Find a local mesh radio community near you, organized by region across Texas."
+>
+  <div class="page-intro">
+    <div class="container-narrow">
+      <h1>Texas Mesh Communities</h1>
+      <p class="hero-sub">A mesh network works best when the people running it know each other. Find a local group near you to get help with setup, plan repeater sites, and meet the people already on the air. Groups are listed by the same region codes used on our map and analyzer. Last reviewed October 20, 2026.</p>
+    </div>
+  </div>
+
+  <section class="about-section" id="regional">
+    <div class="container">
+      <h2>Local Groups by Region</h2>
+      <p class="section-sub">Some regions have more than one group. They're listed in no particular order, and you're welcome to join more than one.</p>
+
+      {regions.map((r) => (
+        <div class="cm-region" id={r.code.toLowerCase()}>
+          <div class="cm-region-head">
+            <span class="cm-code">{r.code}</span>
+            <h3>{r.name}</h3>
+            <a class="cm-live" href={ANALYZER + r.code} target="_blank" rel="noopener">See live {r.code} traffic ↗</a>
+          </div>
+          <div class="community-links cm-grid">
+            {r.groups.map((g) => (
+              <div class="community-card">
+                <span class="community-name">{g.name}{g.multiTech && <span class="cm-tag">Multi-tech</span>}</span>
+                <span class="cm-area">{g.area}</span>
+                <span class="community-desc">{g.desc}</span>
+                <span class="cm-links">
+                  {g.links.map((l) => <a href={l.href} target="_blank" rel="noopener">{l.label} ↗</a>)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="about-section tint" id="statewide">
+    <div class="container">
+      <h2>Statewide Groups</h2>
+      <p class="section-sub">Groups that cover Texas as a whole rather than one region.</p>
+      <div class="community-links">
+        {statewide.map((g) => (
+          <div class="community-card">
+            <span class="community-name">{g.name}</span>
+            <span class="community-desc">{g.desc}</span>
+            <span class="cm-links">
+              {g.links.map((l) => <a href={l.href} target="_blank" rel="noopener">{l.label} ↗</a>)}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="about-section" id="unlisted">
+    <div class="container">
+      <h2>No Local Group Listed Yet</h2>
+      <p class="section-sub">These regions have nodes on the mesh but no community on this list yet. If you know of one, or you'd like to start one, let us know and we'll add it.</p>
+      <div class="regions">
+        {unlisted.map((r) => (
+          <a class="region cm-unlisted" href={ANALYZER + r.code} target="_blank" rel="noopener">
+            <span class="region-code">{r.code}</span>
+            <span class="region-name">{r.name}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="about-section tint" id="resources">
+    <div class="container">
+      <h2>Resources</h2>
+      <div class="community-links">
+        <a href="https://www.rfindex.com/" target="_blank" rel="noopener" class="community-card">
+          <span class="community-name">RF Index</span>
+          <span class="community-desc">Independent, side-by-side comparisons of mesh hardware: firsthand VSWR results, antenna sweep charts, specs, and pricing for Meshtastic and MeshCore devices.</span>
+          <span class="community-url">rfindex.com ↗</span>
+        </a>
+        <a href="https://meshcoretx.net/meshes" target="_blank" rel="noopener" class="community-card">
+          <span class="community-name">MeshCore TX</span>
+          <span class="community-desc">Another directory of Texas MeshCore groups. Its list helped us get this page started.</span>
+          <span class="community-url">meshcoretx.net ↗</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-section" id="add">
+    <div class="container-narrow">
+      <Callout variant="verify" icon="✓" heading="Add or update your community">
+        <p>Run a Texas mesh group that isn't listed, or need a link fixed? Send us the group's name, the area it covers, and where people can find it. Every group is welcome here, whichever broker, map, or firmware you use.</p>
+        <a href="mailto:info@meshtexas.org?subject=Community%20listing" class="btn btn-secondary">Email Us ↗</a>
+      </Callout>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .cm-region { margin-top: 40px; }
+  .cm-region:first-of-type { margin-top: 0; }
+  .cm-region-head {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cm-region-head h3 { font-size: 1.2rem; margin: 0; }
+  .cm-code {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+    color: var(--green);
+  }
+  .cm-live { margin-left: auto; font-size: 0.85rem; }
+  /* auto-fill (not auto-fit) so a region with one group gets a normal-width
+     card instead of a full-width strip */
+  .cm-grid { margin-top: 16px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+  .cm-tag {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 8px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    vertical-align: middle;
+    background: var(--bg-3);
+    color: var(--text-muted);
+  }
+  .cm-area { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+  .cm-links { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.85rem; margin-top: 4px; }
+  .cm-unlisted { color: var(--text); transition: border-color 0.15s; }
+  .cm-unlisted:hover { border-color: var(--accent); text-decoration: none; }
+  @media (max-width: 600px) {
+    .cm-live { margin-left: 0; flex-basis: 100%; }
+  }
+</style>
