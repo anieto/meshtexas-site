@@ -1,0 +1,17 @@
+{{!-- Two rows of pills: categories (the four tags in category.hbs) and
+      regions (every other public tag; make a stray tag internal with a "#"
+      prefix to keep it out). A tag only shows once it has a published post.
+      `current` is the slug of the tag page being viewed, if any. --}}
+{{#get "tags" filter="slug:[how-to,buildout,community,announcement]" include="count.posts" order="name asc" limit="10" as |categories|}}
+  <nav class="article-filter" aria-label="Filter articles by category">
+    <span class="article-filter-label">Category</span>
+    <a href="{{@site.url}}/"{{#unless ../current}} aria-current="page"{{/unless}}>All</a>
+    {{#foreach categories}}{{#if count.posts}}<a href="{{url}}"{{#match slug ../../current}} aria-current="page"{{/match}}>{{name}}</a>{{/if}}{{/foreach}}
+  </nav>
+{{/get}}
+{{#get "tags" filter="visibility:public+slug:-[how-to,buildout,community,announcement]" include="count.posts" order="name asc" limit="50" as |regions|}}
+  <nav class="article-filter" aria-label="Filter articles by region">
+    <span class="article-filter-label">Region</span>
+    {{#foreach regions}}{{#if count.posts}}<a href="{{url}}"{{#match slug ../../current}} aria-current="page"{{/match}}>{{name}}</a>{{/if}}{{/foreach}}
+  </nav>
+{{/get}}

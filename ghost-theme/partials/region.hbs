@@ -1,0 +1,2 @@
+{{!-- Region labels: any public tag that isn't a category (see category.hbs). --}}
+{{#foreach tags}}{{#match visibility "public"}}{{#match slug "how-to"}}{{else match slug "buildout"}}{{else match slug "community"}}{{else match slug "announcement"}}{{else}}<span class="article-card-region">{{name}}</span>{{/match}}{{/match}}{{/foreach}}

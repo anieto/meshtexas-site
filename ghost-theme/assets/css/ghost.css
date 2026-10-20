@@ -171,3 +171,53 @@
 
 .pagination .newer-posts,
 .pagination .older-posts { font-weight: 600; }
+
+/* Category and region filters on the article index and tag pages */
+.article-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.article-filter:last-of-type { margin-bottom: 28px; }
+
+.article-filter-label {
+  min-width: 72px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.article-filter a {
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  text-decoration: none;
+}
+
+.article-filter a:hover { border-color: var(--accent); color: var(--text); }
+
+.article-filter a[aria-current="page"] {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* A row only shows once there's a choice to make: two categories (plus
+   "All"), or two regions. */
+.article-filter[aria-label$="category"]:not(:has(a:nth-of-type(3))),
+.article-filter[aria-label$="region"]:not(:has(a:nth-of-type(2))) { display: none; }
+
+.article-card-region {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--green);
+}
