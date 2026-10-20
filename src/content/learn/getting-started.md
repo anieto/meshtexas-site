@@ -8,7 +8,7 @@ MeshCore turns a small, inexpensive LoRa radio into a long-range messenger — n
 
 ## 1. Get a radio
 
-Any MeshCore-compatible LoRa device works — popular options include the Heltec V3, RAK4631, and LilyGo T-Echo. Handheld all-in-one units and pocket-sized companion radios both work fine; the main thing to decide is whether you want a screen-and-buttons device or a small companion radio that pairs with your phone. Most hardware ships with Meshtastic firmware pre-installed, which is fine — you'll flash over it in the next step.
+Any MeshCore-compatible LoRa device works — popular options include the Heltec V3, RAK4631, and LilyGo T-Echo. Handheld all-in-one units and pocket-sized companion radios both work fine; the main thing to decide is whether you want a screen-and-buttons device or a small companion radio that pairs with your phone. Most hardware ships with Meshtastic firmware pre-installed, which is fine — you'll flash over it in the next step. (Wondering how the two differ? See [MeshCore vs. Meshtastic](/learn/meshcore-vs-meshtastic).)
 
 ## 2. Flash the firmware
 
