@@ -6,7 +6,7 @@ import Layout from '../components/Layout.astro';
 // shared constants module; region codes are already duplicated 4x elsewhere).
 const REGIONS = [
   { code: 'AUS', name: 'Austin' },
-  { code: 'SAT', name: 'San Antonio' },
+  { code: 'SAT', name: 'San Antonio', covers: 'San Antonio, Pearsall, Jourdanton, Pleasanton, Floresville' },
   { code: 'HOU', name: 'Houston' },
   { code: 'DFW', name: 'Dallas–Fort Worth' },
   { code: 'ELP', name: 'El Paso' },
@@ -20,6 +20,9 @@ const REGIONS = [
   { code: 'ACT', name: 'Waco' },
   { code: 'LBB', name: 'Lubbock' },
   { code: 'MAF', name: 'Midland–Odessa' },
+  { code: 'DRT', name: 'Del Rio', covers: 'Del Rio, Brackettville' },
+  { code: 'UVA', name: 'Uvalde / Winter Garden', covers: 'Uvalde, Sabinal, Eagle Pass, La Pryor, Crystal City, Carrizo Springs' },
+  { code: 'LRD', name: 'Laredo', covers: 'Laredo, Cotulla' },
 ];
 ---
 <Layout
@@ -54,7 +57,7 @@ const REGIONS = [
               <label for="field-region">Region</label>
               <select id="field-region" name="region" required>
                 <option value="" disabled selected>Choose a region…</option>
-                {REGIONS.map((r) => <option value={r.code}>{r.code} — {r.name}</option>)}
+                {REGIONS.map((r) => <option value={r.code}>{r.code} — {r.name}{r.covers ? ` (${r.covers})` : ''}</option>)}
               </select>
             </div>
             <div class="form-row">
@@ -82,7 +85,7 @@ const REGIONS = [
         </div>
         <select id="registry-region" aria-label="Filter by region">
           <option value="">All Regions</option>
-          {REGIONS.map((r) => <option value={r.code}>{r.code} — {r.name}</option>)}
+          {REGIONS.map((r) => <option value={r.code}>{r.code} — {r.name}{r.covers ? ` (${r.covers})` : ''}</option>)}
         </select>
       </div>
 
@@ -140,7 +143,7 @@ const REGIONS = [
           <div class="form-row">
             <label for="field-edit-region">Region</label>
             <select id="field-edit-region" name="region" required>
-              {REGIONS.map((r) => <option value={r.code}>{r.code} — {r.name}</option>)}
+              {REGIONS.map((r) => <option value={r.code}>{r.code} — {r.name}{r.covers ? ` (${r.covers})` : ''}</option>)}
             </select>
           </div>
           <div class="form-row">

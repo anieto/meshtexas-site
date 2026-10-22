@@ -59,7 +59,7 @@ import Callout from '../components/Callout.astro';
       </Callout>
 
       <Callout variant="region-note" icon="i" heading="Also sending to MeshMapper?">
-        <p>Observers running the MeshCore firmware use one region code for every broker they send to, so pick a code that exists on both networks. <code>CRP</code>, <code>ACT</code>, and <code>MFE</code> are MeshTexas-only regions; MeshMapper doesn't have them. If you also feed MeshMapper, use its nearest region instead. meshcoretomqtt and meshcore-packet-capture can set a different code per broker (see their tabs below).</p>
+        <p>Observers running the MeshCore firmware use one region code for every broker they send to, so pick a code that exists on both networks. <code>CRP</code>, <code>ACT</code>, <code>MFE</code>, <code>DRT</code>, <code>UVA</code>, and <code>LRD</code> are MeshTexas-only regions; MeshMapper doesn't have them. If you also feed MeshMapper, use its nearest region instead. meshcoretomqtt and meshcore-packet-capture can set a different code per broker (see their tabs below).</p>
       </Callout>
 
       <h3 class="setup-heading">Setup Instructions</h3>
@@ -115,7 +115,7 @@ reboot</code></pre>
             <li>
               <strong>Set your region</strong> using the IATA code for the Texas city nearest to you:
               <div class="iata-grid">
-                <span><code>SAT</code> San Antonio</span>
+                <span><code>SAT</code> San Antonio<small class="iata-covers">Covers: San Antonio, Pearsall, Jourdanton, Pleasanton, Floresville</small></span>
                 <span><code>AUS</code> Austin</span>
                 <span><code>HOU</code> Houston</span>
                 <span><code>DFW</code> Dallas–Fort Worth</span>
@@ -130,6 +130,9 @@ reboot</code></pre>
                 <span><code>ACT</code> Waco</span>
                 <span><code>LBB</code> Lubbock</span>
                 <span><code>MAF</code> Midland–Odessa</span>
+                <span><code>DRT</code> Del Rio<small class="iata-covers">Covers: Del Rio, Brackettville</small></span>
+                <span><code>UVA</code> Uvalde / Winter Garden<small class="iata-covers">Covers: Uvalde, Sabinal, Eagle Pass, La Pryor, Crystal City, Carrizo Springs</small></span>
+                <span><code>LRD</code> Laredo<small class="iata-covers">Covers: Laredo, Cotulla</small></span>
               </div>
               <pre><code>set mqtt.iata AUS</code></pre>
             </li>
@@ -169,7 +172,7 @@ reboot</code></pre>
             <li>
               <strong>Set your IATA region</strong> — replace <code>AUS</code> with the Texas city nearest to you, then expand the option that matches your setup:
               <div class="iata-grid">
-                <span><code>SAT</code> San Antonio</span>
+                <span><code>SAT</code> San Antonio<small class="iata-covers">Covers: San Antonio, Pearsall, Jourdanton, Pleasanton, Floresville</small></span>
                 <span><code>AUS</code> Austin</span>
                 <span><code>HOU</code> Houston</span>
                 <span><code>DFW</code> Dallas–Fort Worth</span>
@@ -184,6 +187,9 @@ reboot</code></pre>
                 <span><code>ACT</code> Waco</span>
                 <span><code>LBB</code> Lubbock</span>
                 <span><code>MAF</code> Midland–Odessa</span>
+                <span><code>DRT</code> Del Rio<small class="iata-covers">Covers: Del Rio, Brackettville</small></span>
+                <span><code>UVA</code> Uvalde / Winter Garden<small class="iata-covers">Covers: Uvalde, Sabinal, Eagle Pass, La Pryor, Crystal City, Carrizo Springs</small></span>
+                <span><code>LRD</code> Laredo<small class="iata-covers">Covers: Laredo, Cotulla</small></span>
               </div>
               <div class="iata-choice">
                 <div class="iata-choice-label">Choose your setup</div>
@@ -259,7 +265,7 @@ journalctl -u meshcoretomqtt -f</code></pre>
             <li>
               <strong>Set your IATA region</strong> — replace <code>AUS</code> with the Texas city nearest to you, then expand the option that matches your setup:
               <div class="iata-grid">
-                <span><code>SAT</code> San Antonio</span>
+                <span><code>SAT</code> San Antonio<small class="iata-covers">Covers: San Antonio, Pearsall, Jourdanton, Pleasanton, Floresville</small></span>
                 <span><code>AUS</code> Austin</span>
                 <span><code>HOU</code> Houston</span>
                 <span><code>DFW</code> Dallas–Fort Worth</span>
@@ -274,6 +280,9 @@ journalctl -u meshcoretomqtt -f</code></pre>
                 <span><code>ACT</code> Waco</span>
                 <span><code>LBB</code> Lubbock</span>
                 <span><code>MAF</code> Midland–Odessa</span>
+                <span><code>DRT</code> Del Rio<small class="iata-covers">Covers: Del Rio, Brackettville</small></span>
+                <span><code>UVA</code> Uvalde / Winter Garden<small class="iata-covers">Covers: Uvalde, Sabinal, Eagle Pass, La Pryor, Crystal City, Carrizo Springs</small></span>
+                <span><code>LRD</code> Laredo<small class="iata-covers">Covers: Laredo, Cotulla</small></span>
               </div>
               <div class="iata-choice">
                 <div class="iata-choice-label">Choose your setup</div>

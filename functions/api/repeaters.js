@@ -1,4 +1,4 @@
-const REGIONS = ['AUS', 'SAT', 'HOU', 'DFW', 'ELP', 'ABI', 'AMA', 'MFE', 'SJT', 'TXK', 'TYR', 'CRP', 'ACT', 'LBB', 'MAF'];
+const REGIONS = ['AUS', 'SAT', 'HOU', 'DFW', 'ELP', 'ABI', 'AMA', 'MFE', 'SJT', 'TXK', 'TYR', 'CRP', 'ACT', 'LBB', 'MAF', 'DRT', 'UVA', 'LRD'];
 
 const MAX_LENGTHS = {
   name: 100,
