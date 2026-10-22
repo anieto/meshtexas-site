@@ -832,10 +832,12 @@ pre code {
 .hint-collapsible .hint-body strong { color: var(--text); }
 
 /* Coverage */
+/* Equal columns, and every card in a row stretches to the tallest, so cards
+   with a covers line don't leave the rest ragged. */
 .regions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 12px;
-  flex-wrap: wrap;
   margin-top: 40px;
 }
 
@@ -847,8 +849,8 @@ pre code {
   background: var(--bg-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px 28px;
-  min-width: 120px;
+  padding: 20px 16px;
+  text-align: center;
 }
 
 .region.active {
@@ -873,8 +875,6 @@ pre code {
 .region-covers {
   font-size: 0.75rem;
   color: var(--text-muted);
-  text-align: center;
-  max-width: 180px;
 }
 
 .region-status {
@@ -884,6 +884,7 @@ pre code {
   letter-spacing: 0.08em;
   padding: 2px 8px;
   border-radius: 20px;
+  margin-top: auto; /* keeps the badge on one line across a row */
 }
 
 .region.active .region-status {

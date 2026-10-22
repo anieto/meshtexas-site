@@ -1,6 +1,33 @@
 ---
 import Layout from '../components/Layout.astro';
 import Callout from '../components/Callout.astro';
+
+// Coverage cards, shown alphabetically by city so no region gets top billing
+// (same rule as communities.astro). covers lists the towns a grouped region
+// takes in, so operators there know which code is theirs.
+const REGIONS = [
+  { code: 'SAT', name: 'San Antonio', status: 'active', covers: 'San Antonio, Pearsall, Jourdanton, Pleasanton, Floresville' },
+  { code: 'AUS', name: 'Austin', status: 'active' },
+  { code: 'HOU', name: 'Houston', status: 'active' },
+  { code: 'DFW', name: 'Dallas–Fort Worth', status: 'active' },
+  { code: 'ELP', name: 'El Paso', status: 'growing' },
+  { code: 'ABI', name: 'Abilene', status: 'active' },
+  { code: 'AMA', name: 'Amarillo', status: 'growing' },
+  { code: 'MFE', name: 'McAllen', status: 'active', covers: 'McAllen, Edinburg, Harlingen' },
+  { code: 'SJT', name: 'San Angelo', status: 'growing' },
+  { code: 'TXK', name: 'Texarkana', status: 'growing' },
+  { code: 'TYR', name: 'Tyler–Longview', status: 'active' },
+  { code: 'CRP', name: 'Corpus Christi', status: 'active' },
+  { code: 'ACT', name: 'Waco', status: 'active' },
+  { code: 'LBB', name: 'Lubbock', status: 'active' },
+  { code: 'MAF', name: 'Midland–Odessa', status: 'growing' },
+  { code: 'DRT', name: 'Del Rio', status: 'new', covers: 'Del Rio, Brackettville' },
+  { code: 'UVA', name: 'Uvalde / Winter Garden', status: 'new', covers: 'Uvalde, Sabinal, Eagle Pass, La Pryor, Crystal City, Carrizo Springs' },
+  { code: 'LRD', name: 'Laredo', status: 'new', covers: 'Laredo, Cotulla' },
+];
+REGIONS.sort((a, b) => a.name.localeCompare(b.name));
+
+const STATUS_LABELS = { active: 'Active', growing: 'Growing', new: 'New' };
 ---
 <Layout
   title="About — MeshTexas"
@@ -30,100 +57,14 @@ import Callout from '../components/Callout.astro';
       <h2>Coverage Regions</h2>
       <p class="section-sub">MeshTexas is active across Texas. Coverage grows as more operators add nodes and repeaters. IATA city codes are used to identify regions on the network.</p>
       <div class="regions">
-        <div class="region active">
-          <div class="region-code">SAT</div>
-          <div class="region-name">San Antonio</div>
-          <div class="region-covers">Covers: San Antonio, Pearsall, Jourdanton, Pleasanton, Floresville</div>
-          <div class="region-status">Active</div>
-        </div>
-        <div class="region active">
-          <div class="region-code">AUS</div>
-          <div class="region-name">Austin</div>
-          <div class="region-status">Active</div>
-        </div>
-        <div class="region active">
-          <div class="region-code">HOU</div>
-          <div class="region-name">Houston</div>
-          <div class="region-status">Active</div>
-        </div>
-        <div class="region active">
-          <div class="region-code">DFW</div>
-          <div class="region-name">Dallas–Fort Worth</div>
-          <div class="region-status">Active</div>
-        </div>
-        <div class="region">
-          <div class="region-code">ELP</div>
-          <div class="region-name">El Paso</div>
-          <div class="region-status">Growing</div>
-        </div>
-        <div class="region active">
-          <div class="region-code">ABI</div>
-          <div class="region-name">Abilene</div>
-          <div class="region-status">Active</div>
-        </div>
-        <div class="region">
-          <div class="region-code">AMA</div>
-          <div class="region-name">Amarillo</div>
-          <div class="region-status">Growing</div>
-        </div>
-        <div class="region active">
-          <div class="region-code">MFE</div>
-          <div class="region-name">McAllen</div>
-          <div class="region-status">Active</div>
-        </div>
-        <div class="region">
-          <div class="region-code">SJT</div>
-          <div class="region-name">San Angelo</div>
-          <div class="region-status">Growing</div>
-        </div>
-        <div class="region">
-          <div class="region-code">TXK</div>
-          <div class="region-name">Texarkana</div>
-          <div class="region-status">Growing</div>
-        </div>
-        <div class="region active">
-          <div class="region-code">TYR</div>
-          <div class="region-name">Tyler–Longview</div>
-          <div class="region-status">Active</div>
-        </div>
-        <div class="region active">
-          <div class="region-code">CRP</div>
-          <div class="region-name">Corpus Christi</div>
-          <div class="region-status">Active</div>
-        </div>
-        <div class="region active">
-          <div class="region-code">ACT</div>
-          <div class="region-name">Waco</div>
-          <div class="region-status">Active</div>
-        </div>
-        <div class="region active">
-          <div class="region-code">LBB</div>
-          <div class="region-name">Lubbock</div>
-          <div class="region-status">Active</div>
-        </div>
-        <div class="region">
-          <div class="region-code">MAF</div>
-          <div class="region-name">Midland–Odessa</div>
-          <div class="region-status">Growing</div>
-        </div>
-        <div class="region">
-          <div class="region-code">DRT</div>
-          <div class="region-name">Del Rio</div>
-          <div class="region-covers">Covers: Del Rio, Brackettville</div>
-          <div class="region-status">New</div>
-        </div>
-        <div class="region">
-          <div class="region-code">UVA</div>
-          <div class="region-name">Uvalde / Winter Garden</div>
-          <div class="region-covers">Covers: Uvalde, Sabinal, Eagle Pass, La Pryor, Crystal City, Carrizo Springs</div>
-          <div class="region-status">New</div>
-        </div>
-        <div class="region">
-          <div class="region-code">LRD</div>
-          <div class="region-name">Laredo</div>
-          <div class="region-covers">Covers: Laredo, Cotulla</div>
-          <div class="region-status">New</div>
-        </div>
+        {REGIONS.map((r) => (
+          <div class={r.status === 'active' ? 'region active' : 'region'}>
+            <div class="region-code">{r.code}</div>
+            <div class="region-name">{r.name}</div>
+            {r.covers && <div class="region-covers">Covers: {r.covers}</div>}
+            <div class="region-status">{STATUS_LABELS[r.status]}</div>
+          </div>
+        ))}
       </div>
     </div>
   </section>
