@@ -41,7 +41,7 @@ import Callout from '../components/Callout.astro';
 
       <h2>What it takes</h2>
       <ul>
-        <li><strong>One observer.</strong> A MeshCore radio running observer firmware, such as a Heltec V3 (about $20), or an existing repeater reflashed with it.</li>
+        <li><strong>One observer.</strong> A MeshCore radio running agessaman&#39;s MQTT Observer firmware, such as a Heltec V3 (about $20), or an existing repeater reflashed with it.</li>
         <li><strong>Wi-Fi where it sits.</strong> It sends what it hears to our broker over the internet.</li>
         <li><strong>A spot with a good view of your mesh.</strong> The more of your area it hears, the more of your nodes show up. Rooftops and tall buildings work well.</li>
         <li><strong>About 15 minutes</strong> to flash it and enter a few settings.</li>
@@ -67,7 +67,7 @@ import Callout from '../components/Callout.astro';
       <h3>What do you collect, and how long do you keep it?</h3>
       <p>The same packets any radio in range can hear, kept for 7 days. Direct messages and private channels stay encrypted. The <a href="/privacy">Privacy</a> page has the details.</p>
       <h3>We also send to MeshMapper. Does the region code matter?</h3>
-      <p>Yes. Observers running the MeshCore firmware use one region code for every broker, so choose one both networks know. Most Texas codes are shared, but <code>CRP</code> (Corpus Christi), <code>ACT</code> (Waco), <code>MFE</code> (McAllen), <code>DRT</code> (Del Rio), <code>UVA</code> (Uvalde / Winter Garden), and <code>LRD</code> (Laredo) exist only on MeshTexas. If you feed both, use MeshMapper's nearest region. The full list of codes we accept is on <a href="/connect#observer">Connect</a>.</p>
+      <p>Yes. Most Texas codes are shared, but <code>CRP</code> (Corpus Christi), <code>ACT</code> (Waco), <code>DRT</code> (Del Rio), <code>UVA</code> (Uvalde / Winter Garden), and <code>LRD</code> (Laredo) exist only on MeshTexas. If you feed both networks from one of those areas, give each broker its own code. The beta channel of agessaman&#39;s MQTT Observer firmware can do that, and so can meshcoretomqtt and meshcore-packet-capture. On the stable release of agessaman&#39;s firmware, one code goes to every broker, so use MeshMapper's nearest region. Setup steps and the full list of codes we accept are on <a href="/connect#observer">Connect</a>.</p>
       <h3>We already run our own map. Can we still connect?</h3>
       <p>Yes. Your observers can send to more than one broker at a time, and we can also give your group access to ours for your own map. See <a href="/about#other-regions">Working With Other Regions</a>.</p>
       <h3>New to MeshCore altogether?</h3>

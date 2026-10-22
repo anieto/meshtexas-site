@@ -59,7 +59,13 @@ import Callout from '../components/Callout.astro';
       </Callout>
 
       <Callout variant="region-note" icon="i" heading="Also sending to MeshMapper?">
-        <p>Observers running the MeshCore firmware use one region code for every broker they send to, so pick a code that exists on both networks. <code>CRP</code>, <code>ACT</code>, <code>MFE</code>, <code>DRT</code>, <code>UVA</code>, and <code>LRD</code> are MeshTexas-only regions; MeshMapper doesn't have them. If you also feed MeshMapper, use its nearest region instead. meshcoretomqtt and meshcore-packet-capture can set a different code per broker (see their tabs below).</p>
+        <p><code>CRP</code>, <code>ACT</code>, <code>DRT</code>, <code>UVA</code>, and <code>LRD</code> are MeshTexas-only regions; MeshMapper doesn't have them. If your observer feeds both networks, it needs a different code for each broker:</p>
+        <ul>
+          <li><strong>agessaman&#39;s MQTT Observer firmware, beta channel:</strong> set <code>mqtt.iata</code> to MeshMapper's nearest region, then give the MeshTexas slot its own code with <code>set mqttN.iata</code> (see step 8 below).</li>
+          <li><strong>agessaman&#39;s MQTT Observer firmware, stable release:</strong> one code goes to every broker, so use MeshMapper's nearest region.</li>
+          <li><strong>meshcoretomqtt and meshcore-packet-capture:</strong> set a code per broker (see their tabs below).</li>
+        </ul>
+        <p>Standard MeshCore firmware from meshcore-dev doesn't publish to MQTT brokers on its own. Observers use one of the three options above.</p>
       </Callout>
 
       <h3 class="setup-heading">Setup Instructions</h3>
@@ -67,13 +73,13 @@ import Callout from '../components/Callout.astro';
 
       <div class="device-tabs">
         <div class="tab-buttons" role="tablist">
-          <button class="tab-btn active" data-tab="firmware" role="tab" aria-selected="true">MeshCore Firmware</button>
+          <button class="tab-btn active" data-tab="firmware" role="tab" aria-selected="true">agessaman Observer Firmware</button>
           <button class="tab-btn" data-tab="mctomqtt" role="tab" aria-selected="false">meshcoretomqtt</button>
           <button class="tab-btn" data-tab="pktcapture" role="tab" aria-selected="false">meshcore-packet-capture</button>
         </div>
 
         <div class="tab-pane active" id="tab-firmware" role="tabpanel">
-          <p class="device-compat">For <strong>Heltec V3/V4, T-LoRa, Tracker, and any ESP32-based board</strong> running the <a href="https://github.com/agessaman/MeshCore" target="_blank" rel="noopener">agessaman MeshCore firmware</a> with MQTT bridge support.</p>
+          <p class="device-compat">For <strong>Heltec V3/V4, T-LoRa, Tracker, and any ESP32-based board</strong> running <a href="https://github.com/agessaman/MeshCore" target="_blank" rel="noopener">agessaman&#39;s MQTT Observer firmware</a>, a community build of MeshCore with MQTT broker support. Standard MeshCore firmware won't work here.</p>
           <ol class="steps">
             <li>
               <strong>New device, or reflashing?</strong> Already running the agessaman firmware? Skip to the next step.
@@ -152,6 +158,18 @@ set mqtt1.server mqtt.meshtexas.org
 set mqtt1.port 443
 set mqtt1.audience mqtt.meshtexas.org
 reboot</code></pre>
+                </div>
+              </details>
+            </li>
+            <li>
+              <strong>Optional: use a MeshTexas-only code on this slot.</strong> If your area's code isn't on MeshMapper (<code>CRP</code>, <code>ACT</code>, <code>DRT</code>, <code>UVA</code>, <code>LRD</code>) and you also feed MeshMapper, leave <code>mqtt.iata</code> on MeshMapper's nearest region and set this slot's code separately. Replace <code>mqtt1</code> with your slot:
+              <pre><code>set mqtt1.iata UVA
+get mqtt1.iata</code></pre>
+              The slot reconnects by itself. To go back to using <code>mqtt.iata</code>, run <code>set mqtt1.iata</code> with no code.
+              <details class="hint-collapsible">
+                <summary>Needs the beta channel of agessaman&#39;s MQTT Observer firmware</summary>
+                <div class="hint-body">
+                  <p>Per-slot codes are a feature of agessaman&#39;s MQTT Observer firmware, not standard MeshCore firmware. They're in its <a href="https://github.com/agessaman/MeshCore/releases/tag/observer-mqtt-beta-latest" target="_blank" rel="noopener">observer-mqtt-beta-latest</a> builds from October 21, 2026 on, and aren't in its stable release yet. A node flashed from the beta channel keeps getting beta updates over the air until you re-flash it by cable. On older builds, <code>set mqtt1.iata</code> returns an error and nothing changes.</p>
                 </div>
               </details>
             </li>

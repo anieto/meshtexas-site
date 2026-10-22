@@ -731,6 +731,15 @@ code {
   color: var(--text-muted);
 }
 
+.region-note-content ul {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+  padding-left: 18px;
+}
+
+.region-note-content li strong { font-size: inherit; }
+
 pre {
   background: var(--bg-3);
   border: 1px solid var(--border);
