@@ -34,10 +34,11 @@ import Layout from '../components/Layout.astro';
       </ul>
       <p><strong>Packets are deleted after 7 days.</strong> A node that hasn't been heard for 7 days is marked inactive. Its basic listing (name, key, last location) stays until it's heard again or removed.</p>
       <p>The <code>MeshTexasBot</code> bot keeps its own records on the same schedule: messages, paths, and advert statistics are deleted after 7 days.</p>
-      <p>This data is public by nature: anyone with a radio in range can receive it, and other sites archive it too. Deleting our copy doesn't make it private. <strong>Treat public channels as public.</strong></p>
+      <p>This data is public by nature: anyone with a radio in range can receive it, and other sites archive it too. Deleting our copy doesn't make it private. <strong>Treat public channels as public.</strong> For how to keep a conversation private, see <a href="/learn/is-the-mesh-private/">Is the Mesh Private?</a></p>
 
       <h2>Observers</h2>
       <p>If you run an observer, it connects to our MQTT broker. The broker's logs include your observer's IP address and are overwritten within hours. The broker also keeps a small trust record for each observer's public key, used to block misbehaving clients, which doesn't include IP addresses. Observers also appear on the analyzer with their name and region.</p>
+      <p>Observers only listen. They report what they hear to the broker and never send anything back onto the mesh, so they don't connect the mesh to the internet. See <a href="/learn/is-the-mesh-private/#what-observers-do-and-dont-do">what observers do (and don't do)</a>.</p>
 
       <h2>Accounts and forms</h2>
       <ul>
