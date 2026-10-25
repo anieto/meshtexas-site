@@ -1086,12 +1086,29 @@ footer a:hover { color: var(--text); }
   background: var(--bg-2);
   border-bottom: 1px solid var(--border);
   position: sticky;
-  top: 57px;
+  top: var(--header-h, 57px);
   z-index: 99;
 }
 
 .mobile-nav.open {
   display: flex;
+}
+
+/* The menu is taller than a phone screen, and a sticky element taller than
+   the viewport can't be scrolled: cap it, scroll it on its own, and keep the
+   page behind it still while it's open. */
+@media (max-width: 640px) {
+  .mobile-nav {
+    max-height: calc(100vh - var(--header-h, 57px));
+    max-height: calc(100dvh - var(--header-h, 57px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  html.mobile-nav-open,
+  html.mobile-nav-open body {
+    overflow: hidden;
+  }
 }
 
 .mobile-nav-link {
