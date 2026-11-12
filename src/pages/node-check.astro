@@ -80,6 +80,10 @@ import Layout from '../components/Layout.astro';
   .nc-btn-primary { background: var(--accent-dim); border-color: var(--accent-dim); color: #fff; padding: 10px 22px; font-size: 0.95rem; }
   .nc-btn-primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
   .nc-btn:disabled { opacity: 0.6; cursor: progress; }
+  .nc-btn-live { border-color: var(--accent); color: var(--accent); }
+  .nc-btn-live::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .nc-btn-live:hover { background: var(--accent-dim); border-color: var(--accent-dim); color: #fff; }
+  #nc-result [hidden] { display: none !important; }
   .nc-linkish { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; }
   .nc-linkish:hover { text-decoration: underline; }
 
@@ -201,6 +205,7 @@ import Layout from '../components/Layout.astro';
   .nc-footnote { margin-top: 10px; font-size: 0.8rem; color: var(--text-muted); }
 
   /* Live test */
+  .nc-live { scroll-margin-top: 90px; }
   .nc-live-steps { margin: 0 0 18px; padding-left: 20px; color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; }
   .nc-live-steps strong { color: var(--text); font-weight: 600; }
   .nc-live-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
@@ -239,7 +244,7 @@ import Layout from '../components/Layout.astro';
     .nc-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .nc-row { grid-template-columns: minmax(0, 1fr) auto; }
     .nc-row .nc-signal { grid-column: 1 / -1; }
-    .nc-actions { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+    .nc-actions { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
     .nc-actions .nc-btn { padding: 8px 6px; }
   }
 </style>
@@ -501,7 +506,7 @@ import Layout from '../components/Layout.astro';
     );
   }
 
-  function livePanel(key: string, nodeName: string | null) {
+  function livePanel(key: string, nodeName: string | null, { autoStart = false, onClose }: { autoStart?: boolean; onClose?: () => void } = {}) {
     const panel = el('div', { class: 'nc-panel nc-live' });
     const intro = () => {
       const start = el('button', { type: 'button', class: 'nc-btn nc-btn-primary' }, 'Start live test');
@@ -531,7 +536,9 @@ import Layout from '../components/Layout.astro';
       const time = el('span', { class: 'nc-live-time' }, clock(LIVE_SECONDS));
       const bar = el('span', { style: 'width:100%' });
       const stop = el('button', { type: 'button', class: 'nc-btn' }, 'Stop');
-      const note = el('p', { class: 'nc-live-note' }, 'Send your flood advert now. Reports usually arrive within a few seconds.');
+      const note = el('p', { class: 'nc-live-note' },
+        'Send a flood advert now: in the MeshCore app, send an advert and choose Flood; on a repeater or room server, run ',
+        el('code', {}, 'advert'), '. Reports usually arrive within a few seconds.');
       const resultBox = el('div', { class: 'nc-live-result', hidden: '' });
       panel.className = 'nc-panel nc-live listening';
       panel.replaceChildren(
@@ -598,7 +605,13 @@ import Layout from '../components/Layout.astro';
         time.textContent = '';
         const again = el('button', { type: 'button', class: 'nc-btn' }, 'Run again');
         again.addEventListener('click', () => begin());
-        stop.replaceWith(again);
+        if (onClose) {
+          const close = el('button', { type: 'button', class: 'nc-btn' }, 'Close');
+          close.addEventListener('click', onClose);
+          stop.replaceWith(again, close);
+        } else {
+          stop.replaceWith(again);
+        }
         if (heard) {
           panel.className = 'nc-panel nc-live done-heard';
           status.lastChild!.textContent = `Heard by ${heard.observers.length} observer${heard.observers.length === 1 ? '' : 's'} in ${heard.regions.length} region${heard.regions.length === 1 ? '' : 's'}`;
@@ -639,7 +652,8 @@ import Layout from '../components/Layout.astro';
       stopLive = () => finish(true);
     }
 
-    intro();
+    if (autoStart) begin();
+    else intro();
     return panel;
   }
 
@@ -665,6 +679,23 @@ import Layout from '../components/Layout.astro';
     const again = el('button', { type: 'button', class: 'nc-btn' }, 'Check again');
     again.addEventListener('click', () => run(report.node.key));
 
+    // The live test stays out of the way until asked for, then opens under
+    // the summary, already listening.
+    const liveSlot = el('div', { hidden: '' });
+    const closeLive = () => {
+      stopLive?.();
+      liveSlot.replaceChildren();
+      liveSlot.hidden = true;
+      liveButton.focus();
+    };
+    const liveButton = el('button', { type: 'button', class: 'nc-btn nc-btn-live' }, 'Live test');
+    liveButton.addEventListener('click', () => {
+      stopLive?.();
+      liveSlot.replaceChildren(livePanel(report.node.key, report.node.name, { autoStart: true, onClose: closeLive }));
+      liveSlot.hidden = false;
+      (liveSlot.firstElementChild as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
     const advert = report.latestAdvert;
     const heard = advert?.observers || [];
     const nearest = heard.length ? heard[0].hops : null;
@@ -680,6 +711,7 @@ import Layout from '../components/Layout.astro';
           ),
         ),
         el('div', { class: 'nc-actions' },
+          liveButton,
           again,
           copy,
           el('a', { class: 'nc-btn', href: report.analyzerUrl, target: '_blank', rel: 'noopener' }, 'Analyzer ↗'),
@@ -695,7 +727,7 @@ import Layout from '../components/Layout.astro';
       ),
     );
 
-    const parts: Node[] = [summary, livePanel(report.node.key, report.node.name), findingsPanel(report.findings)];
+    const parts: Node[] = [summary, liveSlot, findingsPanel(report.findings)];
     if (heard.length) {
       parts.push(el('div', { class: 'nc-panel' },
         el('div', { class: 'nc-panel-head' },
