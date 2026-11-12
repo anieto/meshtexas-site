@@ -509,7 +509,7 @@ const REGIONS = [
             (document.getElementById('field-contact-info') as HTMLInputElement).value = contactInfoValue;
             (document.getElementById('field-name') as HTMLInputElement).focus();
 
-            statusEl!.textContent = 'Repeater added — thanks! Add another below, or close this form when done.';
+            statusEl!.innerHTML = 'Repeater added — thanks! Add another below, or close this form when done. To see which observers hear it, run a <a href="/node-check">Node Check</a>.';
             statusEl!.className = 'registry-form-status success';
           })
           .catch(function () {

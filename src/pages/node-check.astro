@@ -1,0 +1,366 @@
+---
+import Layout from '../components/Layout.astro';
+---
+<Layout
+  title="Node Check — MeshTexas"
+  description="Is your MeshCore node getting out? See which observers hear it across Texas, and what to fix if something's wrong."
+>
+  <div class="page-intro">
+    <div class="container-narrow">
+      <h1>Node Check</h1>
+      <p class="hero-sub">Is your node getting out? Enter its name or public key to see which observers across Texas hear it, and what to fix if something looks wrong.</p>
+    </div>
+  </div>
+
+  <section class="about-section nc-section">
+    <div class="container-narrow">
+      <form class="nc-form" id="nc-form" role="search">
+        <label for="nc-query" class="nc-label">Node name, public key, or shared contact link</label>
+        <div class="nc-input-row">
+          <input id="nc-query" name="q" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+            placeholder="e.g. My Repeater, or 292c9cdb…" required maxlength="300">
+          <button type="submit" class="btn btn-accent" id="nc-submit">Check</button>
+        </div>
+        <p class="nc-mine" id="nc-mine" hidden></p>
+      </form>
+
+      <div id="nc-result" aria-live="polite"></div>
+
+      <details class="hint-collapsible nc-help">
+        <summary>Where do I find my node's public key?</summary>
+        <div class="hint-body">
+          <p>In the MeshCore app, a companion's public key is in its settings. For a repeater or room server, it's shown when you log in to manage it. You can also share the node as a contact and paste the link here.</p>
+          <p>The first 8 or more characters of the key are enough. Names work too, but several nodes can share a name.</p>
+        </div>
+      </details>
+      <details class="hint-collapsible nc-help">
+        <summary>How do I send a flood advert?</summary>
+        <div class="hint-body">
+          <p>A flood advert is relayed by every repeater that hears it, so it shows how far your node really reaches. A zero-hop advert only reaches radios in direct range.</p>
+          <p>In the MeshCore app, send an advert and choose Flood. On a repeater or room server, use the <code>advert</code> command. Give it a minute to reach the observers, then check again.</p>
+        </div>
+      </details>
+      <p class="nc-footnote">Results come from the <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener">MeshTexas analyzer ↗</a>, which only hears what reaches one of its observers. They update about every 30 seconds.</p>
+    </div>
+  </section>
+</Layout>
+
+<style is:global>
+  .nc-section { padding-top: 0; }
+  .nc-form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; }
+  .nc-label {
+    font-size: 0.8rem; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .nc-input-row { display: flex; gap: 10px; }
+  .nc-input-row input {
+    flex: 1; min-width: 0;
+    padding: 10px 12px; font-size: 1rem;
+    background: var(--bg-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: var(--radius);
+  }
+  .nc-input-row input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .nc-input-row .btn { border: 0; cursor: pointer; font: inherit; font-weight: 500; }
+  .nc-input-row .btn:disabled { opacity: 0.6; cursor: progress; }
+  .nc-mine { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
+  .nc-mine button, .nc-linkish {
+    background: none; border: 0; padding: 0; font: inherit;
+    color: var(--accent); cursor: pointer;
+  }
+  .nc-mine button:hover, .nc-linkish:hover { text-decoration: underline; }
+
+  .nc-card {
+    --nc-tone: var(--accent);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--nc-tone);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin-bottom: 20px;
+  }
+  .nc-card.good { --nc-tone: var(--green); }
+  .nc-card.warn { --nc-tone: var(--amber); }
+  .nc-card.bad { --nc-tone: #f85149; }
+  [data-theme="light"] .nc-card.bad { --nc-tone: #cf222e; }
+  .nc-node {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px;
+    font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;
+  }
+  .nc-node strong { color: var(--text); font-size: 1rem; }
+  .nc-role {
+    text-transform: capitalize; font-size: 0.75rem;
+    padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border);
+  }
+  .nc-headline { font-size: 1.35rem; margin: 4px 0 14px; color: var(--nc-tone); }
+
+  .nc-findings { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .nc-finding { display: grid; grid-template-columns: 22px 1fr; gap: 0 10px; }
+  .nc-dot {
+    width: 12px; height: 12px; border-radius: 50%; margin-top: 5px;
+    background: var(--text-muted);
+  }
+  .nc-finding.good .nc-dot { background: var(--green); }
+  .nc-finding.warn .nc-dot { background: var(--amber); }
+  .nc-finding.bad .nc-dot { background: #f85149; }
+  [data-theme="light"] .nc-finding.bad .nc-dot { background: #cf222e; }
+  .nc-finding.info .nc-dot { background: transparent; border: 2px solid var(--text-muted); }
+  .nc-finding-title { font-weight: 600; }
+  .nc-finding p { grid-column: 2; margin: 2px 0 0; font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+  .nc-finding .nc-fix { color: var(--text); }
+  .nc-finding .nc-fix::before { content: 'What to do: '; font-weight: 600; }
+
+  .nc-actions { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 18px; font-size: 0.9rem; }
+
+  .nc-heard h3 { font-size: 1rem; margin: 26px 0 4px; }
+  .nc-heard .nc-sub { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 10px; }
+  .nc-table-wrap { overflow-x: auto; }
+  .nc-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .nc-table th {
+    text-align: left; font-weight: 500; font-size: 0.75rem; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 6px 10px; border-bottom: 1px solid var(--border);
+  }
+  .nc-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  .nc-table td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .nc-region { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; }
+
+  .nc-choices { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-direction: column; gap: 8px; }
+  .nc-choices button {
+    width: 100%; text-align: left; cursor: pointer; font: inherit; color: var(--text);
+    background: var(--bg-3); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline;
+  }
+  .nc-choices button:hover { border-color: var(--accent); }
+  .nc-choices .nc-meta { font-size: 0.8rem; color: var(--text-muted); }
+
+  .nc-help { margin-top: 12px; }
+  .nc-footnote { margin-top: 22px; font-size: 0.8rem; color: var(--text-muted); }
+  .nc-loading { color: var(--text-muted); }
+  .nc-notfound p { margin: 0 0 8px; line-height: 1.6; }
+
+  @media (max-width: 640px) {
+    .nc-input-row { flex-direction: column; }
+    .nc-card { padding: 16px; }
+    .nc-table th:nth-child(4), .nc-table td:nth-child(4) { display: none; }
+  }
+</style>
+
+<script>
+  type Finding = { level: string; title: string; detail: string; fix: string | null };
+  type Observer = { name: string; region: string | null; hops?: number | null; snr: number | null; rssi: number | null; packets?: number | null };
+  type Report = {
+    status: 'ok';
+    node: { key: string; name: string; role: string; lastHeard: string | null };
+    verdict: { level: string; headline: string };
+    findings: Finding[];
+    latestAdvert: { at: string | null; kind: string | null; observers: Observer[]; regions: string[] } | null;
+    direct: Observer[];
+    analyzerUrl: string;
+  };
+  type Response =
+    | Report
+    | { status: 'not_found'; query: string; findings: Finding[] }
+    | { status: 'choose'; query: string; matches: { key: string; name: string; role: string; lastHeard: string | null }[] }
+    | { status: 'ambiguous' | 'error'; message: string };
+
+  const STORAGE_KEY = 'meshtexas-node-check';
+  const form = document.getElementById('nc-form') as HTMLFormElement;
+  const input = document.getElementById('nc-query') as HTMLInputElement;
+  const submit = document.getElementById('nc-submit') as HTMLButtonElement;
+  const result = document.getElementById('nc-result') as HTMLElement;
+  const mine = document.getElementById('nc-mine') as HTMLElement;
+
+  function el<K extends keyof HTMLElementTagNameMap>(tag: K, props: Record<string, string> = {}, ...children: (Node | string | null)[]) {
+    const node = document.createElement(tag);
+    for (const [key, value] of Object.entries(props)) {
+      if (key === 'class') node.className = value;
+      else node.setAttribute(key, value);
+    }
+    for (const child of children) if (child != null) node.append(child);
+    return node;
+  }
+
+  function relative(iso: string | null) {
+    if (!iso) return 'unknown';
+    const diff = Math.max(0, Date.now() - Date.parse(iso));
+    const minutes = Math.round(diff / 60000);
+    if (minutes < 2) return 'just now';
+    if (minutes < 60) return `${minutes} min ago`;
+    const hours = Math.round(minutes / 60);
+    if (hours < 24) return `${hours} h ago`;
+    return `${Math.round(hours / 24)} d ago`;
+  }
+
+  function signal(o: Observer) {
+    const snr = o.snr == null ? '' : `${o.snr > 0 ? '+' : ''}${o.snr} dB`;
+    const rssi = o.rssi == null ? '' : `${o.rssi} dBm`;
+    return [snr, rssi].filter(Boolean).join(' · ') || '—';
+  }
+
+  function remembered(): { key: string; name: string } | null {
+    try {
+      const value = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+      return value && typeof value.key === 'string' ? value : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function remember(key: string, name: string) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ key, name })); } catch {}
+    showMine();
+  }
+
+  function showMine() {
+    const saved = remembered();
+    if (!saved) { mine.hidden = true; return; }
+    const again = el('button', { type: 'button' }, `Check ${saved.name} again`);
+    again.addEventListener('click', () => run(saved.key));
+    mine.replaceChildren('Your last check: ', again);
+    mine.hidden = false;
+  }
+
+  function findingsList(findings: Finding[]) {
+    return el('ul', { class: 'nc-findings' }, ...findings.map((f) =>
+      el('li', { class: `nc-finding ${f.level}` },
+        el('span', { class: 'nc-dot', 'aria-hidden': 'true' }),
+        el('span', { class: 'nc-finding-title' }, f.title),
+        el('p', {}, f.detail),
+        f.fix ? el('p', { class: 'nc-fix' }, f.fix) : null,
+      )
+    ));
+  }
+
+  function table(headers: string[], rows: (string | Node)[][]) {
+    return el('div', { class: 'nc-table-wrap' },
+      el('table', { class: 'nc-table' },
+        el('thead', {}, el('tr', {}, ...headers.map((h) => el('th', {}, h)))),
+        el('tbody', {}, ...rows.map((cells) => el('tr', {}, ...cells.map((c, i) => el('td', i >= 2 ? { class: 'num' } : {}, c))))),
+      ));
+  }
+
+  function renderReport(report: Report) {
+    const shareUrl = `${location.origin}/node-check/${report.node.key.slice(0, 16)}`;
+    const copy = el('button', { type: 'button', class: 'nc-linkish' }, 'Copy link to this check');
+    copy.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        copy.textContent = 'Link copied';
+      } catch {
+        copy.textContent = shareUrl;
+      }
+    });
+    const again = el('button', { type: 'button', class: 'nc-linkish' }, 'Check again');
+    again.addEventListener('click', () => run(report.node.key));
+
+    const card = el('div', { class: `nc-card ${report.verdict.level}` },
+      el('div', { class: 'nc-node' },
+        el('strong', {}, report.node.name),
+        el('span', { class: 'nc-role' }, report.node.role),
+        el('span', {}, `${report.node.key.slice(0, 8)}…`),
+      ),
+      el('h2', { class: 'nc-headline' }, report.verdict.headline),
+      findingsList(report.findings),
+      el('div', { class: 'nc-actions' },
+        again,
+        copy,
+        el('a', { href: report.analyzerUrl, target: '_blank', rel: 'noopener' }, 'See full stats in the analyzer ↗'),
+      ),
+    );
+
+    const parts: Node[] = [card];
+    const advert = report.latestAdvert;
+    if (advert && advert.observers.length) {
+      parts.push(el('div', { class: 'nc-heard' },
+        el('h3', {}, advert.kind === 'flood' ? 'Who heard its last flood advert' : 'Who heard its last advert'),
+        el('p', { class: 'nc-sub' }, `Sent ${relative(advert.at)}. Closest observers first; 0 hops means the observer heard it directly.`),
+        table(['Observer', 'Region', 'Hops', 'Signal'], advert.observers.map((o) => [
+          o.name,
+          el('span', { class: 'nc-region' }, o.region || '—'),
+          o.hops == null ? '—' : String(o.hops),
+          signal(o),
+        ])),
+      ));
+    }
+    if (report.direct.length) {
+      parts.push(el('div', { class: 'nc-heard' },
+        el('h3', {}, 'Observers that hear it directly'),
+        el('p', { class: 'nc-sub' }, 'Average signal of everything they\'ve heard straight from this node.'),
+        table(['Observer', 'Region', 'Packets', 'Signal'], report.direct.map((o) => [
+          o.name,
+          el('span', { class: 'nc-region' }, o.region || '—'),
+          o.packets == null ? '—' : String(o.packets),
+          signal(o),
+        ])),
+      ));
+    }
+    result.replaceChildren(...parts);
+    remember(report.node.key, report.node.name);
+  }
+
+  function renderMessage(level: string, headline: string, body: Node | string) {
+    result.replaceChildren(el('div', { class: `nc-card ${level}` }, el('h2', { class: 'nc-headline' }, headline), body));
+  }
+
+  function render(data: Response) {
+    switch (data.status) {
+      case 'ok':
+        renderReport(data);
+        break;
+      case 'not_found':
+        renderMessage('bad', 'We haven\'t heard this node', el('div', { class: 'nc-notfound' },
+          ...data.findings.flatMap((f) => [el('p', {}, f.detail), f.fix ? el('p', {}, f.fix) : null]),
+        ));
+        break;
+      case 'choose': {
+        const list = el('ul', { class: 'nc-choices' }, ...data.matches.map((m) => {
+          const button = el('button', { type: 'button' },
+            el('strong', {}, m.name),
+            el('span', { class: 'nc-meta' }, `${m.role} · ${m.key.slice(0, 8)}… · last heard ${relative(m.lastHeard)}`),
+          );
+          button.addEventListener('click', () => run(m.key));
+          return el('li', {}, button);
+        }));
+        renderMessage('info', 'Which node is yours?', el('div', {},
+          el('p', {}, `More than one node matches “${data.query}”. Pick yours, or enter its public key.`),
+          list,
+        ));
+        break;
+      }
+      default:
+        renderMessage('warn', data.status === 'ambiguous' ? 'Enter more of the key' : 'Something went wrong', el('p', {}, data.message));
+    }
+  }
+
+  async function run(query: string) {
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    input.value = /^[0-9a-f]{8,64}$/i.test(trimmed) ? trimmed.slice(0, 16) : trimmed;
+    submit.disabled = true;
+    result.replaceChildren(el('p', { class: 'nc-loading' }, 'Checking…'));
+    try {
+      const response = await fetch(`/api/node-check?q=${encodeURIComponent(trimmed)}`);
+      const data = (await response.json()) as Response;
+      render(data);
+      if (data.status === 'ok') {
+        history.replaceState(null, '', `/node-check/${data.node.key.slice(0, 16)}`);
+      }
+    } catch {
+      render({ status: 'error', message: 'Couldn\'t reach the server. Check your connection and try again.' });
+    } finally {
+      submit.disabled = false;
+    }
+  }
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    run(input.value);
+  });
+
+  showMine();
+  // /node-check/<key> opens straight to that node's check.
+  const fromPath = location.pathname.match(/^\/node-check\/([0-9a-fA-F]{8,64})\/?$/);
+  const fromQuery = new URLSearchParams(location.search).get('q');
+  if (fromPath) run(fromPath[1]);
+  else if (fromQuery) run(fromQuery);
+</script>

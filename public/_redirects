@@ -1,0 +1,2 @@
+# /node-check/<key> is a shareable check; the page reads the key from the URL.
+/node-check/*  /node-check/  200
