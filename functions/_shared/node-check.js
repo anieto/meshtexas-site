@@ -114,9 +114,9 @@ export function buildReport({ detail, health, skew, observers }, now = Date.now(
   // Last heard.
   const quiet = lastHeard == null ? Infinity : now - lastHeard;
   if (INFRASTRUCTURE.has(role)) {
-    // Repeaters show up whenever they relay; room servers mostly only through
-    // their own adverts, which can be half a day apart.
-    const quietAfter = role === 'room' ? DAY : 12 * HOUR;
+    // Quiet after a day for both. Room servers get longer before counting as
+    // silent, since they're mostly heard only through their own adverts.
+    const quietAfter = DAY;
     const silentAfter = role === 'room' ? 3 * DAY : 2 * DAY;
     if (quiet <= quietAfter) {
       add('good', `Heard ${ago(lastHeard, now)}`, 'Observers are hearing this node regularly.');
@@ -124,7 +124,7 @@ export function buildReport({ detail, health, skew, observers }, now = Date.now(
       add('warn', `Quiet: last heard ${ago(lastHeard, now)}`,
         role === 'room'
           ? 'A working room server usually sends an advert at least twice a day.'
-          : 'A working repeater usually turns up every few hours, from its own adverts or the traffic it relays.',
+          : 'A working repeater usually turns up at least once a day, from its own adverts or the traffic it relays.',
         'Check that it still has power and its antenna is connected. If it runs on solar, check the battery.');
     } else {
       add('bad', lastHeard == null ? 'No recent traffic' : `Not heard for ${ago(lastHeard, now).replace(' ago', '')}`,
