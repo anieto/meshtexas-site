@@ -191,13 +191,13 @@ export function buildReport({ detail, health, skew, observers }, now = Date.now(
   if (severity === 'warning' || severity === 'critical') {
     add('warn', `Clock is off by ${describeOffset(offset)}`,
       'Nodes with the wrong time can have their adverts treated as old.',
-      'Sync the clock from the MeshCore app, or with the `clock sync` command.');
+      'Sync the clock from the MeshCore app, or by running "clock sync" on the node.');
   } else if (severity === 'absurd' || severity === 'no_clock' || severity === 'bimodal_clock') {
     add('warn', severity === 'bimodal_clock' ? 'Clock keeps jumping' : 'Clock isn\'t set',
       severity === 'bimodal_clock'
         ? 'Its clock sometimes reads right and sometimes far off, which usually means it loses time on restart.'
         : 'Its clock is far from the real time, as if it was never set.',
-      'Sync the clock from the MeshCore app, or with the `clock sync` command.');
+      'Sync the clock from the MeshCore app, or by running "clock sync" on the node.');
   } else if (severity === 'ok' && INFRASTRUCTURE.has(role)) {
     add('good', 'Clock is right', 'Its clock is within a few minutes of the real time.');
   }
