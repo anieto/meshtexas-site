@@ -1,44 +1,7 @@
 import { parseQuery, buildReport, notFound } from '../_shared/node-check.js';
+import { json, analyzer, observerList } from '../_shared/analyzer.js';
 
-const ANALYZER = 'https://analyzer.meshtexas.org/api';
 const CACHE_SECONDS = 30;
-
-function json(body, status = 200, cacheSeconds = 0) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      'content-type': 'application/json;charset=UTF-8',
-      'cache-control': cacheSeconds ? `public, max-age=${cacheSeconds}` : 'no-store',
-    },
-  });
-}
-
-async function analyzer(path, { optional = false } = {}) {
-  const response = await fetch(ANALYZER + path, {
-    headers: { accept: 'application/json', 'user-agent': 'meshtexas.org node-check' },
-    signal: AbortSignal.timeout(8000),
-  });
-  if (response.status === 404 && optional) return null;
-  if (response.status === 404) return { notFound: true };
-  if (response.status === 409) return { ambiguous: true };
-  if (!response.ok) throw new Error(`analyzer ${path} returned ${response.status}`);
-  return response.json();
-}
-
-// The observer list changes slowly and is needed for every check, so it's
-// cached at the edge for five minutes.
-async function observerList(context) {
-  const cache = caches.default;
-  const cacheKey = new Request('https://meshtexas.org/__node-check/observers');
-  const hit = await cache.match(cacheKey);
-  if (hit) return hit.json();
-  const body = await analyzer('/observers');
-  const list = (Array.isArray(body) ? body : body.observers || []).map((o) => ({ id: o.id, iata: o.iata || null }));
-  context.waitUntil(cache.put(cacheKey, new Response(JSON.stringify(list), {
-    headers: { 'content-type': 'application/json', 'cache-control': 'public, max-age=300' },
-  })));
-  return list;
-}
 
 async function check(context, key) {
   const [detail, health, skew, observers] = await Promise.all([

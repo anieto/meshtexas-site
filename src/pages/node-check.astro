@@ -200,7 +200,40 @@ import Layout from '../components/Layout.astro';
   .nc-help .nc-group-title { margin-bottom: 2px; }
   .nc-footnote { margin-top: 10px; font-size: 0.8rem; color: var(--text-muted); }
 
+  /* Live test */
+  .nc-live-steps { margin: 0 0 18px; padding-left: 20px; color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; }
+  .nc-live-steps strong { color: var(--text); font-weight: 600; }
+  .nc-live-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+  .nc-live-status { font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .nc-pulse { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex: none; }
+  .nc-live.listening .nc-pulse { animation: nc-pulse 1.4s ease-in-out infinite; }
+  .nc-live.heard .nc-pulse, .nc-live.done-heard .nc-pulse { background: var(--green); }
+  .nc-live.done-quiet .nc-pulse { background: var(--amber); }
+  @keyframes nc-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.8); } }
+  @media (prefers-reduced-motion: reduce) { .nc-live.listening .nc-pulse { animation: none; } }
+  .nc-live-time { margin-left: auto; font-size: 0.85rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .nc-progress { height: 4px; border-radius: 2px; background: var(--bg-3); overflow: hidden; margin: 14px 0 0; }
+  .nc-progress span { display: block; height: 100%; background: var(--accent); transition: width 1s linear; }
+  .nc-live-note { margin: 12px 0 0; font-size: 0.875rem; color: var(--text-muted); line-height: 1.55; }
+  .nc-live-result { margin-top: 18px; }
+  .nc-live-result .nc-stats { margin-top: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .nc-map {
+    height: 300px; margin: 18px 0; border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--border); background: var(--bg-3); z-index: 0;
+  }
+  .nc-map .leaflet-tooltip { font: inherit; font-size: 0.8rem; }
+  /* OpenStreetMap has no dark tiles; invert them so the map matches dark mode. */
+  [data-theme="dark"] .nc-map .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9); }
+  .nc-map-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.8rem; color: var(--text-muted); margin: -10px 0 16px; }
+  .nc-map-legend .nc-legend-node::before { background: #fff !important; box-shadow: inset 0 0 0 2.5px var(--accent); }
+  .nc-map-legend span::before {
+    content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    margin-right: 6px; vertical-align: -1px; background: var(--dot);
+  }
+
   @media (max-width: 640px) {
+    .nc-live-result .nc-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .nc-map { height: 240px; }
     .nc-search-box { flex-direction: column; }
     .nc-panel { padding: 18px; }
     .nc-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -378,6 +411,238 @@ import Layout from '../components/Layout.astro';
     }));
   }
 
+  // ---- Live test ---------------------------------------------------------
+  type Heard = Observer & { lat?: number | null; lon?: number | null };
+  type Watch =
+    | { status: 'ready' | 'waiting'; mark: number; node: WatchNode | null }
+    | { status: 'heard'; mark: number; node: WatchNode | null; adverts: number; kinds: string[]; observers: Heard[]; regions: string[] }
+    | { status: 'error'; message: string };
+  type WatchNode = { key: string; name: string; lat: number | null; lon: number | null };
+
+  const LIVE_SECONDS = 120;
+  const POLL_MS = 4000;
+  let stopLive: (() => void) | null = null;
+
+  function clock(seconds: number) {
+    const s = Math.max(0, Math.ceil(seconds));
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  }
+
+  let leafletReady: Promise<any> | null = null;
+  function loadLeaflet(): Promise<any> {
+    const w = window as any;
+    if (w.L) return Promise.resolve(w.L);
+    leafletReady ??= new Promise((resolve, reject) => {
+      const css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+      document.head.append(css);
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+      script.onload = () => resolve(w.L);
+      script.onerror = reject;
+      document.head.append(script);
+    });
+    return leafletReady;
+  }
+
+  function cssVar(name: string) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  /** A map of the observers that heard the node, and the node itself when it has a location. */
+  function liveMap(container: HTMLElement) {
+    let map: any = null;
+    let layer: any = null;
+    return async (observers: Heard[], node: WatchNode | null) => {
+      const located = observers.filter((o) => o.lat != null && o.lon != null);
+      const nodeHere = node && node.lat && node.lon ? node : null;
+      if (!located.length && !nodeHere) { container.hidden = true; return; }
+      container.hidden = false;
+      let L: any;
+      try { L = await loadLeaflet(); } catch { container.hidden = true; return; }
+      if (!map) {
+        map = L.map(container, { scrollWheelZoom: false, attributionControl: true });
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 18,
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        }).addTo(map);
+        layer = L.layerGroup().addTo(map);
+      }
+      layer.clearLayers();
+      const green = cssVar('--green');
+      const accent = cssVar('--accent');
+      const points: [number, number][] = [];
+      for (const o of located) {
+        const direct = o.hops === 0;
+        L.circleMarker([o.lat, o.lon], {
+          radius: direct ? 8 : 6, weight: 2, color: '#fff', fillOpacity: 0.95,
+          fillColor: direct ? green : accent,
+        }).bindTooltip(`${o.name} · ${o.hops == null ? '?' : o.hops === 0 ? 'direct' : `${o.hops} hop${o.hops === 1 ? '' : 's'}`}`).addTo(layer);
+        points.push([o.lat as number, o.lon as number]);
+      }
+      if (nodeHere) {
+        L.circleMarker([nodeHere.lat, nodeHere.lon], {
+          radius: 9, weight: 3, color: accent, fillColor: '#fff', fillOpacity: 1,
+        }).bindTooltip(nodeHere.name).addTo(layer);
+        points.push([nodeHere.lat as number, nodeHere.lon as number]);
+      }
+      if (points.length === 1) map.setView(points[0], 11);
+      else map.fitBounds(points, { padding: [28, 28], maxZoom: 12 });
+      setTimeout(() => map.invalidateSize(), 0);
+    };
+  }
+
+  function mapLegend(node: WatchNode | null) {
+    return el('div', { class: 'nc-map-legend' },
+      el('span', { style: `--dot:${cssVar('--green')}` }, 'Heard it directly'),
+      el('span', { style: `--dot:${cssVar('--accent')}` }, 'Heard it through repeaters'),
+      node && node.lat && node.lon ? el('span', { class: 'nc-legend-node' }, 'Your node') : null,
+    );
+  }
+
+  function livePanel(key: string, nodeName: string | null) {
+    const panel = el('div', { class: 'nc-panel nc-live' });
+    const intro = () => {
+      const start = el('button', { type: 'button', class: 'nc-btn nc-btn-primary' }, 'Start live test');
+      start.addEventListener('click', () => begin());
+      panel.className = 'nc-panel nc-live';
+      panel.replaceChildren(
+        el('div', { class: 'nc-panel-head' }, el('h2', {}, 'Live test: did anyone hear me?')),
+        el('p', { class: 'nc-panel-sub' }, `Send a flood advert from ${nodeName || 'your node'} and watch which observers report it, as it happens.`),
+        el('ol', { class: 'nc-live-steps' },
+          el('li', {}, el('strong', {}, 'Start the test'), ' below.'),
+          el('li', {}, el('strong', {}, 'Send a flood advert.'), ' In the MeshCore app, send an advert and choose Flood. On a repeater or room server, run the ', el('code', {}, 'advert'), ' command.'),
+          el('li', {}, el('strong', {}, 'Watch for up to two minutes'), ' as observers report it.'),
+        ),
+        start,
+      );
+    };
+
+    async function watch(after?: number): Promise<Watch> {
+      const query = after == null ? '' : `&after=${after}`;
+      const response = await fetch(`/api/node-watch?key=${encodeURIComponent(key)}${query}`);
+      return response.json();
+    }
+
+    async function begin() {
+      stopLive?.();
+      const status = el('span', { class: 'nc-live-status' }, el('span', { class: 'nc-pulse', 'aria-hidden': 'true' }), 'Starting…');
+      const time = el('span', { class: 'nc-live-time' }, clock(LIVE_SECONDS));
+      const bar = el('span', { style: 'width:100%' });
+      const stop = el('button', { type: 'button', class: 'nc-btn' }, 'Stop');
+      const note = el('p', { class: 'nc-live-note' }, 'Send your flood advert now. Reports usually arrive within a few seconds.');
+      const resultBox = el('div', { class: 'nc-live-result', hidden: '' });
+      panel.className = 'nc-panel nc-live listening';
+      panel.replaceChildren(
+        el('div', { class: 'nc-panel-head' }, el('h2', {}, 'Live test: did anyone hear me?')),
+        el('div', { class: 'nc-live-bar' }, status, time, stop),
+        el('div', { class: 'nc-progress', 'aria-hidden': 'true' }, bar),
+        note,
+        resultBox,
+      );
+
+      let mark: number;
+      try {
+        const first = await watch();
+        if (first.status === 'error') throw new Error(first.message);
+        mark = first.mark;
+      } catch (error) {
+        status.lastChild!.textContent = 'Couldn\'t start the test';
+        note.textContent = error instanceof Error && error.message ? error.message : 'Try again in a moment.';
+        panel.className = 'nc-panel nc-live done-quiet';
+        stop.textContent = 'Back';
+        stop.addEventListener('click', intro);
+        return;
+      }
+
+      status.lastChild!.textContent = 'Listening for your advert…';
+      const started = Date.now();
+      let heard: Extract<Watch, { status: 'heard' }> | null = null;
+      let finished = false;
+      const mapBox = el('div', { class: 'nc-map', hidden: '' });
+      const drawMap = liveMap(mapBox);
+
+      function showHeard(data: Extract<Watch, { status: 'heard' }>) {
+        const count = data.observers.length;
+        const nearest = count ? data.observers[0].hops : null;
+        resultBox.hidden = false;
+        resultBox.replaceChildren(...[
+          el('div', { class: 'nc-stats' },
+            stat('Observers', String(count), 'heard it'),
+            stat('Regions', String(data.regions.length), data.regions.join(', ') || '—'),
+            stat('Nearest', nearest == null ? '—' : nearest === 0 ? 'Direct' : `${nearest} ${nearest === 1 ? 'hop' : 'hops'}`, nearest === 0 ? 'no repeater needed' : 'through repeaters'),
+          ),
+          mapBox,
+          mapBox.hidden ? null : mapLegend(data.node),
+          byRegion(data.observers),
+        ].filter((node): node is HTMLElement => node != null));
+        drawMap(data.observers, data.node).then(() => {
+          const legend = resultBox.querySelector('.nc-map-legend');
+          if (mapBox.hidden) legend?.remove();
+          else if (!legend) mapBox.after(mapLegend(data.node));
+        });
+        const onlyZeroHop = data.kinds.length && data.kinds.every((k) => k !== 'flood');
+        note.textContent = onlyZeroHop
+          ? 'That was a zero-hop advert, so only radios in direct range pass it on. Send a flood advert to see how far it really travels.'
+          : 'More observers may still report it, so keep watching until the timer runs out.';
+      }
+
+      function finish(stopped = false) {
+        if (finished) return;
+        finished = true;
+        clearInterval(timer);
+        clearTimeout(poller);
+        stopLive = null;
+        bar.style.width = '0%';
+        time.textContent = '';
+        const again = el('button', { type: 'button', class: 'nc-btn' }, 'Run again');
+        again.addEventListener('click', () => begin());
+        stop.replaceWith(again);
+        if (heard) {
+          panel.className = 'nc-panel nc-live done-heard';
+          status.lastChild!.textContent = `Heard by ${heard.observers.length} observer${heard.observers.length === 1 ? '' : 's'} in ${heard.regions.length} region${heard.regions.length === 1 ? '' : 's'}`;
+          note.textContent = stopped ? 'Test stopped.' : 'Test complete.';
+        } else {
+          panel.className = 'nc-panel nc-live done-quiet';
+          status.lastChild!.textContent = stopped ? 'Test stopped' : 'Nothing heard in two minutes';
+          note.textContent = stopped ? '' : 'No observer reported an advert from this node. Check that it was a flood advert, that the radio uses the same settings as the rest of Texas (910.525 MHz, 62.5 kHz, SF7, CR5), and that a repeater is in range.';
+        }
+      }
+
+      async function poll() {
+        if (finished) return;
+        try {
+          const data = await watch(mark);
+          if (finished) return;
+          if (data.status === 'heard') {
+            const first = !heard;
+            heard = data;
+            panel.className = 'nc-panel nc-live heard';
+            status.lastChild!.textContent = `Heard! ${data.observers.length} observer${data.observers.length === 1 ? '' : 's'} so far`;
+            if (first || data.observers.length) showHeard(data);
+          }
+        } catch {
+          // Keep listening; a missed poll is caught up by the next one.
+        }
+        if (!finished) poller = window.setTimeout(poll, POLL_MS);
+      }
+
+      const timer = window.setInterval(() => {
+        const left = LIVE_SECONDS - (Date.now() - started) / 1000;
+        time.textContent = `${clock(left)} left`;
+        bar.style.width = `${Math.max(0, (left / LIVE_SECONDS) * 100)}%`;
+        if (left <= 0) finish();
+      }, 1000);
+      let poller = window.setTimeout(poll, POLL_MS);
+      stop.addEventListener('click', () => finish(true));
+      stopLive = () => finish(true);
+    }
+
+    intro();
+    return panel;
+  }
+
   function stat(label: string, value: string, note: string) {
     return el('div', { class: 'nc-stat' },
       el('div', { class: 'nc-stat-label' }, label),
@@ -430,7 +695,7 @@ import Layout from '../components/Layout.astro';
       ),
     );
 
-    const parts: Node[] = [summary, findingsPanel(report.findings)];
+    const parts: Node[] = [summary, livePanel(report.node.key, report.node.name), findingsPanel(report.findings)];
     if (heard.length) {
       parts.push(el('div', { class: 'nc-panel' },
         el('div', { class: 'nc-panel-head' },
@@ -461,10 +726,17 @@ import Layout from '../components/Layout.astro';
       case 'ok':
         renderReport(data);
         break;
-      case 'not_found':
+      case 'not_found': {
         renderMessage('bad', 'We haven\'t heard this node',
-          ...data.findings.flatMap((f) => [el('p', {}, f.detail), f.fix ? el('p', {}, f.fix) : null]));
+          ...data.findings.flatMap((f) => [el('p', {}, f.detail), f.fix ? el('p', {}, f.fix) : null]),
+          /^[0-9a-f]{64}$/i.test(data.query) ? null
+            : el('p', {}, 'To test a new node, enter its full public key; you can then run a live test and watch for its first advert.'));
+        // A full key can be watched even before the analyzer has ever heard it.
+        if (/^[0-9a-f]{64}$/i.test(data.query)) {
+          result.append(el('div', { style: 'margin-top:20px' }, livePanel(data.query.toLowerCase(), null)));
+        }
         break;
+      }
       case 'choose': {
         const list = el('ul', { class: 'nc-choices' }, ...data.matches.map((m) => {
           const button = el('button', { type: 'button' },
@@ -487,7 +759,9 @@ import Layout from '../components/Layout.astro';
   async function run(query: string) {
     const trimmed = query.trim();
     if (!trimmed) return;
-    input.value = /^[0-9a-f]{8,64}$/i.test(trimmed) ? trimmed.slice(0, 16) : trimmed;
+    stopLive?.();
+    // Show short keys for known nodes, but keep a full key, which a live test of a new node needs.
+    input.value = trimmed;
     submit.disabled = true;
     result.replaceChildren(el('p', { class: 'nc-loading' }, 'Checking…'));
     try {
@@ -495,6 +769,7 @@ import Layout from '../components/Layout.astro';
       const data = (await response.json()) as Response;
       render(data);
       if (data.status === 'ok') {
+        input.value = data.node.key.slice(0, 16);
         history.replaceState(null, '', `/node-check/${data.node.key.slice(0, 16)}`);
       }
     } catch {

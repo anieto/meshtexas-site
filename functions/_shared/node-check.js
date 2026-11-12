@@ -53,53 +53,68 @@ function plural(count, one, many = `${one}s`) {
   return `${count} ${count === 1 ? one : many}`;
 }
 
-/** One advert and everyone who reported it, best signal first. */
-function summarizeAdvert(advert, iataByObserver) {
+/**
+ * Adverts and everyone who reported them, closest observer first. Several
+ * adverts (a live test where someone sent two) merge into one list; each
+ * observer keeps its shortest path.
+ */
+export function summarizeAdverts(adverts, observerInfo, { withLocation = false } = {}) {
   const seen = new Map();
-  for (const observation of advert.observations || []) {
-    const id = observation.observer_id;
-    const hops = hopsOf(observation);
-    const entry = {
-      name: observation.observer_name || 'Unnamed observer',
-      region: observation.observer_iata || iataByObserver.get(id) || null,
-      hops,
-      snr: round1(observation.snr),
-      rssi: typeof observation.rssi === 'number' ? observation.rssi : null,
-    };
-    // An observer can report several copies; keep its shortest path.
-    const previous = seen.get(id);
-    if (!previous || (hops ?? 99) < (previous.hops ?? 99)) seen.set(id, entry);
+  for (const advert of adverts) {
+    for (const observation of advert.observations || []) {
+      const id = observation.observer_id;
+      const info = observerInfo.get(id) || {};
+      const hops = hopsOf(observation);
+      const entry = {
+        name: observation.observer_name || 'Unnamed observer',
+        region: observation.observer_iata || info.iata || null,
+        hops,
+        snr: round1(observation.snr),
+        rssi: typeof observation.rssi === 'number' ? observation.rssi : null,
+      };
+      if (withLocation) {
+        entry.lat = info.lat ?? null;
+        entry.lon = info.lon ?? null;
+      }
+      const previous = seen.get(id);
+      if (!previous || (hops ?? 99) < (previous.hops ?? 99)) seen.set(id, entry);
+    }
   }
   const observers = [...seen.values()].sort(
     (a, b) => (a.hops ?? 99) - (b.hops ?? 99) || (b.snr ?? -99) - (a.snr ?? -99)
   );
   const regions = [...new Set(observers.map((o) => o.region).filter(Boolean))].sort();
+  const newest = adverts[0] || {};
   return {
-    at: advert.timestamp || advert.first_seen || null,
-    kind: advert.advert_kind || null,
+    at: newest.timestamp || newest.first_seen || null,
+    kind: newest.advert_kind || null,
     observers,
     regions,
   };
+}
+
+function summarizeAdvert(advert, observerInfo) {
+  return summarizeAdverts([advert], observerInfo);
 }
 
 export function buildReport({ detail, health, skew, observers }, now = Date.now()) {
   const node = detail.node || {};
   const role = node.role || health?.node?.role || 'unknown';
   const key = (node.public_key || '').toLowerCase();
-  const iataByObserver = new Map((observers || []).map((o) => [o.id, o.iata]));
+  const observerInfo = new Map((observers || []).map((o) => [o.id, o]));
 
   const transmissions = Array.isArray(detail.recentAdverts) ? detail.recentAdverts : [];
   const adverts = transmissions.filter((t) => t.payload_type === ADVERT);
-  const latestAdvert = adverts[0] ? summarizeAdvert(adverts[0], iataByObserver) : null;
+  const latestAdvert = adverts[0] ? summarizeAdvert(adverts[0], observerInfo) : null;
   const latestFlood = adverts.find((a) => a.advert_kind === 'flood');
   const floodSummary = latestFlood
-    ? (latestFlood === adverts[0] ? latestAdvert : summarizeAdvert(latestFlood, iataByObserver))
+    ? (latestFlood === adverts[0] ? latestAdvert : summarizeAdvert(latestFlood, observerInfo))
     : null;
 
   const direct = (health?.observers || [])
     .map((o) => ({
       name: o.observer_name || 'Unnamed observer',
-      region: iataByObserver.get(o.observer_id) || null,
+      region: observerInfo.get(o.observer_id)?.iata || null,
       snr: round1(o.avgSnr),
       rssi: typeof o.avgRssi === 'number' ? Math.round(o.avgRssi) : null,
       packets: o.packetCount ?? null,
