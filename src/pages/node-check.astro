@@ -5,143 +5,209 @@ import Layout from '../components/Layout.astro';
   title="Node Check — MeshTexas"
   description="Is your MeshCore node getting out? See which observers hear it across Texas, and what to fix if something's wrong."
 >
-  <div class="page-intro">
+  <div class="page-intro nc-intro">
     <div class="container-narrow">
       <h1>Node Check</h1>
-      <p class="hero-sub">Is your node getting out? Enter its name or public key to see which observers across Texas hear it, and what to fix if something looks wrong.</p>
-    </div>
-  </div>
+      <p class="hero-sub">Is your node getting out? See which observers across Texas hear it, and what to fix if something looks wrong.</p>
 
-  <section class="about-section nc-section">
-    <div class="container-narrow">
-      <form class="nc-form" id="nc-form" role="search">
-        <label for="nc-query" class="nc-label">Node name, public key, or shared contact link</label>
-        <div class="nc-input-row">
+      <form class="nc-search" id="nc-form" role="search">
+        <label for="nc-query" class="visually-hidden">Node name, public key, or shared contact link</label>
+        <div class="nc-search-box">
           <input id="nc-query" name="q" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
-            placeholder="e.g. My Repeater, or 292c9cdb…" required maxlength="300">
-          <button type="submit" class="btn btn-accent" id="nc-submit">Check</button>
+            placeholder="Node name, public key, or shared contact link" required maxlength="300">
+          <button type="submit" class="nc-btn nc-btn-primary" id="nc-submit">Check</button>
         </div>
         <p class="nc-mine" id="nc-mine" hidden></p>
       </form>
+    </div>
+  </div>
 
+  <section class="nc-body">
+    <div class="container-narrow">
       <div id="nc-result" aria-live="polite"></div>
 
-      <details class="hint-collapsible nc-help">
-        <summary>Where do I find my node's public key?</summary>
-        <div class="hint-body">
-          <p>In the MeshCore app, a companion's public key is in its settings. For a repeater or room server, it's shown when you log in to manage it. You can also share the node as a contact and paste the link here.</p>
-          <p>The first 8 or more characters of the key are enough. Names work too, but several nodes can share a name.</p>
-        </div>
-      </details>
-      <details class="hint-collapsible nc-help">
-        <summary>How do I send a flood advert?</summary>
-        <div class="hint-body">
-          <p>A flood advert is relayed by every repeater that hears it, so it shows how far your node really reaches. A zero-hop advert only reaches radios in direct range.</p>
-          <p>In the MeshCore app, send an advert and choose Flood. On a repeater or room server, use the <code>advert</code> command. Give it a minute to reach the observers, then check again.</p>
-        </div>
-      </details>
-      <p class="nc-footnote">Results come from the <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener">MeshTexas analyzer ↗</a>, which only hears what reaches one of its observers. They update about every 30 seconds.</p>
+      <div class="nc-help">
+        <h2 class="nc-group-title">Help</h2>
+        <details class="hint-collapsible">
+          <summary>Where do I find my node's public key?</summary>
+          <div class="hint-body">
+            <p>In the MeshCore app, a companion's public key is in its settings. For a repeater or room server, it's shown when you log in to manage it. You can also share the node as a contact and paste the link here.</p>
+            <p>The first 8 or more characters of the key are enough. Names work too, but several nodes can share a name.</p>
+          </div>
+        </details>
+        <details class="hint-collapsible">
+          <summary>How do I send a flood advert?</summary>
+          <div class="hint-body">
+            <p>A flood advert is relayed by every repeater that hears it, so it shows how far your node really reaches. A zero-hop advert only reaches radios in direct range.</p>
+            <p>In the MeshCore app, send an advert and choose Flood. On a repeater or room server, use the <code>advert</code> command. Give it a minute to reach the observers, then check again.</p>
+          </div>
+        </details>
+        <p class="nc-footnote">Results come from the <a href="https://analyzer.meshtexas.org" target="_blank" rel="noopener">MeshTexas analyzer ↗</a>, which only hears what reaches one of its observers. They update about every 30 seconds.</p>
+      </div>
     </div>
   </section>
 </Layout>
 
 <style is:global>
-  .nc-section { padding-top: 0; }
-  .nc-form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; }
-  .nc-label {
-    font-size: 0.8rem; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.06em;
+  .nc-intro { padding-bottom: 40px; }
+  .visually-hidden {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
   }
-  .nc-input-row { display: flex; gap: 10px; }
-  .nc-input-row input {
-    flex: 1; min-width: 0;
-    padding: 10px 12px; font-size: 1rem;
-    background: var(--bg-2); color: var(--text);
-    border: 1px solid var(--border); border-radius: var(--radius);
-  }
-  .nc-input-row input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
-  .nc-input-row .btn { border: 0; cursor: pointer; font: inherit; font-weight: 500; }
-  .nc-input-row .btn:disabled { opacity: 0.6; cursor: progress; }
-  .nc-mine { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
-  .nc-mine button, .nc-linkish {
-    background: none; border: 0; padding: 0; font: inherit;
-    color: var(--accent); cursor: pointer;
-  }
-  .nc-mine button:hover, .nc-linkish:hover { text-decoration: underline; }
 
-  .nc-card {
-    --nc-tone: var(--accent);
-    background: var(--bg-2);
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--nc-tone);
-    border-radius: var(--radius);
-    padding: 20px 22px;
-    margin-bottom: 20px;
+  /* Search, part of the intro */
+  .nc-search { margin-top: 28px; }
+  .nc-search-box {
+    display: flex; gap: 6px; padding: 6px;
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
   }
-  .nc-card.good { --nc-tone: var(--green); }
-  .nc-card.warn { --nc-tone: var(--amber); }
-  .nc-card.bad { --nc-tone: #f85149; }
-  [data-theme="light"] .nc-card.bad { --nc-tone: #cf222e; }
-  .nc-node {
-    display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px;
-    font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;
+  .nc-search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.18); }
+  .nc-search-box input {
+    flex: 1; min-width: 0; border: 0; background: transparent; color: var(--text);
+    padding: 10px 12px; font: inherit; font-size: 1rem;
   }
-  .nc-node strong { color: var(--text); font-size: 1rem; }
-  .nc-role {
-    text-transform: capitalize; font-size: 0.75rem;
-    padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border);
-  }
-  .nc-headline { font-size: 1.35rem; margin: 4px 0 14px; color: var(--nc-tone); }
+  .nc-search-box input:focus { outline: none; }
+  .nc-mine { margin: 10px 2px 0; font-size: 0.85rem; color: var(--text-muted); }
 
-  .nc-findings { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
-  .nc-finding { display: grid; grid-template-columns: 22px 1fr; gap: 0 10px; }
-  .nc-dot {
-    width: 12px; height: 12px; border-radius: 50%; margin-top: 5px;
-    background: var(--text-muted);
+  .nc-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 8px 14px; border-radius: 8px; font: inherit; font-size: 0.875rem; font-weight: 500;
+    border: 1px solid var(--border); background: var(--bg-3); color: var(--text);
+    cursor: pointer; white-space: nowrap; text-decoration: none;
   }
-  .nc-finding.good .nc-dot { background: var(--green); }
-  .nc-finding.warn .nc-dot { background: var(--amber); }
-  .nc-finding.bad .nc-dot { background: #f85149; }
-  [data-theme="light"] .nc-finding.bad .nc-dot { background: #cf222e; }
-  .nc-finding.info .nc-dot { background: transparent; border: 2px solid var(--text-muted); }
-  .nc-finding-title { font-weight: 600; }
-  .nc-finding p { grid-column: 2; margin: 2px 0 0; font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
-  .nc-finding .nc-fix { color: var(--text); }
-  .nc-finding .nc-fix::before { content: 'What to do: '; font-weight: 600; }
+  .nc-btn:hover { border-color: var(--accent); text-decoration: none; color: var(--text); }
+  .nc-btn-primary { background: var(--accent-dim); border-color: var(--accent-dim); color: #fff; padding: 10px 22px; font-size: 0.95rem; }
+  .nc-btn-primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .nc-btn:disabled { opacity: 0.6; cursor: progress; }
+  .nc-linkish { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; }
+  .nc-linkish:hover { text-decoration: underline; }
 
-  .nc-actions { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 18px; font-size: 0.9rem; }
-
-  .nc-heard h3 { font-size: 1rem; margin: 26px 0 4px; }
-  .nc-heard .nc-sub { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 10px; }
-  .nc-table-wrap { overflow-x: auto; }
-  .nc-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-  .nc-table th {
-    text-align: left; font-weight: 500; font-size: 0.75rem; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.05em;
-    padding: 6px 10px; border-bottom: 1px solid var(--border);
+  /* Results */
+  .nc-body { padding: 40px 0 64px; }
+  #nc-result:not(:empty) { margin-bottom: 48px; }
+  .nc-stack { display: flex; flex-direction: column; gap: 20px; }
+  .nc-panel {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px;
+    padding: 24px;
   }
-  .nc-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
-  .nc-table td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .nc-region { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; }
+  .nc-panel > h2, .nc-panel-head h2 { font-size: 1.05rem; margin: 0; letter-spacing: -0.01em; }
+  .nc-panel-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; margin-bottom: 4px; }
+  .nc-panel-sub { margin: 0 0 16px; font-size: 0.875rem; color: var(--text-muted); }
+  .nc-loading { color: var(--text-muted); padding: 8px 2px; }
 
-  .nc-choices { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-direction: column; gap: 8px; }
+  :root { --nc-red: #f85149; }
+  [data-theme="light"] { --nc-red: #cf222e; }
+  .tone-good { --tone: var(--green); }
+  .tone-warn { --tone: var(--amber); }
+  .tone-bad { --tone: var(--nc-red); }
+  .tone-info { --tone: var(--accent); }
+
+  /* Summary */
+  .nc-summary { border-top: 4px solid var(--tone); }
+  .nc-summary-top { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .nc-name { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 6px; word-break: break-word; }
+  .nc-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 0.85rem; color: var(--text-muted); }
+  .nc-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 2px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 500;
+    border: 1px solid var(--border); color: var(--text-muted); text-transform: capitalize;
+  }
+  .nc-key { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; }
+  .nc-status {
+    display: inline-flex; align-items: center; gap: 8px; margin-top: 16px;
+    padding: 6px 14px 6px 10px; border-radius: 999px; font-weight: 600; font-size: 0.95rem;
+    color: var(--tone);
+    background: color-mix(in srgb, var(--tone) 12%, transparent);
+  }
+  .nc-status::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--tone); }
+  .nc-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .nc-stats {
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px;
+    margin-top: 20px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+    background: var(--border);
+  }
+  .nc-stat { background: var(--bg-3); padding: 14px 16px; }
+  .nc-stat-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+  .nc-stat-value { font-size: 1.25rem; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .nc-stat-note { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+
+  /* Findings */
+  .nc-group + .nc-group { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--border); }
+  .nc-group-title {
+    font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--text-muted); margin: 0 0 12px;
+  }
+  .nc-findings { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+  .nc-finding { display: grid; grid-template-columns: 26px 1fr; column-gap: 12px; align-items: start; }
+  .nc-icon {
+    width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+    font-size: 0.8rem; font-weight: 700; line-height: 1;
+    color: var(--tone); background: color-mix(in srgb, var(--tone) 14%, transparent);
+  }
+  .nc-finding-title { font-weight: 600; line-height: 1.4; padding-top: 2px; }
+  .nc-finding p { grid-column: 2; margin: 3px 0 0; font-size: 0.9rem; color: var(--text-muted); line-height: 1.55; }
+  .nc-fix {
+    margin-top: 8px !important; padding: 8px 12px; border-radius: 8px;
+    background: var(--bg-3); color: var(--text) !important;
+  }
+  .nc-fix strong { font-weight: 600; }
+
+  /* Observer lists */
+  .nc-region + .nc-region { margin-top: 18px; }
+  .nc-region-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+  .nc-region-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 600; font-size: 0.8rem;
+    padding: 1px 8px; border-radius: 6px; background: var(--bg-3); border: 1px solid var(--border);
+  }
+  .nc-region-count { font-size: 0.8rem; color: var(--text-muted); }
+  .nc-rows { list-style: none; margin: 0; padding: 0; }
+  .nc-row {
+    display: grid; grid-template-columns: minmax(0, 1fr) 84px 150px; align-items: center; gap: 12px;
+    padding: 9px 4px; border-bottom: 1px solid var(--border); font-size: 0.9rem;
+  }
+  .nc-row:last-child { border-bottom: 0; }
+  .nc-row-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nc-hops {
+    justify-self: start; font-size: 0.75rem; font-weight: 500; padding: 2px 8px; border-radius: 999px;
+    background: var(--bg-3); color: var(--text-muted); white-space: nowrap;
+  }
+  .nc-hops.direct { color: var(--green); background: color-mix(in srgb, var(--green) 14%, transparent); }
+  .nc-signal { display: flex; flex-direction: column; gap: 4px; font-variant-numeric: tabular-nums; }
+  .nc-signal-text { display: flex; justify-content: space-between; gap: 8px; font-size: 0.82rem; }
+  .nc-signal-text .rssi { color: var(--text-muted); }
+  .nc-bar { height: 4px; border-radius: 2px; background: var(--bg-3); overflow: hidden; }
+  .nc-bar span { display: block; height: 100%; border-radius: 2px; background: var(--tone); }
+  .nc-more { margin-top: 8px; font-size: 0.85rem; }
+
+  /* Choices */
+  .nc-choices { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
   .nc-choices button {
     width: 100%; text-align: left; cursor: pointer; font: inherit; color: var(--text);
-    background: var(--bg-3); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline;
+    background: var(--bg-3); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; justify-content: space-between;
   }
   .nc-choices button:hover { border-color: var(--accent); }
-  .nc-choices .nc-meta { font-size: 0.8rem; color: var(--text-muted); }
+  .nc-choice-meta { font-size: 0.8rem; color: var(--text-muted); }
 
-  .nc-help { margin-top: 12px; }
-  .nc-footnote { margin-top: 22px; font-size: 0.8rem; color: var(--text-muted); }
-  .nc-loading { color: var(--text-muted); }
-  .nc-notfound p { margin: 0 0 8px; line-height: 1.6; }
+  .nc-message h2 { color: var(--tone); font-size: 1.2rem; margin: 0 0 10px; }
+  .nc-message p { margin: 0 0 8px; line-height: 1.6; color: var(--text-muted); }
+  .nc-message { border-top: 4px solid var(--tone); }
+
+  /* Help */
+  .nc-help { display: flex; flex-direction: column; gap: 10px; }
+  .nc-help .nc-group-title { margin-bottom: 2px; }
+  .nc-footnote { margin-top: 10px; font-size: 0.8rem; color: var(--text-muted); }
 
   @media (max-width: 640px) {
-    .nc-input-row { flex-direction: column; }
-    .nc-card { padding: 16px; }
-    .nc-table th:nth-child(4), .nc-table td:nth-child(4) { display: none; }
+    .nc-search-box { flex-direction: column; }
+    .nc-panel { padding: 18px; }
+    .nc-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .nc-row { grid-template-columns: minmax(0, 1fr) auto; }
+    .nc-row .nc-signal { grid-column: 1 / -1; }
+    .nc-actions { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+    .nc-actions .nc-btn { padding: 8px 6px; }
   }
 </style>
 
@@ -164,19 +230,21 @@ import Layout from '../components/Layout.astro';
     | { status: 'ambiguous' | 'error'; message: string };
 
   const STORAGE_KEY = 'meshtexas-node-check';
+  const ROWS_PER_REGION = 5;
+  const ICONS: Record<string, string> = { good: '✓', warn: '!', bad: '✕', info: 'i' };
   const form = document.getElementById('nc-form') as HTMLFormElement;
   const input = document.getElementById('nc-query') as HTMLInputElement;
   const submit = document.getElementById('nc-submit') as HTMLButtonElement;
   const result = document.getElementById('nc-result') as HTMLElement;
   const mine = document.getElementById('nc-mine') as HTMLElement;
 
-  function el<K extends keyof HTMLElementTagNameMap>(tag: K, props: Record<string, string> = {}, ...children: (Node | string | null)[]) {
+  function el<K extends keyof HTMLElementTagNameMap>(tag: K, props: Record<string, string> = {}, ...children: (Node | string | null | false)[]) {
     const node = document.createElement(tag);
     for (const [key, value] of Object.entries(props)) {
       if (key === 'class') node.className = value;
       else node.setAttribute(key, value);
     }
-    for (const child of children) if (child != null) node.append(child);
+    for (const child of children) if (child) node.append(child);
     return node;
   }
 
@@ -191,10 +259,35 @@ import Layout from '../components/Layout.astro';
     return `${Math.round(hours / 24)} d ago`;
   }
 
+  function shortDate(iso: string | null) {
+    if (!iso) return 'Not heard';
+    const date = new Date(iso);
+    const today = new Date().toDateString() === date.toDateString();
+    return today
+      ? `Today, ${date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
+      : date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  }
+
+  function hopsLabel(hops: number | null | undefined) {
+    if (hops == null) return el('span', { class: 'nc-hops' }, '—');
+    return hops === 0
+      ? el('span', { class: 'nc-hops direct' }, 'Direct')
+      : el('span', { class: 'nc-hops' }, `${hops} ${hops === 1 ? 'hop' : 'hops'}`);
+  }
+
   function signal(o: Observer) {
-    const snr = o.snr == null ? '' : `${o.snr > 0 ? '+' : ''}${o.snr} dB`;
-    const rssi = o.rssi == null ? '' : `${o.rssi} dBm`;
-    return [snr, rssi].filter(Boolean).join(' · ') || '—';
+    if (o.snr == null && o.rssi == null) return el('span', { class: 'nc-signal' }, '—');
+    // SNR from -15 dB (barely decodable) to +12 dB (strong) fills the bar.
+    const snr = o.snr ?? -15;
+    const fill = Math.max(4, Math.min(100, ((snr + 15) / 27) * 100));
+    const tone = snr >= 5 ? 'good' : snr >= -5 ? 'warn' : 'bad';
+    return el('span', { class: 'nc-signal' },
+      el('span', { class: 'nc-signal-text' },
+        el('span', {}, o.snr == null ? '—' : `${o.snr > 0 ? '+' : ''}${o.snr} dB SNR`),
+        el('span', { class: 'rssi' }, o.rssi == null ? '' : `${o.rssi} dBm`),
+      ),
+      el('span', { class: `nc-bar tone-${tone}`, 'aria-hidden': 'true' }, el('span', { style: `width:${fill}%` })),
+    );
   }
 
   function remembered(): { key: string; name: string } | null {
@@ -214,34 +307,88 @@ import Layout from '../components/Layout.astro';
   function showMine() {
     const saved = remembered();
     if (!saved) { mine.hidden = true; return; }
-    const again = el('button', { type: 'button' }, `Check ${saved.name} again`);
+    const again = el('button', { type: 'button', class: 'nc-linkish' }, saved.name);
     again.addEventListener('click', () => run(saved.key));
-    mine.replaceChildren('Your last check: ', again);
+    mine.replaceChildren('Last checked: ', again);
     mine.hidden = false;
   }
 
-  function findingsList(findings: Finding[]) {
-    return el('ul', { class: 'nc-findings' }, ...findings.map((f) =>
-      el('li', { class: `nc-finding ${f.level}` },
-        el('span', { class: 'nc-dot', 'aria-hidden': 'true' }),
-        el('span', { class: 'nc-finding-title' }, f.title),
-        el('p', {}, f.detail),
-        f.fix ? el('p', { class: 'nc-fix' }, f.fix) : null,
-      )
-    ));
+  function finding(f: Finding) {
+    return el('li', { class: `nc-finding tone-${f.level}` },
+      el('span', { class: 'nc-icon', 'aria-hidden': 'true' }, ICONS[f.level] || 'i'),
+      el('span', { class: 'nc-finding-title' }, f.title),
+      el('p', {}, f.detail),
+      f.fix ? el('p', { class: 'nc-fix' }, el('strong', {}, 'What to do: '), f.fix) : null,
+    );
   }
 
-  function table(headers: string[], rows: (string | Node)[][]) {
-    return el('div', { class: 'nc-table-wrap' },
-      el('table', { class: 'nc-table' },
-        el('thead', {}, el('tr', {}, ...headers.map((h) => el('th', {}, h)))),
-        el('tbody', {}, ...rows.map((cells) => el('tr', {}, ...cells.map((c, i) => el('td', i >= 2 ? { class: 'num' } : {}, c))))),
-      ));
+  function findingsPanel(findings: Finding[]) {
+    const groups: [string, Finding[]][] = [
+      ['Needs attention', findings.filter((f) => f.level === 'bad' || f.level === 'warn')],
+      ['Looking good', findings.filter((f) => f.level === 'good')],
+      ['Good to know', findings.filter((f) => f.level === 'info')],
+    ];
+    return el('div', { class: 'nc-panel' },
+      ...groups.filter(([, list]) => list.length).map(([title, list]) =>
+        el('div', { class: 'nc-group' },
+          el('h3', { class: 'nc-group-title' }, title),
+          el('ul', { class: 'nc-findings' }, ...list.map(finding)),
+        )),
+    );
+  }
+
+  function observerRow(o: Observer, extra: Node | null = null) {
+    return el('li', { class: 'nc-row' },
+      el('span', { class: 'nc-row-name', title: o.name }, o.name),
+      extra ?? hopsLabel(o.hops),
+      signal(o),
+    );
+  }
+
+  /** Observers grouped by region, largest group first, a few rows each. */
+  function byRegion(observers: Observer[], extra?: (o: Observer) => Node) {
+    const groups = new Map<string, Observer[]>();
+    for (const o of observers) {
+      const key = o.region || 'Unknown';
+      groups.set(key, [...(groups.get(key) || []), o]);
+    }
+    // Regions with the closest observer first, matching the order within each.
+    const closest = (list: Observer[]) => Math.min(...list.map((o) => o.hops ?? 99));
+    const ordered = [...groups.entries()].sort((a, b) =>
+      closest(a[1]) - closest(b[1]) || b[1].length - a[1].length || a[0].localeCompare(b[0]));
+    return el('div', {}, ...ordered.map(([region, list]) => {
+      const rows = el('ul', { class: 'nc-rows' }, ...list.slice(0, ROWS_PER_REGION).map((o) => observerRow(o, extra ? extra(o) : null)));
+      const hidden = list.length - ROWS_PER_REGION;
+      let more: HTMLElement | null = null;
+      if (hidden > 0) {
+        more = el('button', { type: 'button', class: 'nc-linkish nc-more' }, `Show ${hidden} more in ${region}`);
+        more.addEventListener('click', () => {
+          rows.append(...list.slice(ROWS_PER_REGION).map((o) => observerRow(o, extra ? extra(o) : null)));
+          more!.remove();
+        });
+      }
+      return el('div', { class: 'nc-region' },
+        el('div', { class: 'nc-region-head' },
+          el('span', { class: 'nc-region-code' }, region),
+          el('span', { class: 'nc-region-count' }, `${list.length} ${list.length === 1 ? 'observer' : 'observers'}`),
+        ),
+        rows,
+        more,
+      );
+    }));
+  }
+
+  function stat(label: string, value: string, note: string) {
+    return el('div', { class: 'nc-stat' },
+      el('div', { class: 'nc-stat-label' }, label),
+      el('div', { class: 'nc-stat-value' }, value),
+      el('div', { class: 'nc-stat-note' }, note),
+    );
   }
 
   function renderReport(report: Report) {
     const shareUrl = `${location.origin}/node-check/${report.node.key.slice(0, 16)}`;
-    const copy = el('button', { type: 'button', class: 'nc-linkish' }, 'Copy link to this check');
+    const copy = el('button', { type: 'button', class: 'nc-btn' }, 'Copy link');
     copy.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(shareUrl);
@@ -250,56 +397,63 @@ import Layout from '../components/Layout.astro';
         copy.textContent = shareUrl;
       }
     });
-    const again = el('button', { type: 'button', class: 'nc-linkish' }, 'Check again');
+    const again = el('button', { type: 'button', class: 'nc-btn' }, 'Check again');
     again.addEventListener('click', () => run(report.node.key));
 
-    const card = el('div', { class: `nc-card ${report.verdict.level}` },
-      el('div', { class: 'nc-node' },
-        el('strong', {}, report.node.name),
-        el('span', { class: 'nc-role' }, report.node.role),
-        el('span', {}, `${report.node.key.slice(0, 8)}…`),
+    const advert = report.latestAdvert;
+    const heard = advert?.observers || [];
+    const nearest = heard.length ? heard[0].hops : null;
+    const level = report.verdict.level;
+
+    const summary = el('div', { class: `nc-panel nc-summary tone-${level}` },
+      el('div', { class: 'nc-summary-top' },
+        el('div', {},
+          el('h2', { class: 'nc-name' }, report.node.name),
+          el('div', { class: 'nc-meta' },
+            el('span', { class: 'nc-chip' }, report.node.role),
+            el('span', { class: 'nc-key', title: report.node.key }, `${report.node.key.slice(0, 16)}…`),
+          ),
+        ),
+        el('div', { class: 'nc-actions' },
+          again,
+          copy,
+          el('a', { class: 'nc-btn', href: report.analyzerUrl, target: '_blank', rel: 'noopener' }, 'Analyzer ↗'),
+        ),
       ),
-      el('h2', { class: 'nc-headline' }, report.verdict.headline),
-      findingsList(report.findings),
-      el('div', { class: 'nc-actions' },
-        again,
-        copy,
-        el('a', { href: report.analyzerUrl, target: '_blank', rel: 'noopener' }, 'See full stats in the analyzer ↗'),
+      el('div', { class: 'nc-status' }, report.verdict.headline),
+      el('div', { class: 'nc-stats' },
+        stat('Last heard', relative(report.node.lastHeard), shortDate(report.node.lastHeard)),
+        stat('Reached', heard.length ? String(heard.length) : '—', heard.length ? `observer${heard.length === 1 ? '' : 's'}, last advert` : 'No recent advert'),
+        stat('Regions', advert?.regions.length ? String(advert.regions.length) : '—', advert?.regions.length ? advert.regions.join(', ') : 'None yet'),
+        stat('Nearest', nearest == null ? '—' : nearest === 0 ? 'Direct' : `${nearest} ${nearest === 1 ? 'hop' : 'hops'}`,
+          report.direct.length ? `${report.direct.length} hear${report.direct.length === 1 ? 's' : ''} it directly` : 'None hear it directly'),
       ),
     );
 
-    const parts: Node[] = [card];
-    const advert = report.latestAdvert;
-    if (advert && advert.observers.length) {
-      parts.push(el('div', { class: 'nc-heard' },
-        el('h3', {}, advert.kind === 'flood' ? 'Who heard its last flood advert' : 'Who heard its last advert'),
-        el('p', { class: 'nc-sub' }, `Sent ${relative(advert.at)}. Closest observers first; 0 hops means the observer heard it directly.`),
-        table(['Observer', 'Region', 'Hops', 'Signal'], advert.observers.map((o) => [
-          o.name,
-          el('span', { class: 'nc-region' }, o.region || '—'),
-          o.hops == null ? '—' : String(o.hops),
-          signal(o),
-        ])),
+    const parts: Node[] = [summary, findingsPanel(report.findings)];
+    if (heard.length) {
+      parts.push(el('div', { class: 'nc-panel' },
+        el('div', { class: 'nc-panel-head' },
+          el('h2', {}, advert!.kind === 'flood' ? 'Who heard its last flood advert' : 'Who heard its last advert'),
+          el('span', { class: 'nc-region-count' }, `Sent ${relative(advert!.at)}`),
+        ),
+        el('p', { class: 'nc-panel-sub' }, 'Grouped by region, closest first. "Direct" means the observer heard it without any repeater in between.'),
+        byRegion(heard),
       ));
     }
     if (report.direct.length) {
-      parts.push(el('div', { class: 'nc-heard' },
-        el('h3', {}, 'Observers that hear it directly'),
-        el('p', { class: 'nc-sub' }, 'Average signal of everything they\'ve heard straight from this node.'),
-        table(['Observer', 'Region', 'Packets', 'Signal'], report.direct.map((o) => [
-          o.name,
-          el('span', { class: 'nc-region' }, o.region || '—'),
-          o.packets == null ? '—' : String(o.packets),
-          signal(o),
-        ])),
+      parts.push(el('div', { class: 'nc-panel' },
+        el('div', { class: 'nc-panel-head' }, el('h2', {}, 'Observers that hear it directly')),
+        el('p', { class: 'nc-panel-sub' }, 'Average signal of everything they\'ve heard straight from this node.'),
+        byRegion(report.direct, (o) => el('span', { class: 'nc-hops' }, o.packets == null ? '—' : `${o.packets} pkts`)),
       ));
     }
-    result.replaceChildren(...parts);
+    result.replaceChildren(el('div', { class: 'nc-stack' }, ...parts));
     remember(report.node.key, report.node.name);
   }
 
-  function renderMessage(level: string, headline: string, body: Node | string) {
-    result.replaceChildren(el('div', { class: `nc-card ${level}` }, el('h2', { class: 'nc-headline' }, headline), body));
+  function renderMessage(level: string, headline: string, ...body: (Node | string | null)[]) {
+    result.replaceChildren(el('div', { class: `nc-panel nc-message tone-${level}` }, el('h2', {}, headline), ...body));
   }
 
   function render(data: Response) {
@@ -308,23 +462,21 @@ import Layout from '../components/Layout.astro';
         renderReport(data);
         break;
       case 'not_found':
-        renderMessage('bad', 'We haven\'t heard this node', el('div', { class: 'nc-notfound' },
-          ...data.findings.flatMap((f) => [el('p', {}, f.detail), f.fix ? el('p', {}, f.fix) : null]),
-        ));
+        renderMessage('bad', 'We haven\'t heard this node',
+          ...data.findings.flatMap((f) => [el('p', {}, f.detail), f.fix ? el('p', {}, f.fix) : null]));
         break;
       case 'choose': {
         const list = el('ul', { class: 'nc-choices' }, ...data.matches.map((m) => {
           const button = el('button', { type: 'button' },
             el('strong', {}, m.name),
-            el('span', { class: 'nc-meta' }, `${m.role} · ${m.key.slice(0, 8)}… · last heard ${relative(m.lastHeard)}`),
+            el('span', { class: 'nc-choice-meta' }, `${m.role} · ${m.key.slice(0, 8)}… · heard ${relative(m.lastHeard)}`),
           );
           button.addEventListener('click', () => run(m.key));
           return el('li', {}, button);
         }));
-        renderMessage('info', 'Which node is yours?', el('div', {},
+        renderMessage('info', 'Which node is yours?',
           el('p', {}, `More than one node matches “${data.query}”. Pick yours, or enter its public key.`),
-          list,
-        ));
+          list);
         break;
       }
       default:
